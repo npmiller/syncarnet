@@ -1,0 +1,62 @@
+@startuml
+
+package fr.insarouen.asi.notesync.tasks
+class Task {
+	-String description
+	-long due
+	-long entry
+	-long modified
+	-String project
+	-Status status
+	-Priority priority
+	-UUID uuid
+	
+	+Task Task(String, long, String, Priority)
+
+	+void setDescription(String)
+	+void setDue(long)
+	+void setProject(String)
+	+void setPriority(Priority)
+
+	+String getDescription()
+	+String getFormattedDue()
+	+long getDue()
+	+String getProject()
+	+Priority getPriority()
+	+UUID getUUID()
+
+	+boolean equals(Object)
+	+int hashCode()
+	+String toString()
+}
+
+enum Priority {
+	HIGH
+	MEDIUM
+	LOW
+}
+
+class TaskList extends LinkedList {
+	+boolean add(Task)
+	+static Tasklist merge(TaskList, TaskList)
+}
+end package
+
+package fr.insarouen.asi.notesync.sync
+
+end package
+
+package fr.insarouen.asi.notesync
+class NoteSync extends Activity {
+	+onCreate(Bundle)
+}
+
+class TaskAdapter extends BaseAdapter {
+	+TaskAdapter(Context, ArrayList<Task>)
+	+getCount()
+	+getItem()
+	+getItemId()
+	+getView()
+}
+end package
+@enduml

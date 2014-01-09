@@ -1,0 +1,5 @@
+*~
+*.swp
+application/bin
+application/gen
+rapport.pdf

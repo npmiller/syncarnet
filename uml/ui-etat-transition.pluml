@@ -1,0 +1,15 @@
+@startuml
+[*] --> NoteSync
+
+state NoteSync {
+	state "Liste des tâches" as TaskList
+	state "Ajout d'une tâche" as TaskAdd
+	state "Édition d'une tâche" as TaskEdit
+	[*] --> TaskList
+	TaskList --> TaskEdit
+	TaskEdit --> TaskList
+	TaskList --> TaskAdd
+	TaskAdd --> TaskList
+}
+NoteSync --> [*]
+@enduml

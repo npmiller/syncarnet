@@ -1,0 +1,26 @@
+@startuml
+[*] --> NoteSync
+
+state NoteSync {
+	state "Liste des tâches" as TaskList
+	state "Ajout d'une tâche" as TaskAdd
+	state "Édition d'une tâche" as TaskEdit
+	[*] --> TaskList
+	TaskList --> TaskEdit
+	TaskEdit --> TaskList
+	TaskList --> TaskAdd
+	TaskAdd --> TaskList
+}
+state Synchronisation {
+	state "Recherche des pairs" as RechercheDesPairs 
+	state "Selection du pair" as SelectionDuPair
+	state "Transfert des tâches" as Transfert
+	[*] --> RechercheDesPairs
+	RechercheDesPairs --> SelectionDuPair
+	SelectionDuPair --> Transfert
+}
+Synchronisation --> [*]
+Synchronisation -left-> TaskList
+TaskList -right-> Synchronisation
+NoteSync --> [*]
+@enduml
