@@ -17,26 +17,6 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 		super.add(i, task);
 		return true;
 	}
-	
-	public static TaskList filterByPriority(TaskList l, Priority p) {
-		TaskList filteredList = new TaskList();
-		for(Task t : l) {
-			if(t.getPriority().equals(p)) {
-				filteredList.add(t);
-			}
-		}
-		return filteredList;
-	}
-	
-	public static TaskList filterByProject(TaskList l, String p) {
-		TaskList filteredList = new TaskList();
-		for(Task t : l) {
-			if(t.getProject().equals(p)) {
-				filteredList.add(t);
-			}
-		}
-		return filteredList;
-	}
 
 	/**
 	 * Merges two TaskLists into one
