@@ -29,6 +29,19 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 		this.tasks = tasks;
 	}
 
+	public void resetData() {
+		tasks = origTasks;
+		notifyDataSetChanged();
+	}
+
+	public void removeTask(int position) {
+		origTasks.remove(tasks.remove(position));
+		notifyDataSetChanged();
+		if(getCount() == 0) {
+			resetData();
+		}
+	}
+
 	@Override
 	public int getCount() {
 		return tasks.size();

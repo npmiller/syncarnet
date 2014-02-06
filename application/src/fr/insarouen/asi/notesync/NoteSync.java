@@ -171,8 +171,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       @Override
 	       public void removeTask(int position) {
-		       tasks.remove(position);
-		       adapter.notifyDataSetChanged();
+		       adapter.removeTask(position);
 	       }
 
 	       @Override
