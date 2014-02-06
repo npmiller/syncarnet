@@ -81,7 +81,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		       tasks = readTaskList();
 		       adapter = new TaskListAdapter(this, tasks);
-		       adapter.getFilter().filter("projet");
 
 		       if(savedInstanceState == null) {
 			       final ActionBar actionBar = getActionBar();

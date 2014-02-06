@@ -87,6 +87,9 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 			case R.id.add:
 				((Callbacks)getActivity()).onAddClick();
 				return true;
+			case R.id.filterByProject:
+				((TaskListAdapter)getListAdapter()).getFilter().filter("projet");
+				return true;
 			default:
 				return getActivity().onOptionsItemSelected(item);
 		}

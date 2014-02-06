@@ -26,6 +26,7 @@
     <string name="findingPeers">Finding peers</string>
     <string name="discoveryInitiated">Discovery initiated</string>
     <string name="discoveryFailed">Discovery failed : </string>
+    <string name="filterByProject">Filter by project</string>
     <string-array name="priorities">
         <item>Low</item>
         <item>Medium</item>
