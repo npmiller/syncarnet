@@ -35,9 +35,6 @@ public class PeerSelection implements OnPeerSelected {
 		WifiP2pConfig config = new WifiP2pConfig();
 		config.deviceAddress = device.deviceAddress;
 		config.wps.setup = WpsInfo.PBC;
-		if (progressDialog != null && progressDialog.isShowing()) {
-			progressDialog.dismiss();
-		}
 		progressDialog = ProgressDialog.show(noteSync, noteSync.getString(R.string.backCancel),
 		noteSync.getString(R.string.connectingTo) + device.deviceAddress, true, true
 		);

@@ -195,9 +195,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 
 	       public void onInitiateDiscovery() {
-		       //if (progressDialog != null && progressDialog.isShowing()) {
-		       //progressDialog.dismiss();
-		       //}
 		       progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
 				       true, new DialogInterface.OnCancelListener() {
 					       @Override
@@ -235,9 +232,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       public void onPeerSelection(PeerListDialog peerListDialog) {
 		       this.peerListDialog = peerListDialog;
-		       if (progressDialog != null && progressDialog.isShowing()) {
-			       progressDialog.dismiss();
-		       }
 		       if (!isConnected && !isConnecting)
 			       peerListDialog.show(getFragmentManager(), "PeerListDialog");
 	       }
