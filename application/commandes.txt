@@ -4,3 +4,9 @@
 		$ android avd
 3. Déployer l'application sur la machine virtuelle :
 		$ adb install bin/notesync-debug-unaligned.apk
+4. Débuggage : 
+		$ adb -s WIKO logcat NoteSync:D "*":S
+	pour n'avoir que les logs 
+	taggués "NoteSync"
+		$ adb -s WIKO logcat 
+	pour tout avoir

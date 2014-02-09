@@ -3,6 +3,7 @@ package fr.insarouen.asi.notesync.sync;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -63,9 +64,11 @@ public class TaskListTransferService extends IntentService {
 
 				noteSync.showToast(noteSync.getString(R.string.successSync));
 			} catch (IOException e) {
-				noteSync.showToast("IOException");
+				noteSync.showToast(noteSync.getString(R.string.IOException));
+				Log.d("NoteSync","IOException : "+e.getStackTrace().toString());
 			} catch (ClassNotFoundException e) {
-				noteSync.showToast("ClassNotFoundException");
+				noteSync.showToast(noteSync.getString(R.string.ClassNotFoundException));
+				Log.d("NoteSync","ClassNotFoundException : "+e.getStackTrace().toString());
 			} finally {
 				socketClose(socket);
 				socketClose(client);
@@ -116,11 +119,13 @@ public class TaskListTransferService extends IntentService {
 				return "succes";
 			}
 			catch (IOException e) {
-				noteSync.showToast("IOException 2");
+				noteSync.showToast(noteSync.getString(R.string.IOException));
+				Log.d("NoteSync","IOException : "+e.getStackTrace().toString());
 				return null;
 			}
 			catch (ClassNotFoundException e) {
-				noteSync.showToast("ClassNotFoundException 2");
+				noteSync.showToast(noteSync.getString(R.string.ClassNotFoundException));
+				Log.d("NoteSync","ClassNotFoundException : "+e.getStackTrace().toString());
 				return null;
 			}
 		}

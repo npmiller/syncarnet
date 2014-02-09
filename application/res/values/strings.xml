@@ -22,11 +22,13 @@
     <string name="backCancel">Press back to cancel</string>
     <string name="syncing">Synchronizing</string>
     <string name="connectingTo">Connecting to : </string>
-    <string name="connectFailed">Connect failed ; retry</string>
+    <string name="connectFailed">Connect failed ; please try again </string>
     <string name="findingPeers">Finding peers</string>
     <string name="discoveryInitiated">Discovery initiated</string>
-    <string name="discoveryFailed">Discovery failed : </string>
     <string name="filterByProject">Filter by project</string>
+    <string name="discoveryFailed">Discovery failed ; please reactivate Wifi and try again </string>
+    <string name="IOException">An error occured while transfering ; please try again</string>
+    <string name="ClassNotFoundException">An error occured while rebuilding tasks ; please try again</string>
     <string-array name="priorities">
         <item>Low</item>
         <item>Medium</item>

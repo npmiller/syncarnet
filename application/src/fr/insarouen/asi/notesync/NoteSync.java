@@ -20,6 +20,8 @@ import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 
 import android.os.Bundle;
 
+import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
@@ -192,9 +194,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 
 	       public void onInitiateDiscovery() {
-		       //if (progressDialog != null && progressDialog.isShowing()) {
-		       //progressDialog.dismiss();
-		       //}
 		       progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
 				       true, new DialogInterface.OnCancelListener() {
 					       @Override
@@ -212,8 +211,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		       @Override
 		       public void onFailure(int reasonCode) {
-			       Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed) + reasonCode,
+			       Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed),
 				       Toast.LENGTH_SHORT).show();
+			       Log.d("NoteSync","Discovery failed : "+reasonCode);
 			       if (NoteSync.this.progressDialog != null && NoteSync.this.progressDialog.isShowing()) {
 				       NoteSync.this.progressDialog.dismiss();
 			       }
@@ -231,9 +231,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       public void onPeerSelection(PeerListDialog peerListDialog) {
 		       this.peerListDialog = peerListDialog;
-		       if (progressDialog != null && progressDialog.isShowing()) {
-			       progressDialog.dismiss();
-		       }
 		       if (!isConnected && !isConnecting)
 			       peerListDialog.show(getFragmentManager(), "PeerListDialog");
 	       }
