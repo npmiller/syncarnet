@@ -20,6 +20,8 @@ import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 
 import android.os.Bundle;
 
+import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
@@ -213,8 +215,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		       @Override
 		       public void onFailure(int reasonCode) {
-			       Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed) + reasonCode,
+			       Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed),
 				       Toast.LENGTH_SHORT).show();
+			       Log.d("NoteSync","Discovery failed : "+reasonCode);
 			       if (NoteSync.this.progressDialog != null && NoteSync.this.progressDialog.isShowing()) {
 				       NoteSync.this.progressDialog.dismiss();
 			       }

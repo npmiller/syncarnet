@@ -8,6 +8,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.WpsInfo;
+import android.util.Log;
 import android.widget.Toast;
 
 import fr.insarouen.asi.notesync.*;
@@ -50,6 +51,8 @@ public class PeerSelection implements OnPeerSelected {
 			public void onFailure(int reason) {
 				Toast.makeText(noteSync, noteSync.getString(R.string.connectFailed),
 				Toast.LENGTH_SHORT).show();
+				Log.d("NoteSync","Connect failed : "+reason);
+				
 			}
 		});
 		noteSync.setConnecting(true);
