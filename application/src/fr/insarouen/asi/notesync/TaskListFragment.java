@@ -20,7 +20,10 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 
-public class TaskListFragment extends ListFragment implements OnItemLongClickListener {
+import android.util.Log;
+
+public class TaskListFragment extends ListFragment implements OnItemLongClickListener,
+							      ProjectFilterDialog.ProjectFilterListener {
 
 	public interface Callbacks {
 		public TaskList getTasks();
@@ -78,6 +81,12 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 	}
 
 	@Override
+	public void filterByProject(String project) {
+		((TaskListAdapter)getListAdapter()).getFilter().filter(project);
+		Log.d("NoteSync", project);
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
@@ -88,7 +97,7 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 				((Callbacks)getActivity()).onAddClick();
 				return true;
 			case R.id.filterByProject:
-				((TaskListAdapter)getListAdapter()).getFilter().filter("projet");
+				(new ProjectFilterDialog(this)).show(getFragmentManager(), "ProjectFilter");
 				return true;
 			default:
 				return getActivity().onOptionsItemSelected(item);

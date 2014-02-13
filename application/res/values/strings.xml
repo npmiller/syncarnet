@@ -13,6 +13,7 @@
     <string name="choosepeer">Choose a peer : </string>
     <string name="description">Description</string>
     <string name="project">Project</string>
+    <string name="filter">Filter</string>
     <string name="clearDate">Clear date</string>
     <string name="nowifi">Wifi is not turned on</string>
     <string name="successSync">Synchronization successful</string>
