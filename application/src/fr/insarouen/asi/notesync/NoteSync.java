@@ -187,9 +187,13 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       @Override
 	       public void onSyncClick() {
-		       receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-		       registerReceiver(receiver, intentFilter);
-		       onInitiateDiscovery();
+		       if (!isConnected){
+			       receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
+			       registerReceiver(receiver, intentFilter);
+			       onInitiateDiscovery();
+		       } else {
+			       this.peerListDialog.reconnect(this);
+		       }
 	       }
 
 
@@ -232,18 +236,20 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       public void onPeerSelection(PeerListDialog peerListDialog) {
 		       this.peerListDialog = peerListDialog;
-		       if (!isConnected && !isConnecting)
+		       if (!isConnected && !isConnecting && !peerListDialog.peerListEmpty())
 			       peerListDialog.show(getFragmentManager(), "PeerListDialog");
 	       }
 
 	       public void setConnected(boolean isConnected) {
 		       this.isConnected = isConnected;
-		       if (peerListDialog != null) {
-			       peerListDialog.getPeerSelection().setConnected();
-			       peerListDialog.dismiss();
-		       }
-		       if (progressDialog != null && progressDialog.isShowing()) {
-			       progressDialog.dismiss();
+		       if (isConnected){
+			       if (peerListDialog != null) {
+				       peerListDialog.getPeerSelection().setConnected();
+				       peerListDialog.dismiss();
+			       }
+			       if (progressDialog != null && progressDialog.isShowing()) {
+				       progressDialog.dismiss();
+			       }
 		       }
 	       }
 
