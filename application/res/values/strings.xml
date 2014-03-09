@@ -13,6 +13,7 @@
     <string name="choosepeer">Choose a peer : </string>
     <string name="description">Description</string>
     <string name="project">Project</string>
+    <string name="filter">Filter</string>
     <string name="clearDate">Clear date</string>
     <string name="nowifi">Wifi is not turned on</string>
     <string name="successSync">Synchronization successful</string>
@@ -25,6 +26,8 @@
     <string name="connectFailed">Connect failed ; please try again </string>
     <string name="findingPeers">Finding peers</string>
     <string name="discoveryInitiated">Discovery initiated</string>
+    <string name="filterByProject">Filter by project</string>
+    <string name="clearFilter">Clear filter</string>
     <string name="discoveryFailed">Discovery failed ; please reactivate Wifi and try again </string>
     <string name="IOException">An error occured while transfering ; please try again</string>
     <string name="ClassNotFoundException">An error occured while rebuilding tasks ; please try again</string>

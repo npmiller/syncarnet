@@ -7,4 +7,10 @@
 		android:icon="@drawable/ic_action_new"
 		android:title="@string/add" 
 		android:showAsAction="ifRoom" />
+	<item android:id="@+id/filterByProject"
+		android:title="@string/filterByProject"
+		/>
+	<item android:id="@+id/clearFilter"
+		android:title="@string/clearFilter"
+		/>
 </menu>

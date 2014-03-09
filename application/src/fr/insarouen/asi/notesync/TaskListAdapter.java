@@ -8,20 +8,38 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
 
+import android.widget.Filter;
+//import android.widget.Filter.FilterResults;
 import android.widget.TextView;
+import android.widget.Filterable;
 import android.widget.BaseAdapter;
 
-public class TaskListAdapter extends BaseAdapter {
+public class TaskListAdapter extends BaseAdapter implements Filterable {
 	private TaskList tasks;
+	private TaskList origTasks;
 	private LayoutInflater inflater;
 
 	public TaskListAdapter(Context context, TaskList tasks) {
 		inflater = LayoutInflater.from(context);
 		this.tasks = tasks;
+		this.origTasks = tasks;
 	}
 
 	public void setTasks(TaskList tasks) {
 		this.tasks = tasks;
+	}
+
+	public void resetData() {
+		tasks = origTasks;
+		notifyDataSetChanged();
+	}
+
+	public void removeTask(int position) {
+		origTasks.remove(tasks.remove(position));
+		notifyDataSetChanged();
+		if(getCount() == 0) {
+			resetData();
+		}
 	}
 
 	@Override
@@ -65,5 +83,41 @@ public class TaskListAdapter extends BaseAdapter {
 		holder.project.setText(tasks.get(position).getProject());
 		
 		return convertView;
+	}
+
+	@Override
+	public Filter getFilter() {
+		return new ProjectFilter();
+	}
+
+	private class ProjectFilter extends Filter {
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
+			FilterResults r = new FilterResults();
+			if(constraint == null || constraint.length() == 0) {
+				r.values = tasks;
+				r.count = tasks.size();
+			} else {
+				TaskList filtered = new TaskList();
+				for(Task t : tasks) {
+					if(t.getProject().equals(constraint.toString())) {
+						filtered.add(t);
+					}
+				}
+				r.values = filtered;
+				r.count = filtered.size();
+			}
+			return r;
+		}
+
+		@Override
+		protected void publishResults(CharSequence constraint, FilterResults results) {
+			if(results.count == 0) {
+				notifyDataSetInvalidated();
+			} else {
+				tasks = (TaskList) results.values;
+				notifyDataSetChanged();
+			}
+		}
 	}
 }
