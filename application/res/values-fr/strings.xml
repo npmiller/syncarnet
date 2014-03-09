@@ -13,6 +13,7 @@
     <string name="choosepeer">Choisissez un pair : </string>
     <string name="description">Description</string>
     <string name="project">Projet</string>
+    <string name="filter">Filtrer</string>
     <string name="clearDate">Retirer la date</string>
     <string name="nowifi">Le wifi n\'est pas activé</string>
     <string name="successSync">Synchronization effectuée avec succès</string>
@@ -25,6 +26,8 @@
     <string name="connectFailed">La connexion a échoué ; veuillez réessayer</string>
     <string name="findingPeers">Recherche des pairs en cours</string>
     <string name="discoveryInitiated">Découverte des pairs lancée</string>
+    <string name="filterByProject">Filtrer par projet</string>
+    <string name="clearFilter">Supprimer les filtres</string>
     <string name="discoveryFailed">La découverte des pairs à échoué ; veuillez réactiver le Wifi et réessayer </string>
     <string name="IOException">Une erreur de transfert est apparue ; veuillez réessayer</string>
     <string name="ClassNotFoundException">Une erreur dans la reconstruction des tâches est apparue ; veuillez réessayer</string>

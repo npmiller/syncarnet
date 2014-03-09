@@ -83,7 +83,6 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 	@Override
 	public void filterByProject(String project) {
 		((TaskListAdapter)getListAdapter()).getFilter().filter(project);
-		Log.d("NoteSync", project);
 	}
 
 	@Override
@@ -98,6 +97,9 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 				return true;
 			case R.id.filterByProject:
 				(new ProjectFilterDialog(this)).show(getFragmentManager(), "ProjectFilter");
+				return true;
+			case R.id.clearFilter:
+				((TaskListAdapter)getListAdapter()).resetData();
 				return true;
 			default:
 				return getActivity().onOptionsItemSelected(item);

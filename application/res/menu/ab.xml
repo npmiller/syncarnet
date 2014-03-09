@@ -10,4 +10,7 @@
 	<item android:id="@+id/filterByProject"
 		android:title="@string/filterByProject"
 		/>
+	<item android:id="@+id/clearFilter"
+		android:title="@string/clearFilter"
+		/>
 </menu>
