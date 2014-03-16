@@ -8,9 +8,6 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -60,16 +57,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 	       private BroadcastReceiver receiver = null;
 	       private ProgressDialog progressDialog = null;
 	       private PeerListDialog peerListDialog;
-		   // Message types sent from the BluetoothChatService Handler
-		   public static final int MESSAGE_STATE_CHANGE = 1;
-		   public static final int MESSAGE_READ = 2;
-		   public static final int MESSAGE_WRITE = 3;
-		   public static final int MESSAGE_DEVICE_NAME = 4;
-		   public static final int MESSAGE_TOAST = 5;
-		   // Intent request codes
-		   private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
-		   private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
-		   private static final int REQUEST_ENABLE_BT = 3;
 
 	       private final IntentFilter intentFilter = new IntentFilter();
 
@@ -106,15 +93,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 			       ft.replace(R.id.container, new TaskListFragment());
 			       ft.commit();
 		       }
-			   // Get local Bluetooth adapter
-			   mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-			   // If the adapter is null, then Bluetooth is not supported
-			   if (mBluetoothAdapter == null) {
-				   Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-				   finish();
-				   return;
-			   }
 	       }
 
 	       @Override
@@ -155,9 +133,12 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       /* TaskEditFragment */
 	       @Override
-	       public void replaceTask(Task t, boolean orderChanged) {
-		       if(orderChanged) {
-			       tasks.remove(t);
+	       public void replaceTask(Task t, int taskListPosition) {
+		       Task t2 = tasks.get(taskListPosition);
+		       if(t.getDue() != null && t.getDue().equals(t2.getDue()) && t.getPriority().equals(t2.getPriority())) {
+			       tasks.set(taskListPosition, t);
+		       } else {
+			       tasks.remove(taskListPosition);
 			       addTask(t);
 		       }
 		       adapter.notifyDataSetChanged();
@@ -183,7 +164,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 	       @Override
 	       public void showDetails(int position) {
 		       FragmentTransaction ft = getFragmentManager().beginTransaction();
-		       ft.replace(R.id.container, new TaskEditFragment((Task)adapter.getItem(position)));
+		       ft.replace(R.id.container, new TaskEditFragment(tasks.get(position), position));
 		       ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		       ft.addToBackStack(null);
 		       ft.commit();
@@ -191,9 +172,8 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       @Override
 	       public void removeTask(int position) {
-		       //tasks.remove(adapter.getItem(position));
-		       //adapter.notifyDataSetChanged();
-		       adapter.removeTask(position);
+		       tasks.remove(position);
+		       adapter.notifyDataSetChanged();
 	       }
 
 	       @Override
@@ -207,13 +187,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       @Override
 	       public void onSyncClick() {
-		       if (!isConnected){
-			       receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-			       registerReceiver(receiver, intentFilter);
-			       onInitiateDiscovery();
-		       } else {
-			       this.peerListDialog.reconnect(this);
-		       }
+		       receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
+		       registerReceiver(receiver, intentFilter);
+		       onInitiateDiscovery();
 	       }
 
 
@@ -256,20 +232,18 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       public void onPeerSelection(PeerListDialog peerListDialog) {
 		       this.peerListDialog = peerListDialog;
-		       if (!isConnected && !isConnecting && !peerListDialog.peerListEmpty())
+		       if (!isConnected && !isConnecting)
 			       peerListDialog.show(getFragmentManager(), "PeerListDialog");
 	       }
 
 	       public void setConnected(boolean isConnected) {
 		       this.isConnected = isConnected;
-		       if (isConnected){
-			       if (peerListDialog != null) {
-				       peerListDialog.getPeerSelection().setConnected();
-				       peerListDialog.dismiss();
-			       }
-			       if (progressDialog != null && progressDialog.isShowing()) {
-				       progressDialog.dismiss();
-			       }
+		       if (peerListDialog != null) {
+			       peerListDialog.getPeerSelection().setConnected();
+			       peerListDialog.dismiss();
+		       }
+		       if (progressDialog != null && progressDialog.isShowing()) {
+			       progressDialog.dismiss();
 		       }
 	       }
 

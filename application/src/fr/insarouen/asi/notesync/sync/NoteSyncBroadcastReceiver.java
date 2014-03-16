@@ -49,7 +49,6 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 				noteSync.setIsWifiP2pEnabled(true);
 			} else {
 				noteSync.setIsWifiP2pEnabled(false);
-				noteSync.setConnected(false);
 				progressDialog = noteSync.getProgressDialog();
 				if (progressDialog != null && progressDialog.isShowing()) {
 					progressDialog.dismiss();
@@ -83,8 +82,6 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 				Toast.makeText(noteSync, noteSync.getString(R.string.connexionSuccessful), Toast.LENGTH_SHORT).show();
 				peerList.setIntent(intent);
 				manager.requestConnectionInfo(channel, peerList);
-			} else {
-				noteSync.setConnected(false);
 			}
 		}
 	}

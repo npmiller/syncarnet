@@ -20,10 +20,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 
-import android.util.Log;
-
-public class TaskListFragment extends ListFragment implements OnItemLongClickListener,
-							      ProjectFilterDialog.ProjectFilterListener {
+public class TaskListFragment extends ListFragment implements OnItemLongClickListener {
 
 	public interface Callbacks {
 		public TaskList getTasks();
@@ -81,11 +78,6 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 	}
 
 	@Override
-	public void filterByProject(String project) {
-		((TaskListAdapter)getListAdapter()).getFilter().filter(project);
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
@@ -94,12 +86,6 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 				return true;
 			case R.id.add:
 				((Callbacks)getActivity()).onAddClick();
-				return true;
-			case R.id.filterByProject:
-				(new ProjectFilterDialog(this)).show(getFragmentManager(), "ProjectFilter");
-				return true;
-			case R.id.clearFilter:
-				((TaskListAdapter)getListAdapter()).resetData();
 				return true;
 			default:
 				return getActivity().onOptionsItemSelected(item);
