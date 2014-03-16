@@ -212,11 +212,23 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		   @Override
 		   public void onSyncClick() {
-			   receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-			   registerReceiver(receiver, intentFilter);
-			   onInitiateDiscovery();
+			   //receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
+			   //registerReceiver(receiver, intentFilter);
+			   //onInitiateDiscovery();
+			   Intent serverIntent = null;
+			   serverIntent = new Intent(this, DeviceListActivity.class);
+			   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
 		   }
 
+
+		   private void ensureDiscoverable() {
+			   if (mBluetoothAdapter.getScanMode() !=
+					   BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+				   Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+				   discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+				   startActivity(discoverableIntent);
+					   }
+		   }
 
 
 		   public void onInitiateDiscovery() {
