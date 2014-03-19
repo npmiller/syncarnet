@@ -25,7 +25,7 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 	 * Returns whether or not a Task has been deleted from the TaskList
 	 */
 	public boolean deleted(Task task) {
-		return deletedTasks.contains(task);
+		return deletedTasks.contains(task.getUUID());
 	}
 
 	/**
