@@ -68,6 +68,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 		   public static final int MESSAGE_WRITE = 3;
 		   public static final int MESSAGE_DEVICE_NAME = 4;
 		   public static final int MESSAGE_TOAST = 5;
+		   // Key names received from the BluetoothChatService Handler
+		   public static final String DEVICE_NAME = "device_name";
+		   public static final String TOAST = "toast";
 		   // Intent request codes
 		   private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
 		   private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
@@ -76,6 +79,8 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 		   private String mConnectedDeviceName = null;
 		   // Local Bluetooth adapter
 		   private BluetoothAdapter mBluetoothAdapter = null;
+		   // Member object for the chat services
+		   private SyncBTService mChatService = null;
 
 		   private final IntentFilter intentFilter = new IntentFilter();
 
@@ -226,13 +231,53 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 				   //registerReceiver(receiver, intentFilter);
 				   //onInitiateDiscovery();
 				   Intent serverIntent = null;
-				   serverIntent = new Intent(this, DeviceListActivity.class);
-				   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+				   serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
+				   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 			   } else {
 				   this.peerListDialog.reconnect(this);
 			   }
 		   }
 
+		   public void onActivityResult(int requestCode, int resultCode, Intent data) {
+			   switch (requestCode) {
+				   case REQUEST_CONNECT_DEVICE_SECURE:
+					   // When DeviceListActivity returns with a device to connect
+					   if (resultCode == Activity.RESULT_OK) {
+						   connectDevice(data, true);
+					   }
+					   break;
+				   case REQUEST_CONNECT_DEVICE_INSECURE:
+					   // When DeviceListActivity returns with a device to connect
+					   if (resultCode == Activity.RESULT_OK) {
+						   connectDevice(data, false);
+					   }
+					   break;
+				   case REQUEST_ENABLE_BT:
+					   // When the request to enable Bluetooth returns
+					   if (resultCode == Activity.RESULT_OK) {
+						   // Bluetooth is now enabled, so set up a chat session
+						   //setupChat();
+						   Toast.makeText(this, "activity result ok de enable bt", Toast.LENGTH_SHORT).show();
+					   } else {
+						   // User did not enable Bluetooth or an error occurred
+						   //Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
+						   Toast.makeText(this, "bt pas mis", Toast.LENGTH_SHORT).show();
+						   finish();
+					   }
+			   }
+		   }
+
+		   private void connectDevice(Intent data, boolean secure) {
+			   // Get the device MAC address
+			   String address = data.getExtras()
+				   .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+			   // Get the BluetoothDevice object
+			   BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+			   // Attempt to connect to the device
+			   // Initialize the BluetoothChatService to perform bluetooth connections
+			   mChatService = new SyncBTService(this);
+			   mChatService.connect(device, secure);
+		   }
 
 		   private void ensureDiscoverable() {
 			   if (mBluetoothAdapter.getScanMode() !=
