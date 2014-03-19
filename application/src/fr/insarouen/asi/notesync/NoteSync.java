@@ -10,6 +10,9 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -59,6 +62,12 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 		   private BroadcastReceiver receiver = null;
 		   private ProgressDialog progressDialog = null;
 		   private PeerListDialog peerListDialog;
+		   // Message types sent from the BluetoothChatService Handler
+		   public static final int MESSAGE_STATE_CHANGE = 1;
+		   public static final int MESSAGE_READ = 2;
+		   public static final int MESSAGE_WRITE = 3;
+		   public static final int MESSAGE_DEVICE_NAME = 4;
+		   public static final int MESSAGE_TOAST = 5;
 		   // Intent request codes
 		   private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
 		   private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
@@ -212,12 +221,16 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		   @Override
 		   public void onSyncClick() {
-			   //receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-			   //registerReceiver(receiver, intentFilter);
-			   //onInitiateDiscovery();
-			   Intent serverIntent = null;
-			   serverIntent = new Intent(this, DeviceListActivity.class);
-			   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+			   if (!isConnected){
+				   //receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
+				   //registerReceiver(receiver, intentFilter);
+				   //onInitiateDiscovery();
+				   Intent serverIntent = null;
+				   serverIntent = new Intent(this, DeviceListActivity.class);
+				   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+			   } else {
+				   this.peerListDialog.reconnect(this);
+			   }
 		   }
 
 
@@ -269,18 +282,20 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		   public void onPeerSelection(PeerListDialog peerListDialog) {
 			   this.peerListDialog = peerListDialog;
-			   if (!isConnected && !isConnecting)
+			   if (!isConnected && !isConnecting && !peerListDialog.peerListEmpty())
 				   peerListDialog.show(getFragmentManager(), "PeerListDialog");
 		   }
 
 		   public void setConnected(boolean isConnected) {
 			   this.isConnected = isConnected;
-			   if (peerListDialog != null) {
-				   peerListDialog.getPeerSelection().setConnected();
-				   peerListDialog.dismiss();
-			   }
-			   if (progressDialog != null && progressDialog.isShowing()) {
-				   progressDialog.dismiss();
+			   if (isConnected){
+				   if (peerListDialog != null) {
+					   peerListDialog.getPeerSelection().setConnected();
+					   peerListDialog.dismiss();
+				   }
+				   if (progressDialog != null && progressDialog.isShowing()) {
+					   progressDialog.dismiss();
+				   }
 			   }
 		   }
 
