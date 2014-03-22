@@ -4,6 +4,7 @@ import fr.insarouen.asi.notesync.tasks.*;
 
 import android.app.AlertDialog;
 import android.app.ListFragment;
+import android.app.ActionBar;
 
 import android.os.Bundle;
 
@@ -15,15 +16,19 @@ import android.view.MenuInflater;
 import android.widget.ListView;
 import android.widget.ListAdapter;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemLongClickListener;
 
+import java.util.ArrayList;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 
 import android.util.Log;
 
 public class TaskListFragment extends ListFragment implements OnItemLongClickListener,
-							      ProjectFilterDialog.ProjectFilterListener {
+							      ProjectFilterDialog.ProjectFilterListener,
+							      ActionBar.OnNavigationListener
+{
 
 	public interface Callbacks {
 		public TaskList getTasks();
@@ -34,6 +39,7 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		public void onAddClick();
 	}
 
+	private ArrayAdapter<String> adapter;
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -41,6 +47,25 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		this.setListAdapter(((Callbacks)getActivity()).getTasksAdapter());
 		getListView().setOnItemLongClickListener(this);
 		setHasOptionsMenu(true);
+		ActionBar ab = getActivity().getActionBar();
+		ab.setDisplayShowTitleEnabled(false);
+		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		adapter = new ArrayAdapter<String>(ab.getThemedContext(),android.R.layout.simple_spinner_item);
+		adapter.add("All projects");
+		adapter.add("projet1");
+		adapter.add("test");
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ab.setListNavigationCallbacks(adapter, this);
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		if(itemPosition == 0) {
+			((TaskListAdapter)getListAdapter()).resetData();
+		} else {
+			filterByProject(adapter.getItem(itemPosition));
+		}
+		return true;
 	}
 
 	@Override
