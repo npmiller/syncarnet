@@ -5,6 +5,7 @@ import fr.insarouen.asi.notesync.tasks.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import java.util.Calendar;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -116,5 +117,31 @@ public class TaskListTest {
 		assertEquals("t22", tf.get(3).getDescription());
 		assertEquals("t12", tf.get(4).getDescription());
 		assertEquals(5, tf.size());
+	}
+
+	@Test
+	public void test_projects() {
+		TaskList tl1 = new TaskList();
+		Task t1 = new Task("t1", null, "projet", Priority.MEDIUM);
+		Task t2 = new Task("t2", null, "projet1", Priority.LOW);
+		Task t3 = new Task("t3", null, "projet", Priority.HIGH);
+		Task t4 = new Task("t4", null, "projet1", Priority.HIGH);
+		tl1.add(t1);
+		tl1.add(t2);
+		tl1.add(t3);
+		tl1.add(t4);
+		ArrayList<String> p = tl1.getProjects();
+		assertEquals(2, p.size());
+		assertTrue(p.contains("projet"));
+		assertTrue(p.contains("projet1"));
+		tl1.remove(t1);
+		assertTrue(p.contains("projet"));
+		tl1.remove(t3);
+		assertFalse(p.contains("projet"));
+		tl1.remove(0);
+		assertTrue(p.contains("projet1"));
+		tl1.remove(0);
+		assertFalse(p.contains("projet1"));
+		assertTrue(p.isEmpty());
 	}
 }
