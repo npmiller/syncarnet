@@ -94,6 +94,7 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 			FilterResults r = new FilterResults();
+			tasks = origTasks;
 			if(constraint == null || constraint.length() == 0) {
 				r.values = tasks;
 				r.count = tasks.size();
