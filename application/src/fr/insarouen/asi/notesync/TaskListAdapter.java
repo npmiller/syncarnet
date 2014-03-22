@@ -13,16 +13,54 @@ import android.widget.Filter;
 import android.widget.TextView;
 import android.widget.Filterable;
 import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
+
+import java.util.List;
 
 public class TaskListAdapter extends BaseAdapter implements Filterable {
 	private TaskList tasks;
 	private TaskList origTasks;
 	private LayoutInflater inflater;
+	private ProjectsAdapter projects;
 
 	public TaskListAdapter(Context context, TaskList tasks) {
 		inflater = LayoutInflater.from(context);
 		this.tasks = tasks;
 		this.origTasks = tasks;
+		projects = new ProjectsAdapter(context, android.R.layout.simple_spinner_item, tasks.getProjects());
+	}
+	
+	public ProjectsAdapter getProjectsAdapter() {
+		return projects;
+	}
+	
+	public class ProjectsAdapter extends ArrayAdapter<String> {
+		public ProjectsAdapter(Context context, int resource, List<String> projects) {
+			super(context, resource, projects);
+		}
+
+		@Override
+		public String getItem(int position) {
+			if(position==0) {
+				return getContext().getString(R.string.AllProjects);
+			} else {
+				return super.getItem(position - 1);
+			}
+		}
+
+		@Override
+		public int getCount() {
+			return super.getCount() + 1;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			if(position == 0) {
+				return 45122;
+			} else {
+				return super.getItemId(position - 1);
+			}
+		}
 	}
 
 	public void setTasks(TaskList tasks) {
@@ -37,6 +75,7 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 	public void removeTask(int position) {
 		origTasks.remove(tasks.remove(position));
 		notifyDataSetChanged();
+		projects.notifyDataSetChanged();
 		if(getCount() == 0) {
 			resetData();
 		}

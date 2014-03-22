@@ -39,7 +39,7 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		public void onAddClick();
 	}
 
-	private ArrayAdapter<String> adapter;
+	private TaskListAdapter.ProjectsAdapter adapter;
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -50,10 +50,7 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		ActionBar ab = getActivity().getActionBar();
 		ab.setDisplayShowTitleEnabled(false);
 		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		adapter = new ArrayAdapter<String>(ab.getThemedContext(),android.R.layout.simple_spinner_item);
-		adapter.add("All projects");
-		adapter.add("projet1");
-		adapter.add("test");
+		adapter = ((Callbacks)getActivity()).getTasksAdapter().getProjectsAdapter();
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		ab.setListNavigationCallbacks(adapter, this);
 	}
