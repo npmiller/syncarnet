@@ -4,6 +4,7 @@ import fr.insarouen.asi.notesync.tasks.*;
 import fr.insarouen.asi.notesync.helpers.*;
 
 import android.app.Fragment;
+import android.app.ActionBar;
 import android.app.DatePickerDialog;
 
 import android.os.Bundle;
@@ -50,6 +51,9 @@ public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDat
 			task = (Task)savedInstanceState.getSerializable("task");
 			cal = (Calendar)savedInstanceState.getSerializable("cal");
 		}
+		ActionBar ab = getActivity().getActionBar();
+		ab.setDisplayShowTitleEnabled(true);
+		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 	}
 
 	@Override
