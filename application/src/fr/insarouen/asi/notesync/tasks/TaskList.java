@@ -19,7 +19,7 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 		int i = Collections.binarySearch(this, task, comparator); 
 		i = (i<0) ? (-i)-1 : ++i;
 		super.add(i, task);
-		if(!projects.contains(task.getProject())) {
+		if(!projects.contains(task.getProject()) && task.getProject() != null) {
 			projects.add(task.getProject());
 		}
 		return true;
