@@ -234,7 +234,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 				   serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
 				   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 			   } else {
-				   this.peerListDialog.reconnect(this);
+				   //this.peerListDialog.reconnect(this);
 			   }
 		   }
 
