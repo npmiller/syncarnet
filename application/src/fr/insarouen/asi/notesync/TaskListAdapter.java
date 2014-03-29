@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.widget.Filter;
 //import android.widget.Filter.FilterResults;
 import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Filterable;
 import android.widget.BaseAdapter;
 
@@ -61,6 +62,7 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 		TextView description;
 		TextView dueDate;
 		TextView project;
+		ImageView priority;
 	}
 
 	@Override
@@ -73,6 +75,7 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 			holder.description = (TextView)convertView.findViewById(R.id.description);
 			holder.dueDate = (TextView)convertView.findViewById(R.id.dueDate);
 			holder.project = (TextView)convertView.findViewById(R.id.project);
+			holder.priority = (ImageView)convertView.findViewById(R.id.priority);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
@@ -81,6 +84,17 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 		holder.description.setText(tasks.get(position).getDescription());
 		holder.dueDate.setText(tasks.get(position).getFormattedDue());
 		holder.project.setText(tasks.get(position).getProject());
+		switch(tasks.get(position).getPriority()) {
+			case HIGH :
+				holder.priority.setImageResource(R.drawable.high_priority);
+				break;
+			case MEDIUM :
+				holder.priority.setImageResource(R.drawable.medium_priority);
+				break;
+			case LOW :
+				holder.priority.setImageResource(R.drawable.low_priority);
+				break;
+		}
 		
 		return convertView;
 	}
