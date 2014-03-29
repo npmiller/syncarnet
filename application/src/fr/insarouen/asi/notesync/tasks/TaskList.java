@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 public class TaskList extends ArrayList<Task> implements Serializable {
 	private ArrayList<UUID> deletedTasks = new ArrayList<UUID>();
+	private ArrayList<String> projects = new ArrayList<String>();
 
 	/**
 	 * Inserts a new task at the adequate position based on its due date and priority.
@@ -18,6 +19,9 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 		int i = Collections.binarySearch(this, task, comparator); 
 		i = (i<0) ? (-i)-1 : ++i;
 		super.add(i, task);
+		if(!projects.contains(task.getProject()) && task.getProject() != null) {
+			projects.add(task.getProject());
+		}
 		return true;
 	}
 
@@ -28,13 +32,19 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 		return deletedTasks.contains(task.getUUID());
 	}
 
+	public ArrayList<String> getProjects() {
+		return projects;
+	}
+
 	/**
 	 * Removes a task from the TaskList and stores its UUID
 	 */
 	@Override
 	public boolean remove(Object o) {
+		boolean r = super.remove(o);
 		deletedTasks.add(((Task)o).getUUID());
-		return super.remove(o);
+		cleanProjects(((Task)o).getProject());
+		return r;
 	}
 
 	/**
@@ -44,7 +54,24 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 	public Task remove(int position) {
 		Task task = super.remove(position);
 		deletedTasks.add(task.getUUID());
+		cleanProjects(task.getProject());
 		return task;
+	}
+
+	private void cleanProjects(String project) {
+		boolean finished = true;
+		int i = 0;
+		int len = this.size();
+		while(i < len && finished) {
+			Task t = get(i);
+			if(t.getProject() != null && t.getProject().equals(project)) {
+				finished = false;
+			}
+			i++;
+		}
+		if(finished) {
+			projects.remove(project);
+		}
 	}
 
 	/**

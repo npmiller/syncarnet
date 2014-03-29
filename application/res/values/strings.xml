@@ -31,6 +31,7 @@
     <string name="discoveryFailed">Discovery failed ; please reactivate Wifi and try again </string>
     <string name="IOException">An error occured while transfering ; please try again</string>
     <string name="ClassNotFoundException">An error occured while rebuilding tasks ; please try again</string>
+    <string name="AllProjects">All projects</string>
     <string-array name="priorities">
         <item>Low</item>
         <item>Medium</item>

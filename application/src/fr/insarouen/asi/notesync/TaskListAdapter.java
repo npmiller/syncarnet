@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.view.LayoutInflater;
 
 import android.widget.Filter;
-//import android.widget.Filter.FilterResults;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Filterable;
@@ -19,13 +18,19 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 	private TaskList tasks;
 	private TaskList origTasks;
 	private LayoutInflater inflater;
+	private ProjectsAdapter projects;
 
 	public TaskListAdapter(Context context, TaskList tasks) {
 		inflater = LayoutInflater.from(context);
 		this.tasks = tasks;
 		this.origTasks = tasks;
+		projects = new ProjectsAdapter(context, android.R.layout.simple_spinner_item, tasks.getProjects());
 	}
-
+	
+	public ProjectsAdapter getProjectsAdapter() {
+		return projects;
+	}
+	
 	public void setTasks(TaskList tasks) {
 		this.tasks = tasks;
 	}
@@ -38,6 +43,7 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 	public void removeTask(int position) {
 		origTasks.remove(tasks.remove(position));
 		notifyDataSetChanged();
+		projects.notifyDataSetChanged();
 		if(getCount() == 0) {
 			resetData();
 		}
@@ -108,13 +114,14 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 			FilterResults r = new FilterResults();
+			tasks = origTasks;
 			if(constraint == null || constraint.length() == 0) {
 				r.values = tasks;
 				r.count = tasks.size();
 			} else {
 				TaskList filtered = new TaskList();
 				for(Task t : tasks) {
-					if(t.getProject().equals(constraint.toString())) {
+					if(t.getProject() != null && t.getProject().equals(constraint.toString())) {
 						filtered.add(t);
 					}
 				}

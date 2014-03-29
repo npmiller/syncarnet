@@ -48,7 +48,9 @@ public class Task implements Serializable {
 			due.set(Calendar.MILLISECOND, 0);
 		}
 		this.due = due;
-		this.project = project;
+		if(project != null && !project.equals("")) {
+			this.project = project;
+		}
 		this.priority = priority;
 	}
 
@@ -76,7 +78,11 @@ public class Task implements Serializable {
 
 	public void setProject(String project) {
 		this.modified = new Date().getTime();
-		this.project = project;
+		if(project != null && project.equals("")) {
+			this.project = null;
+		} else {
+			this.project = project;
+		}
 	}
 
 	/**

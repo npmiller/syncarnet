@@ -31,6 +31,7 @@
     <string name="discoveryFailed">La découverte des pairs à échoué ; veuillez réactiver le Wifi et réessayer </string>
     <string name="IOException">Une erreur de transfert est apparue ; veuillez réessayer</string>
     <string name="ClassNotFoundException">Une erreur dans la reconstruction des tâches est apparue ; veuillez réessayer</string>
+    <string name="AllProjects">Tous les projets</string>
     <string-array name="priorities">
         <item>Basse</item>
         <item>Moyenne</item>
