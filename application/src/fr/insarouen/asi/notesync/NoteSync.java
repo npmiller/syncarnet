@@ -137,6 +137,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 				   Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				   startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
 			   }
+			   // Initialize the BluetoothChatService to perform bluetooth connections
+			   mChatService = new SyncBTService(this);
+			   mChatService.start();
 		   }
 
 		   @Override
@@ -275,11 +278,10 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 			   // Get the device MAC address
 			   String address = data.getExtras()
 				   .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+						   Toast.makeText(this, address, Toast.LENGTH_SHORT).show();
 			   // Get the BluetoothDevice object
 			   BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
 			   // Attempt to connect to the device
-			   // Initialize the BluetoothChatService to perform bluetooth connections
-			   mChatService = new SyncBTService(this);
 			   mChatService.connect(device, secure);
 		   }
 

@@ -62,6 +62,13 @@ public class SyncBTService {
      * @param context  The UI Activity Context
      * @param handler  A Handler to send messages back to the UI Activity
      */
+    public SyncBTService() {
+		//this.notesync = notesync;
+        mAdapter = BluetoothAdapter.getDefaultAdapter();
+        mState = STATE_NONE;
+        mHandler = null;
+    }
+
     public SyncBTService(NoteSync notesync) {
 		this.notesync = notesync;
         mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -78,7 +85,7 @@ public class SyncBTService {
         mState = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(NoteSync.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        //mHandler.obtainMessage(NoteSync.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
     /**
@@ -164,11 +171,11 @@ public class SyncBTService {
         mConnectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
-        Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_DEVICE_NAME);
-        Bundle bundle = new Bundle();
-        bundle.putString(NoteSync.DEVICE_NAME, device.getName());
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        //Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_DEVICE_NAME);
+        //Bundle bundle = new Bundle();
+        //bundle.putString(NoteSync.DEVICE_NAME, device.getName());
+        //msg.setData(bundle);
+        //mHandler.sendMessage(msg);
 
         setState(STATE_CONNECTED);
     }
@@ -223,11 +230,11 @@ public class SyncBTService {
      */
     private void connectionFailed() {
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(NoteSync.TOAST, "Unable to connect device");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        //Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_TOAST);
+        //Bundle bundle = new Bundle();
+        //bundle.putString(NoteSync.TOAST, "Unable to connect device");
+        //msg.setData(bundle);
+        //mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
         //NoteSyncService.this.start();
@@ -238,11 +245,11 @@ public class SyncBTService {
      */
     private void connectionLost() {
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(NoteSync.TOAST, "Device connection was lost");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        //Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_TOAST);
+        //Bundle bundle = new Bundle();
+        //bundle.putString(NoteSync.TOAST, "Device connection was lost");
+        //msg.setData(bundle);
+        //mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
         //NoteSyncService.this.start();
@@ -259,23 +266,22 @@ public class SyncBTService {
         private String mSocketType;
 
         public AcceptThread(boolean secure) {
+			notesync.showToast("Accept thread created");
             BluetoothServerSocket tmp = null;
             mSocketType = secure ? "Secure":"Insecure";
 
             // Create a new listening server socket
-            //try {
+			try {
                 if (secure) {
-                    //tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE,
-                        //MY_UUID_SECURE);
-					   Toast.makeText(notesync, "secure", Toast.LENGTH_SHORT).show();
+					tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE,
+						MY_UUID_SECURE);
                 } else {
-                    //tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
-                            //NAME_INSECURE, MY_UUID_INSECURE);
-					   Toast.makeText(notesync, "insecure", Toast.LENGTH_SHORT).show();
+					tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
+							NAME_INSECURE, MY_UUID_INSECURE);
                 }
-            //} catch (IOException e) {
-                //Log.e(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
-            //}
+			} catch (IOException e) {
+				Log.e(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
+			}
             mmServerSocket = tmp;
         }
 
@@ -352,19 +358,19 @@ public class SyncBTService {
 
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
-            //try {
+			try {
                 if (secure) {
-                    //tmp = device.createRfcommSocketToServiceRecord(
-                            //MY_UUID_SECURE);
+					tmp = device.createRfcommSocketToServiceRecord(
+							MY_UUID_SECURE);
 					   Toast.makeText(notesync, "secure", Toast.LENGTH_SHORT).show();
                 } else {
-                    //tmp = device.createInsecureRfcommSocketToServiceRecord(
-                            //MY_UUID_INSECURE);
+					tmp = device.createInsecureRfcommSocketToServiceRecord(
+							MY_UUID_INSECURE);
 					   Toast.makeText(notesync, "insecure", Toast.LENGTH_SHORT).show();
                 }
-            //} catch (IOException e) {
-                //Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
-            //}
+			} catch (IOException e) {
+				Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+			}
             mmSocket = tmp;
         }
 
@@ -376,29 +382,29 @@ public class SyncBTService {
             mAdapter.cancelDiscovery();
 
             // Make a connection to the BluetoothSocket
-            try {
+			try {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
-                mmSocket.connect();
-            } catch (IOException e) {
+				mmSocket.connect();
+			} catch (IOException e) {
                 // Close the socket
-                try {
-                    mmSocket.close();
-                } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() " + mSocketType +
-                            " socket during connection failure", e2);
-                }
-                connectionFailed();
-                return;
-            }
+				try {
+					mmSocket.close();
+				} catch (IOException e2) {
+					Log.e(TAG, "unable to close() " + mSocketType +
+							" socket during connection failure", e2);
+				}
+				connectionFailed();
+				return;
+			}
 
             // Reset the ConnectThread because we're done
-            //synchronized (NoteSyncService.this) {
-                //mConnectThread = null;
-            //}
+			synchronized (SyncBTService.this) {
+				mConnectThread = null;
+			}
 
             // Start the connected thread
-            connected(mmSocket, mmDevice, mSocketType);
+			connected(mmSocket, mmDevice, mSocketType);
         }
 
         public void cancel() {
@@ -444,20 +450,25 @@ public class SyncBTService {
 
             // Keep listening to the InputStream while connected
             while (true) {
-                //try {
+				try {
                     // Read from the InputStream
-                    //bytes = mmInStream.read(buffer);
+					bytes = mmInStream.read(buffer);
+					//String message = new String((byte[]) bytes);
+					   //Toast.makeText(notesync, bytes, Toast.LENGTH_SHORT).show();
+					   //Toast.makeText(notesync, "message received and long toast", Toast.LENGTH_LONG).show();
+			notesync.showToast("message received");
+					
 
                     // Send the obtained bytes to the UI Activity
 					//mHandler.obtainMessage(NoteSync.MESSAGE_READ, bytes, -1, buffer)
 							//.sendToTarget();
-                //} catch (IOException e) {
-                    //Log.e(TAG, "disconnected", e);
+				} catch (IOException e) {
+					Log.e(TAG, "disconnected", e);
                     //connectionLost();
                     // Start the service over to restart listening mode
                     //NoteSyncService.this.start();
-                    //break;
-                //}
+					break;
+				}
             }
         }
 
@@ -467,11 +478,15 @@ public class SyncBTService {
          */
         public void write(byte[] buffer) {
             try {
-                mmOutStream.write(buffer);
+                //mmOutStream.write(buffer);
+				String message = "test";
+				mmOutStream.write(message.getBytes());
+					   //Toast.makeText(notesync, "message sent and very long toast", Toast.LENGTH_LONG).show();
+			notesync.showToast("message sent");
 
                 // Share the sent message back to the UI Activity
-                mHandler.obtainMessage(NoteSync.MESSAGE_WRITE, -1, -1, buffer)
-                        .sendToTarget();
+                //mHandler.obtainMessage(NoteSync.MESSAGE_WRITE, -1, -1, buffer)
+                        //.sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }
