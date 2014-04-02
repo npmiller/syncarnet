@@ -4,6 +4,7 @@ import fr.insarouen.asi.notesync.tasks.*;
 import fr.insarouen.asi.notesync.helpers.*;
 
 import android.app.Fragment;
+import android.app.ActionBar;
 import android.app.DatePickerDialog;
 
 import android.os.Bundle;
@@ -24,41 +25,40 @@ import java.util.Calendar;
 public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 	private Task task;
 	private Calendar cal;
-	private int taskListPosition;
 
 	private Spinner priority = null;
 	private EditText project = null;
 	private EditText description = null;
 
 	public interface Callbacks {
-		public void replaceTask(Task t, int pos);
+		public void replaceTask(Task t, boolean orderChanged);
 	}
 
 	public TaskEditFragment() {
 		super();
 	}
 
-	public TaskEditFragment(Task task, int taskListPosition) {
+	public TaskEditFragment(Task task) {
 		super();
 		this.task = task;
 		this.cal = task.getDue();
-		this.taskListPosition = taskListPosition;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		if(savedInstanceState != null) {
-			taskListPosition = savedInstanceState.getInt("taskListPosition", 0);
 			task = (Task)savedInstanceState.getSerializable("task");
 			cal = (Calendar)savedInstanceState.getSerializable("cal");
 		}
+		ActionBar ab = getActivity().getActionBar();
+		ab.setDisplayShowTitleEnabled(true);
+		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putInt("taskListPosition", taskListPosition);
 		outState.putSerializable("task", task);
 		outState.putSerializable("cal", cal);
 	}
@@ -105,10 +105,17 @@ public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDat
 				String p = project.getText().toString().trim();
 				int pos = priority.getSelectedItemPosition();
 				task.setDescription(d);
-				task.setDue(cal);
-				task.setProject(p);
-				task.setPriority(PrioritySpinnerHelper.getPriority(pos));
-				((Callbacks)getActivity()).replaceTask(task, taskListPosition);
+				if(task.getDue() != null && task.getDue().equals(cal) && task.getPriority().equals(PrioritySpinnerHelper.getPriority(pos))) {
+					task.setDue(cal);
+					task.setProject(p);
+					task.setPriority(PrioritySpinnerHelper.getPriority(pos));
+					((Callbacks)getActivity()).replaceTask(task, false);
+				} else {
+					task.setDue(cal);
+					task.setProject(p);
+					task.setPriority(PrioritySpinnerHelper.getPriority(pos));
+					((Callbacks)getActivity()).replaceTask(task, true);
+				}
 			}
 		}
 	}
@@ -120,9 +127,9 @@ public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDat
 			if(c == null) 
 				c = Calendar.getInstance();
 			DatePickerDialog dpd = new DatePickerDialog(getActivity(), TaskEditFragment.this,
-					      c.get(Calendar.YEAR), 
-					      c.get(Calendar.MONTH), 
-					      c.get(Calendar.DAY_OF_MONTH));
+					c.get(Calendar.YEAR), 
+					c.get(Calendar.MONTH), 
+					c.get(Calendar.DAY_OF_MONTH));
 			dpd.getDatePicker().setCalendarViewShown(true);
 			dpd.getDatePicker().setSpinnersShown(false);
 			dpd.show();

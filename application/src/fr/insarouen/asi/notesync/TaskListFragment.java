@@ -4,6 +4,7 @@ import fr.insarouen.asi.notesync.tasks.*;
 
 import android.app.AlertDialog;
 import android.app.ListFragment;
+import android.app.ActionBar;
 
 import android.os.Bundle;
 
@@ -15,12 +16,18 @@ import android.view.MenuInflater;
 import android.widget.ListView;
 import android.widget.ListAdapter;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemLongClickListener;
 
+import java.util.ArrayList;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 
-public class TaskListFragment extends ListFragment implements OnItemLongClickListener {
+import android.util.Log;
+
+public class TaskListFragment extends ListFragment implements OnItemLongClickListener,
+							      ActionBar.OnNavigationListener
+{
 
 	public interface Callbacks {
 		public TaskList getTasks();
@@ -32,6 +39,8 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		public void onAddClick();
 	}
 
+	private ProjectsAdapter projects;
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -39,6 +48,22 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		this.setListAdapter(((Callbacks)getActivity()).getTasksAdapter());
 		getListView().setOnItemLongClickListener(this);
 		setHasOptionsMenu(true);
+		ActionBar ab = getActivity().getActionBar();
+		ab.setDisplayShowTitleEnabled(false);
+		ab.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		projects = ((Callbacks)getActivity()).getTasksAdapter().getProjectsAdapter();
+		projects.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ab.setListNavigationCallbacks(projects, this);
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		if(itemPosition == 0) {
+			((TaskListAdapter)getListAdapter()).resetData();
+		} else {
+			filterByProject(projects.getItem(itemPosition));
+		}
+		return true;
 	}
 
 	@Override
@@ -76,6 +101,10 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.ab, menu);
 		//getActivity().onCreateOptionsMenu(menu);
+	}
+
+	public void filterByProject(String project) {
+		((TaskListAdapter)getListAdapter()).getFilter().filter(project);
 	}
 
 	@Override

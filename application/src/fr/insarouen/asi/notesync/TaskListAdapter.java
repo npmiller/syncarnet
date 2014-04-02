@@ -8,20 +8,45 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
 
+import android.widget.Filter;
 import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.Filterable;
 import android.widget.BaseAdapter;
 
-public class TaskListAdapter extends BaseAdapter {
+public class TaskListAdapter extends BaseAdapter implements Filterable {
 	private TaskList tasks;
+	private TaskList origTasks;
 	private LayoutInflater inflater;
+	private ProjectsAdapter projects;
 
 	public TaskListAdapter(Context context, TaskList tasks) {
 		inflater = LayoutInflater.from(context);
 		this.tasks = tasks;
+		this.origTasks = tasks;
+		projects = new ProjectsAdapter(context, android.R.layout.simple_spinner_item, tasks.getProjects());
 	}
-
+	
+	public ProjectsAdapter getProjectsAdapter() {
+		return projects;
+	}
+	
 	public void setTasks(TaskList tasks) {
 		this.tasks = tasks;
+	}
+
+	public void resetData() {
+		tasks = origTasks;
+		notifyDataSetChanged();
+	}
+
+	public void removeTask(int position) {
+		origTasks.remove(tasks.remove(position));
+		notifyDataSetChanged();
+		projects.notifyDataSetChanged();
+		if(getCount() == 0) {
+			resetData();
+		}
 	}
 
 	@Override
@@ -43,6 +68,7 @@ public class TaskListAdapter extends BaseAdapter {
 		TextView description;
 		TextView dueDate;
 		TextView project;
+		ImageView priority;
 	}
 
 	@Override
@@ -55,6 +81,7 @@ public class TaskListAdapter extends BaseAdapter {
 			holder.description = (TextView)convertView.findViewById(R.id.description);
 			holder.dueDate = (TextView)convertView.findViewById(R.id.dueDate);
 			holder.project = (TextView)convertView.findViewById(R.id.project);
+			holder.priority = (ImageView)convertView.findViewById(R.id.priority);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
@@ -63,7 +90,55 @@ public class TaskListAdapter extends BaseAdapter {
 		holder.description.setText(tasks.get(position).getDescription());
 		holder.dueDate.setText(tasks.get(position).getFormattedDue());
 		holder.project.setText(tasks.get(position).getProject());
+		switch(tasks.get(position).getPriority()) {
+			case HIGH :
+				holder.priority.setImageResource(R.drawable.high_priority);
+				break;
+			case MEDIUM :
+				holder.priority.setImageResource(R.drawable.medium_priority);
+				break;
+			case LOW :
+				holder.priority.setImageResource(R.drawable.low_priority);
+				break;
+		}
 		
 		return convertView;
+	}
+
+	@Override
+	public Filter getFilter() {
+		return new ProjectFilter();
+	}
+
+	private class ProjectFilter extends Filter {
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
+			FilterResults r = new FilterResults();
+			tasks = origTasks;
+			if(constraint == null || constraint.length() == 0) {
+				r.values = tasks;
+				r.count = tasks.size();
+			} else {
+				TaskList filtered = new TaskList();
+				for(Task t : tasks) {
+					if(t.getProject() != null && t.getProject().equals(constraint.toString())) {
+						filtered.add(t);
+					}
+				}
+				r.values = filtered;
+				r.count = filtered.size();
+			}
+			return r;
+		}
+
+		@Override
+		protected void publishResults(CharSequence constraint, FilterResults results) {
+			if(results.count == 0) {
+				notifyDataSetInvalidated();
+			} else {
+				tasks = (TaskList) results.values;
+				notifyDataSetChanged();
+			}
+		}
 	}
 }

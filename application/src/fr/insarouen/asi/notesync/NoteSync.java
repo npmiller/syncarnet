@@ -175,12 +175,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		   /* TaskEditFragment */
 		   @Override
-		   public void replaceTask(Task t, int taskListPosition) {
-			   Task t2 = tasks.get(taskListPosition);
-			   if(t.getDue() != null && t.getDue().equals(t2.getDue()) && t.getPriority().equals(t2.getPriority())) {
-				   tasks.set(taskListPosition, t);
-			   } else {
-				   tasks.remove(taskListPosition);
+		   public void replaceTask(Task t, boolean orderChanged) {
+			   if(orderChanged) {
+				   tasks.remove(t);
 				   addTask(t);
 			   }
 			   adapter.notifyDataSetChanged();
@@ -206,7 +203,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 		   @Override
 		   public void showDetails(int position) {
 			   FragmentTransaction ft = getFragmentManager().beginTransaction();
-			   ft.replace(R.id.container, new TaskEditFragment(tasks.get(position), position));
+			   ft.replace(R.id.container, new TaskEditFragment((Task)adapter.getItem(position)));
 			   ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 			   ft.addToBackStack(null);
 			   ft.commit();
@@ -214,8 +211,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		   @Override
 		   public void removeTask(int position) {
-			   tasks.remove(position);
-			   adapter.notifyDataSetChanged();
+			   adapter.removeTask(position);
 		   }
 
 		   @Override
