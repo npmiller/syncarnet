@@ -37,9 +37,9 @@ public class SyncBTService {
 
     // Unique UUID for this application
     private static final UUID MY_UUID_SECURE =
-        UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+        UUID.fromString("aa87c0d0-afac-11de-8a39-0800200c9a66");
     private static final UUID MY_UUID_INSECURE =
-        UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+        UUID.fromString("ace255c0-200a-11e0-ac64-0800200c9a66");
 
     // Member fields
     private final BluetoothAdapter mAdapter;
@@ -266,7 +266,7 @@ public class SyncBTService {
         private String mSocketType;
 
         public AcceptThread(boolean secure) {
-			notesync.showToast("Accept thread created");
+			//notesync.showToast("Accept thread created");
             BluetoothServerSocket tmp = null;
             mSocketType = secure ? "Secure":"Insecure";
 
@@ -362,11 +362,11 @@ public class SyncBTService {
                 if (secure) {
 					tmp = device.createRfcommSocketToServiceRecord(
 							MY_UUID_SECURE);
-					   Toast.makeText(notesync, "secure", Toast.LENGTH_SHORT).show();
+					   //Toast.makeText(notesync, "secure", Toast.LENGTH_SHORT).show();
                 } else {
 					tmp = device.createInsecureRfcommSocketToServiceRecord(
 							MY_UUID_INSECURE);
-					   Toast.makeText(notesync, "insecure", Toast.LENGTH_SHORT).show();
+					   //Toast.makeText(notesync, "insecure", Toast.LENGTH_SHORT).show();
                 }
 			} catch (IOException e) {
 				Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
@@ -456,7 +456,7 @@ public class SyncBTService {
 					//String message = new String((byte[]) bytes);
 					   //Toast.makeText(notesync, bytes, Toast.LENGTH_SHORT).show();
 					   //Toast.makeText(notesync, "message received and long toast", Toast.LENGTH_LONG).show();
-			notesync.showToast("message received");
+            Log.i(TAG, "message received");
 					
 
                     // Send the obtained bytes to the UI Activity
@@ -482,7 +482,7 @@ public class SyncBTService {
 				String message = "test";
 				mmOutStream.write(message.getBytes());
 					   //Toast.makeText(notesync, "message sent and very long toast", Toast.LENGTH_LONG).show();
-			notesync.showToast("message sent");
+            Log.i(TAG, "message sent");
 
                 // Share the sent message back to the UI Activity
                 //mHandler.obtainMessage(NoteSync.MESSAGE_WRITE, -1, -1, buffer)

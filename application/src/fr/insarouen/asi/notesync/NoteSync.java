@@ -261,11 +261,11 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 					   if (resultCode == Activity.RESULT_OK) {
 						   // Bluetooth is now enabled, so set up a chat session
 						   //setupChat();
-						   Toast.makeText(this, "activity result ok de enable bt", Toast.LENGTH_SHORT).show();
+						   //Toast.makeText(this, "activity result ok de enable bt", Toast.LENGTH_SHORT).show();
 					   } else {
 						   // User did not enable Bluetooth or an error occurred
 						   //Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
-						   Toast.makeText(this, "bt pas mis", Toast.LENGTH_SHORT).show();
+						   //Toast.makeText(this, "bt pas mis", Toast.LENGTH_SHORT).show();
 						   finish();
 					   }
 			   }
@@ -275,7 +275,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 			   // Get the device MAC address
 			   String address = data.getExtras()
 				   .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-			   Toast.makeText(this, address, Toast.LENGTH_SHORT).show();
+			   //Toast.makeText(this, address, Toast.LENGTH_SHORT).show();
 			   // Get the BluetoothDevice object
 			   BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
 			   // Attempt to connect to the device
