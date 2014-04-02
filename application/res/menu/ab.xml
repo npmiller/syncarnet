@@ -4,11 +4,11 @@
 		android:title="@string/add" 
 		android:showAsAction="ifRoom" />
 	<item android:id="@+id/syncWifi"
-		android:icon="@drawable/ic_action_refresh"
+		android:icon="@android:drawable/ic_menu_rotate"
 		android:title="@string/syncWifi"
 		android:showAsAction="ifRoom" />
 	<item android:id="@+id/syncBT"
-		android:icon="@drawable/ic_action_refresh"
+		android:icon="@android:drawable/ic_menu_rotate"
 		android:title="@string/syncBT"
 		android:showAsAction="ifRoom" />
 </menu>
