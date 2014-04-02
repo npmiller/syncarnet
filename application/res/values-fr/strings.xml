@@ -3,7 +3,8 @@
     <string name="app_name">NoteSync</string>
     <string name="add">Ajouter</string>
     <string name="apply">Appliquer</string>
-    <string name="sync">Synchronise</string>
+    <string name="syncWifi">Synchroniser avec le Wifi</string>
+    <string name="syncBT">Synchroniser avec le Bluetooth</string>
     <string name="pickdate">Choisir date d\'échéance</string>
     <string name="nodescription">Vous devez fixez une description</string>
     <string name="nosave">Erreur : La sauvegarde de la liste de tâches à échouée</string>

@@ -27,7 +27,8 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		public TaskListAdapter getTasksAdapter();
 		public void showDetails(int pos);
 		public void removeTask(int pos);
-		public void onSyncClick();
+		public void onSyncWifiClick();
+		public void onSyncBTClick();
 		public void onAddClick();
 	}
 
@@ -81,8 +82,11 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
-			case R.id.sync:
-				((Callbacks)getActivity()).onSyncClick();
+			case R.id.syncWifi:
+				((Callbacks)getActivity()).onSyncWifiClick();
+				return true;
+			case R.id.syncBT:
+				((Callbacks)getActivity()).onSyncBTClick();
 				return true;
 			case R.id.add:
 				((Callbacks)getActivity()).onAddClick();

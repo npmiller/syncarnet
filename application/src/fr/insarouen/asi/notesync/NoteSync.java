@@ -225,17 +225,21 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 		   }
 
 		   @Override
-		   public void onSyncClick() {
+		   public void onSyncWifiClick() {
 			   if (!isConnected){
-				   //receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-				   //registerReceiver(receiver, intentFilter);
-				   //onInitiateDiscovery();
-				   Intent serverIntent = null;
-				   serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
-				   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+				   receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
+				   registerReceiver(receiver, intentFilter);
+				   onInitiateDiscovery();
 			   } else {
-				   //this.peerListDialog.reconnect(this);
+				   this.peerListDialog.reconnect(this);
 			   }
+		   }
+
+		   @Override
+		   public void onSyncBTClick() {
+			Intent serverIntent = null;
+			serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
+			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 		   }
 
 		   public void onActivityResult(int requestCode, int resultCode, Intent data) {
