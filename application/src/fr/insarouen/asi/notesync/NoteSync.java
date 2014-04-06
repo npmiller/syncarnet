@@ -131,16 +131,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 		   @Override
 		   public void onResume() {
 			   super.onResume();
-			   // If BT is not on, request that it be enabled.
-			   // setupChat() will then be called during onActivityResult
-			   if (!mBluetoothAdapter.isEnabled()) {
-				   Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				   startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-			   } else {
-				   // Initialize the BluetoothChatService to perform bluetooth connections
-				   mChatService = new SyncBTService(this);
-				   mChatService.start();
-			   }
 		   }
 
 		   @Override
@@ -237,9 +227,13 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 		   @Override
 		   public void onSyncBTClick() {
-			   Intent serverIntent = null;
-			   serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
-			   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+			   // If BT is not on, request that it be enabled.
+			   // setupChat() will then be called during onActivityResult
+			   if (!mBluetoothAdapter.isEnabled()) {
+				   Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				   startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+			   } else {
+			   }
 		   }
 
 		   public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -262,11 +256,17 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 						   // Bluetooth is now enabled, so set up a chat session
 						   //setupChat();
 						   //Toast.makeText(this, "activity result ok de enable bt", Toast.LENGTH_SHORT).show();
+						   // Initialize the BluetoothChatService to perform bluetooth connections
+						   mChatService = new SyncBTService(this);
+						   mChatService.start();
+						   Intent serverIntent = null;
+						   serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
+						   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 					   } else {
 						   // User did not enable Bluetooth or an error occurred
 						   //Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
 						   //Toast.makeText(this, "bt pas mis", Toast.LENGTH_SHORT).show();
-						   finish();
+						   //finish();
 					   }
 			   }
 		   }
