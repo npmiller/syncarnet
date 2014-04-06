@@ -451,19 +451,21 @@ public class SyncBTService {
 			int bytes;
 			try {
 				ObjectOutputStream oos = new ObjectOutputStream(mmOutStream);
-				String msg = "msg test gt2";
-				oos.writeObject(msg);
-				Log.d(TAG,msg+" sent");
+				TaskList originalTL = notesync.getTasks();
+				oos.writeObject(originalTL);
+				Log.d(TAG,"task list sent");
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
 			}
 
 			// Keep listening to the InputStream while connected
-			while (true) {
+			//while (true) {
 				try {
 					ObjectInputStream ois = new ObjectInputStream(mmInStream);
-					String msg = (String) ois.readObject();
-					Log.d(TAG,msg+" received");
+					TaskList mergedTL = TaskList.merge(notesync.getTasks(), (TaskList) ois.readObject());
+					notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
+
+					Log.d(TAG,"task list received");
 
 					// Send the obtained bytes to the UI Activity
 					//mHandler.obtainMessage(NoteSync.MESSAGE_READ, bytes, -1, buffer)
@@ -473,11 +475,11 @@ public class SyncBTService {
 					connectionLost();
 					// Start the service over to restart listening mode
 					//NoteSyncService.this.start();
-					break;
+					//break;
 				} catch (ClassNotFoundException e) {
 					Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
 				}
-			}
+			//}
 		}
 
 		/**

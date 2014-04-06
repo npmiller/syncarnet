@@ -131,6 +131,10 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 		   @Override
 		   public void onResume() {
 			   super.onResume();
+			   //if (mBluetoothAdapter.isEnabled()) {
+						   //mChatService = new SyncBTService(this);
+						   //mChatService.start();
+			   //}
 		   }
 
 		   @Override
