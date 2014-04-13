@@ -49,9 +49,11 @@ public class SyncBTService {
 	private AcceptThread mSecureAcceptThread;
 	private AcceptThread mInsecureAcceptThread;
 	private ConnectThread mConnectThread;
-	private ConnectedThread mConnectedThread;
+	private ConnectedThreadServer mConnectedThreadServer;
+	private ConnectedThreadClient mConnectedThreadClient;
 	private int mState;
 	private NoteSync notesync;
+	private TaskList originalTL;
 
 	// Constants that indicate the current connection state
 	public static final int STATE_NONE = 0;       // we're doing nothing
@@ -76,6 +78,8 @@ public class SyncBTService {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
 		mHandler = null;
+		originalTL = notesync.getTasks();
+		Log.d(TAG, "taskList retrieved");
 	}
 
 	/**
@@ -106,7 +110,8 @@ public class SyncBTService {
 		if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
 
 		// Cancel any thread currently running a connection
-		if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
+		if (mConnectedThreadServer != null) {mConnectedThreadServer.cancel(); mConnectedThreadServer = null;}
+		if (mConnectedThreadClient != null) {mConnectedThreadClient.cancel(); mConnectedThreadClient = null;}
 
 		setState(STATE_LISTEN);
 
@@ -135,7 +140,8 @@ public class SyncBTService {
 		}
 
 		// Cancel any thread currently running a connection
-		if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
+		if (mConnectedThreadServer != null) {mConnectedThreadServer.cancel(); mConnectedThreadServer = null;}
+		if (mConnectedThreadClient != null) {mConnectedThreadClient.cancel(); mConnectedThreadClient = null;}
 
 		// Start the thread to connect with the given device
 		mConnectThread = new ConnectThread(device, secure);
@@ -149,14 +155,15 @@ public class SyncBTService {
 	 * @param device  The BluetoothDevice that has been connected
 	 */
 	public synchronized void connected(BluetoothSocket socket, BluetoothDevice
-			device, final String socketType) {
+			device, final String socketType, boolean server) {
 		if (D) Log.d(TAG, "connected, Socket Type:" + socketType);
 
 		// Cancel the thread that completed the connection
 		if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
 
 		// Cancel any thread currently running a connection
-		if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
+		if (mConnectedThreadServer != null) {mConnectedThreadServer.cancel(); mConnectedThreadServer = null;}
+		if (mConnectedThreadClient != null) {mConnectedThreadClient.cancel(); mConnectedThreadClient = null;}
 
 		// Cancel the accept thread because we only want to connect to one device
 		if (mSecureAcceptThread != null) {
@@ -169,8 +176,13 @@ public class SyncBTService {
 		}
 
 		// Start the thread to manage the connection and perform transmissions
-		mConnectedThread = new ConnectedThread(socket, socketType);
-		mConnectedThread.start();
+		if (server) {
+			mConnectedThreadServer = new ConnectedThreadServer(socket, socketType);
+			mConnectedThreadServer.start();
+		} else {
+			mConnectedThreadClient = new ConnectedThreadClient(socket, socketType);
+			mConnectedThreadClient.start();
+		}
 
 		// Send the name of the connected device back to the UI Activity
 		//Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_DEVICE_NAME);
@@ -193,11 +205,15 @@ public class SyncBTService {
 			mConnectThread = null;
 		}
 
-		if (mConnectedThread != null) {
-			mConnectedThread.cancel();
-			mConnectedThread = null;
+		if (mConnectedThreadServer != null) {
+			mConnectedThreadServer.cancel();
+			mConnectedThreadServer = null;
 		}
 
+		if (mConnectedThreadClient != null) {
+			mConnectedThreadClient.cancel();
+			mConnectedThreadClient = null;
+		}
 		if (mSecureAcceptThread != null) {
 			mSecureAcceptThread.cancel();
 			mSecureAcceptThread = null;
@@ -215,17 +231,17 @@ public class SyncBTService {
 	 * @param out The bytes to write
 	 * @see ConnectedThread#write(byte[])
 	 */
-	public void write(byte[] out) {
-		// Create temporary object
-		ConnectedThread r;
-		// Synchronize a copy of the ConnectedThread
-		synchronized (this) {
-			if (mState != STATE_CONNECTED) return;
-			r = mConnectedThread;
-		}
-		// Perform the write unsynchronized
-		r.write(out);
-	}
+	//public void write(byte[] out) {
+	// Create temporary object
+	//ConnectedThread r;
+	// Synchronize a copy of the ConnectedThread
+	//synchronized (this) {
+	//if (mState != STATE_CONNECTED) return;
+	//r = mConnectedThread;
+	//}
+	// Perform the write unsynchronized
+	//r.write(out);
+	//}
 
 	/**
 	 * Indicate that the connection attempt failed and notify the UI Activity.
@@ -313,7 +329,7 @@ public class SyncBTService {
 							case STATE_CONNECTING:
 								// Situation normal. Start the connected thread.
 								connected(socket, socket.getRemoteDevice(),
-										mSocketType);
+										mSocketType, true);
 								break;
 							case STATE_NONE:
 							case STATE_CONNECTED:
@@ -406,7 +422,7 @@ public class SyncBTService {
 			}
 
 			// Start the connected thread
-			connected(mmSocket, mmDevice, mSocketType);
+			connected(mmSocket, mmDevice, mSocketType, false);
 		}
 
 		public void cancel() {
@@ -422,13 +438,13 @@ public class SyncBTService {
 	 * This thread runs during a connection with a remote device.
 	 * It handles all incoming and outgoing transmissions.
 	 */
-	private class ConnectedThread extends Thread {
+	private class ConnectedThreadServer extends Thread {
 		private final BluetoothSocket mmSocket;
 		private final InputStream mmInStream;
 		private final OutputStream mmOutStream;
 
-		public ConnectedThread(BluetoothSocket socket, String socketType) {
-			Log.d(TAG, "create ConnectedThread: " + socketType);
+		public ConnectedThreadServer(BluetoothSocket socket, String socketType) {
+			Log.d(TAG, "create ConnectedThreadServer: " + socketType);
 			mmSocket = socket;
 			InputStream tmpIn = null;
 			OutputStream tmpOut = null;
@@ -446,55 +462,125 @@ public class SyncBTService {
 		}
 
 		public void run() {
-			Log.i(TAG, "BEGIN mConnectedThread");
-			byte[] buffer = new byte[1024];
-			int bytes;
+			Log.i(TAG, "BEGIN mConnectedThreadServer");
+			//byte[] buffer = new byte[1024];
+			//int bytes;
 			try {
 				ObjectOutputStream oos = new ObjectOutputStream(mmOutStream);
-				TaskList originalTL = notesync.getTasks();
+				Log.d(TAG,"writing object...");
 				oos.writeObject(originalTL);
+				//oos.writeObject(new String("testServer"));
 				Log.d(TAG,"task list sent");
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
 			}
 
 			// Keep listening to the InputStream while connected
-			//while (true) {
-				try {
-					ObjectInputStream ois = new ObjectInputStream(mmInStream);
-					TaskList mergedTL = TaskList.merge(notesync.getTasks(), (TaskList) ois.readObject());
-					notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
+			//boolean received = false;
+			//while (!received) {
+			try {
+				ObjectInputStream ois = new ObjectInputStream(mmInStream);
+				Log.d(TAG,"reading and merging...");
+				notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge((TaskList) ois.readObject(), originalTL)));
+				Log.d(TAG,"task list merged");
+				//TaskList receivedTL = (TaskList) ois.readObject();
+				//Log.d(TAG,"task list received");
+				//TaskList mergedTL = TaskList.merge(originalTL, receivedTL);
+				//Log.d(TAG, (String) ois.readObject()+" received");
+				//received = true;
+				//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
 
-					Log.d(TAG,"task list received");
 
-					// Send the obtained bytes to the UI Activity
-					//mHandler.obtainMessage(NoteSync.MESSAGE_READ, bytes, -1, buffer)
-					//.sendToTarget();
-				} catch (IOException e) {
-					Log.e(TAG, "disconnected", e);
-					connectionLost();
-					// Start the service over to restart listening mode
-					//NoteSyncService.this.start();
-					//break;
-				} catch (ClassNotFoundException e) {
-					Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
-				}
+				// Send the obtained bytes to the UI Activity
+				//mHandler.obtainMessage(NoteSync.MESSAGE_READ, bytes, -1, buffer)
+				//.sendToTarget();
+			} catch (IOException e) {
+				Log.e(TAG, "disconnected", e);
+				connectionLost();
+				// Start the service over to restart listening mode
+				//NoteSyncService.this.start();
+				//break;
+			} catch (ClassNotFoundException e) {
+				Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
+			}
 			//}
 		}
 
-		/**
-		 * Write to the connected OutStream.
-		 * @param buffer  The bytes to write
-		 */
-		public void write(byte[] buffer) {
+		public void cancel() {
+			try {
+				mmSocket.close();
+			} catch (IOException e) {
+				Log.e(TAG, "close() of connect socket failed", e);
+			}
+		}
+	}
+
+	/**
+	 * This thread runs during a connection with a remote device.
+	 * It handles all incoming and outgoing transmissions.
+	 */
+	private class ConnectedThreadClient extends Thread {
+		private final BluetoothSocket mmSocket;
+		private final InputStream mmInStream;
+		private final OutputStream mmOutStream;
+
+		public ConnectedThreadClient(BluetoothSocket socket, String socketType) {
+			Log.d(TAG, "create ConnectedThreadClient: " + socketType);
+			mmSocket = socket;
+			InputStream tmpIn = null;
+			OutputStream tmpOut = null;
+
+			// Get the BluetoothSocket input and output streams
+			try {
+				tmpIn = socket.getInputStream();
+				tmpOut = socket.getOutputStream();
+			} catch (IOException e) {
+				Log.e(TAG, "temp sockets not created", e);
+			}
+
+			mmInStream = tmpIn;
+			mmOutStream = tmpOut;
+		}
+
+		public void run() {
+			Log.i(TAG, "BEGIN mConnectedThreadClient");
+			//byte[] buffer = new byte[1024];
+			//int bytes;
+
+			// Keep listening to the InputStream while connected
+			//boolean received = false;
+			//while (!received) {
+			try {
+				ObjectInputStream ois = new ObjectInputStream(mmInStream);
+				Log.d(TAG,"reading and merging...");
+				notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge((TaskList) ois.readObject(), originalTL)));
+				Log.d(TAG,"task list merged");
+				//TaskList receivedTL = (TaskList) ois.readObject();
+				//Log.d(TAG,"task list received");
+				//TaskList mergedTL = TaskList.merge(originalTL, receivedTL);
+				//Log.d(TAG, (String) ois.readObject()+" received");
+				//received = true;
+				//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
+
+
+				// Send the obtained bytes to the UI Activity
+				//mHandler.obtainMessage(NoteSync.MESSAGE_READ, bytes, -1, buffer)
+				//.sendToTarget();
+			} catch (IOException e) {
+				Log.e(TAG, "disconnected", e);
+				connectionLost();
+				// Start the service over to restart listening mode
+				//NoteSyncService.this.start();
+				//break;
+			} catch (ClassNotFoundException e) {
+				Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
+			}
+			//}
 			try {
 				ObjectOutputStream oos = new ObjectOutputStream(mmOutStream);
-				String msg = "msg test";
-				oos.writeObject(msg);
-				Log.d(TAG,msg+" sent");
-				// Share the sent message back to the UI Activity
-				//mHandler.obtainMessage(NoteSync.MESSAGE_WRITE, -1, -1, buffer)
-				//.sendToTarget();
+				oos.writeObject(originalTL);
+				//oos.writeObject(new String("testClient"));
+				Log.d(TAG,"task list sent");
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
 			}
