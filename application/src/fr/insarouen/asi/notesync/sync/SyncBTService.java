@@ -9,6 +9,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -463,37 +469,40 @@ public class SyncBTService {
 
 		public void run() {
 			Log.i(TAG, "BEGIN mConnectedThreadServer");
-			//byte[] buffer = new byte[1024];
-			//int bytes;
 			try {
-				ObjectOutputStream oos = new ObjectOutputStream(mmOutStream);
-				Log.d(TAG,"writing object...");
-				oos.writeObject(originalTL);
+				//ObjectOutputStream oos = new ObjectOutputStream(mmOutStream);
+				//Log.d(TAG,"writing object...");
+				//oos.writeObject(originalTL);
+				//Log.d(TAG,"task list sent");
 				//oos.writeObject(new String("testServer"));
-				Log.d(TAG,"task list sent");
+				byte[] bytes = TLToBytes(originalTL);
+				int TLSize = bytes.length;
+				int BIG_NUM = 100;
+				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,TLSize+4));
+				d.writeInt(TLSize);
+				Log.e(TAG, "Taille TL : " + TLSize);
+				for (int i=0 ; i<bytes.length ; i+=BIG_NUM) {
+					int b = ((i+BIG_NUM) < bytes.length) ? BIG_NUM : bytes.length - i ;
+					d.write(bytes,i,b);
+					d.flush();
+				}
+				Log.e(TAG, i + " bytes sent");
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
 			}
 
 			// Keep listening to the InputStream while connected
 			//boolean received = false;
-			//while (!received) {
 			try {
 				ObjectInputStream ois = new ObjectInputStream(mmInStream);
 				Log.d(TAG,"reading and merging...");
-				notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge((TaskList) ois.readObject(), originalTL)));
-				Log.d(TAG,"task list merged");
+				//notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge((TaskList) ois.readObject(), originalTL)));
+				//Log.d(TAG,"task list merged");
 				//TaskList receivedTL = (TaskList) ois.readObject();
 				//Log.d(TAG,"task list received");
 				//TaskList mergedTL = TaskList.merge(originalTL, receivedTL);
-				//Log.d(TAG, (String) ois.readObject()+" received");
-				//received = true;
+				Log.d(TAG, (String) ois.readObject()+" received");
 				//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
-
-
-				// Send the obtained bytes to the UI Activity
-				//mHandler.obtainMessage(NoteSync.MESSAGE_READ, bytes, -1, buffer)
-				//.sendToTarget();
 			} catch (IOException e) {
 				Log.e(TAG, "disconnected", e);
 				connectionLost();
@@ -503,7 +512,6 @@ public class SyncBTService {
 			} catch (ClassNotFoundException e) {
 				Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
 			}
-			//}
 		}
 
 		public void cancel() {
@@ -544,28 +552,29 @@ public class SyncBTService {
 
 		public void run() {
 			Log.i(TAG, "BEGIN mConnectedThreadClient");
-			//byte[] buffer = new byte[1024];
-			//int bytes;
 
 			// Keep listening to the InputStream while connected
 			//boolean received = false;
-			//while (!received) {
 			try {
-				ObjectInputStream ois = new ObjectInputStream(mmInStream);
-				Log.d(TAG,"reading and merging...");
-				notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge((TaskList) ois.readObject(), originalTL)));
-				Log.d(TAG,"task list merged");
+				//ObjectInputStream ois = new ObjectInputStream(mmInStream);
+				//Log.d(TAG,"reading and merging...");
+				//notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge((TaskList) ois.readObject(), originalTL)));
+				//Log.d(TAG,"task list merged");
 				//TaskList receivedTL = (TaskList) ois.readObject();
 				//Log.d(TAG,"task list received");
 				//TaskList mergedTL = TaskList.merge(originalTL, receivedTL);
 				//Log.d(TAG, (String) ois.readObject()+" received");
-				//received = true;
 				//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
-
-
-				// Send the obtained bytes to the UI Activity
-				//mHandler.obtainMessage(NoteSync.MESSAGE_READ, bytes, -1, buffer)
-				//.sendToTarget();
+				DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream));
+				int TLSize = d.readInt();
+				Log.e(TAG, "Taille TL : " + TLSize);
+				int bytes = 0;
+				byte[] buffer = new byte[TLSize];
+				while (bytes < TLSize) {
+					bytes += d.read(buffer,bytes,TLSize-bytes);
+				}
+				Log.e(TAG, bytes + " bytes received");
+				TaskList receivedTL = bytesToTL(buffer);
 			} catch (IOException e) {
 				Log.e(TAG, "disconnected", e);
 				connectionLost();
@@ -575,11 +584,10 @@ public class SyncBTService {
 			} catch (ClassNotFoundException e) {
 				Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
 			}
-			//}
 			try {
 				ObjectOutputStream oos = new ObjectOutputStream(mmOutStream);
-				oos.writeObject(originalTL);
-				//oos.writeObject(new String("testClient"));
+				//oos.writeObject(originalTL);
+				oos.writeObject(new String("testClient"));
 				Log.d(TAG,"task list sent");
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
@@ -594,4 +602,18 @@ public class SyncBTService {
 			}
 		}
 	}
+
+	private static byte[] TLToBytes(TaskList tl) throws IOException {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+		ObjectOutputStream o = new ObjectOutputStream(b);
+		o.writeObject(tl);
+		return b.toByteArray();
+	}
+
+	private static TaskList bytesToTL(byte[] bytes) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+		ObjectInputStream o = new ObjectInputStream(b);
+		return (TaskList) o.readObject();
+	}
+
 }
