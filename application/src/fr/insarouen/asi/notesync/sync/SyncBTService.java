@@ -481,7 +481,8 @@ public class SyncBTService {
 				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,TLSize+4));
 				d.writeInt(TLSize);
 				Log.e(TAG, "Taille TL : " + TLSize);
-				for (int i=0 ; i<bytes.length ; i+=BIG_NUM) {
+				int i=0;
+				for (i=0 ; i<bytes.length ; i+=BIG_NUM) {
 					int b = ((i+BIG_NUM) < bytes.length) ? BIG_NUM : bytes.length - i ;
 					d.write(bytes,i,b);
 					d.flush();
