@@ -1,9 +1,9 @@
 @startuml
 
-package fr.insarouen.asi.notesync.tasks
-class Task {
+package fr.insarouen.asi.notesync.tasks {
+class Task <<Serializable>> {
 	-String description
-	-long due
+	-Calendar due
 	-long entry
 	-long modified
 	-String project
@@ -11,16 +11,16 @@ class Task {
 	-Priority priority
 	-UUID uuid
 	
-	+Task Task(String, long, String, Priority)
+	+Task Task(String, Calendar, String, Priority)
 
 	+void setDescription(String)
-	+void setDue(long)
+	+void setDue(Calendar)
 	+void setProject(String)
 	+void setPriority(Priority)
 
 	+String getDescription()
 	+String getFormattedDue()
-	+long getDue()
+	+Calendar getDue()
 	+String getProject()
 	+Priority getPriority()
 	+UUID getUUID()
@@ -36,27 +36,55 @@ enum Priority {
 	LOW
 }
 
-class TaskList extends LinkedList {
+class TaskList <<Serializable>> {
+	-ArrayList<UUID> deletedTasks
+	-ArrayList<String> projects
+
 	+boolean add(Task)
+	+boolean remove(Object)
+	+Task remove(int)
+
+	+boolean deleted(Task)
+	+ArrayList<String> getProjects()
+
 	+static Tasklist merge(TaskList, TaskList)
+
 }
-end package
+}
+TaskList <|-- ArrayList
 
-package fr.insarouen.asi.notesync.sync
+package fr.insarouen.asi.notesync.sync {
 
-end package
+}
 
-package fr.insarouen.asi.notesync
-class NoteSync extends Activity {
+package fr.insarouen.asi.notesync {
+class NoteSync {
 	+onCreate(Bundle)
 }
 
-class TaskAdapter extends BaseAdapter {
-	+TaskAdapter(Context, ArrayList<Task>)
+class TaskListAdapter {
+	-TaskList tasks
+	-TaskList origTasks
+	-LayoutInflater inflater
+	-ProjectsAdapter projects
+
+	+TaskAdapter(Context, TaskList)
 	+getCount()
 	+getItem()
 	+getItemId()
 	+getView()
+
+	+ProjectsAdapter getProjectsAdapter()
+
+	+void setTasks(TaskList)
+	+void resetData()
+	+void removeTask(int)
+
+	+Filter getFilter()
 }
-end package
+}
+NoteSync <|-- Activity
+TaskListAdapter <|-- BaseAdapter
+TaskListAdapter <|-- Filterable
+
 @enduml
