@@ -47,9 +47,9 @@ public class SyncBTService {
 
 	// Unique UUID for this application
 	private static final UUID MY_UUID_SECURE =
-		UUID.fromString("aa87c0d0-afac-11de-8a39-0800200c9a65");
+		UUID.fromString("aa87c0d0-afac-11de-8a39-0850200c9a65");
 	private static final UUID MY_UUID_INSECURE =
-		UUID.fromString("ace255c0-200a-11e0-ac64-0800200c9a66");
+		UUID.fromString("ace255c0-200a-11e0-ac64-0850200c9a66");
 
 	// Member fields
 	private final BluetoothAdapter mAdapter;
@@ -98,17 +98,21 @@ public class SyncBTService {
 	public void endSync(boolean server) {
 		Log.d(TAG, "last step to sync !");
 		if (server) {
+			Log.d(TAG, "endSync server");
 			//doit fermer la fenêtre de synchro bt
 		}
-		//try {
-			//TaskList receivedTL = bytesToTL(this.receivedTLBytes);
+		try {
+			TaskList receivedTL = (TaskList) bytesToObject(this.receivedTLBytes);
+			Log.e(TAG, "tasklist received : " + receivedTL.toString());
 			//notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge(receivedTL, originalTL)));
-			//Log.e(TAG, "finally sync !");
-		//} catch (IOException e) {
-				//Log.e(TAG, "IOException during bytesToTL", e);
-		//} catch (ClassNotFoundException e) {
-				//Log.e(TAG, "ClassNotFoundException during bytesToTL", e);
-		//}
+			//Test ot = (Test) bytesToObject(this.receivedTLBytes);
+			//Log.e(TAG, "objet test : " + ot.toString());
+			Log.e(TAG, "finally sync !");
+		} catch (IOException e) {
+				Log.e(TAG, "IOException during bytesToObject", e);
+		} catch (ClassNotFoundException e) {
+				Log.e(TAG, "ClassNotFoundException during bytesToObject", e);
+		}
 	}
 
 	/**
@@ -539,14 +543,53 @@ public class SyncBTService {
 				//oos.writeObject(originalTL);
 				//Log.d(TAG,"task list sent");
 				//oos.writeObject(new String("testServer"));
-				//byte[] bytes = (new String("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestmao")).getBytes();
-				byte[] bytes = TLToBytes(originalTL);
+				this.sleep(01000);
+				Test ot = new Test(84);
+				ot.addString("chat");
+				ot.addString("miaou");
+				ot.addString("lait");
+				ot.addString("mu");
+				ot.addString("dou");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				ot.addString("moustache soyeuse");
+				//byte[] bytes = ObjectToBytes((Object) ot);
+				byte[] bytes = ObjectToBytes((Object) originalTL);
 				int TLSize = bytes.length;
 				int BIG_NUM = 100;
 				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,TLSize+4));
 				Log.e(TAG, "Taille TL : " + TLSize);
 				d.writeInt(TLSize);
 				Log.e(TAG, "Taille TL sent");
+				this.sleep(01000);
 				int i=0;
 				for (i=0 ; i<bytes.length ; i+=BIG_NUM) {
 					int b = ((i+BIG_NUM) < bytes.length) ? BIG_NUM : bytes.length - i ;
@@ -555,14 +598,14 @@ public class SyncBTService {
 				}
 				//Log.e(TAG, "TL sent : " + bytes.hashCode()); //test
 				Log.d(TAG,"task list sent");
-				//this.sleep(01000);
+				this.sleep(10000);
 				//d.close();
 				//Log.d(TAG,"socket closed");
 				SyncBTService.this.endSync(true);
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
-			//} catch (InterruptedException e) {
-				//Log.d(TAG,"InterruptedException : "+e.getStackTrace().toString());
+			} catch (InterruptedException e) {
+				Log.d(TAG,"InterruptedException : "+e.getStackTrace().toString());
 			}
 		}
 
@@ -608,7 +651,46 @@ public class SyncBTService {
 			byte[] buffer;
 
 			try {
-				byte[] bytes = TLToBytes(originalTL);
+				Test ot = new Test(66);
+				ot.addString("otarie");
+				ot.addString("ocean");
+				ot.addString("plouf");
+				ot.addString("glou");
+				ot.addString("honk");
+				ot.addString("nageoire");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				ot.addString("huile pas pouih");
+				//byte[] bytes = ObjectToBytes((Object) ot);
+				byte[] bytes = ObjectToBytes((Object) originalTL);
 				int TLSize = bytes.length;
 				int BIG_NUM = 100;
 				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,TLSize+4));
@@ -658,7 +740,7 @@ public class SyncBTService {
 				//String st = new String(buffer);
 				//Log.e(TAG, "TL received : " + st); //test
 				//TaskList receivedTL = bytesToTL(buffer);
-				//this.sleep(05000);
+				//this.sleep(06000);
 				//d.close();
 				//Log.d(TAG,"socket closed");
 				SyncBTService.this.endSync(false);
@@ -686,17 +768,17 @@ public class SyncBTService {
 		}
 	}
 
-	private static byte[] TLToBytes(TaskList tl) throws IOException {
+	private static byte[] ObjectToBytes(Object object) throws IOException {
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
 		ObjectOutputStream o = new ObjectOutputStream(b);
-		o.writeObject(tl);
+		o.writeObject(object);
 		return b.toByteArray();
 	}
 
-	private static TaskList bytesToTL(byte[] bytes) throws IOException, ClassNotFoundException {
+	private static Object bytesToObject(byte[] bytes) throws IOException, ClassNotFoundException {
 		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
 		ObjectInputStream o = new ObjectInputStream(b);
-		return (TaskList) o.readObject();
+		return  o.readObject();
 	}
 
 }
