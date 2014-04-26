@@ -20,7 +20,7 @@ public class Test extends ArrayList<String> implements Serializable {
 	public String toString() {
 		String res = "" + this.valeur;
 		for (String s : this) 
-			res = res + " " + s;
+			res = res + " i";
 		return res;
 	}
 
