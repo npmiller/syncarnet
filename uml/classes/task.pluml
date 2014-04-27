@@ -1,5 +1,4 @@
 @startuml
-
 package fr.insarouen.asi.notesync.tasks {
 class Task <<Serializable>> {
 	-String description
@@ -52,39 +51,5 @@ class TaskList <<Serializable>> {
 }
 }
 TaskList <|-- ArrayList
-
-package fr.insarouen.asi.notesync.sync {
-
-}
-
-package fr.insarouen.asi.notesync {
-class NoteSync {
-	+onCreate(Bundle)
-}
-
-class TaskListAdapter {
-	-TaskList tasks
-	-TaskList origTasks
-	-LayoutInflater inflater
-	-ProjectsAdapter projects
-
-	+TaskAdapter(Context, TaskList)
-	+getCount()
-	+getItem()
-	+getItemId()
-	+getView()
-
-	+ProjectsAdapter getProjectsAdapter()
-
-	+void setTasks(TaskList)
-	+void resetData()
-	+void removeTask(int)
-
-	+Filter getFilter()
-}
-}
-NoteSync <|-- Activity
-TaskListAdapter <|-- BaseAdapter
-TaskListAdapter <|-- Filterable
 
 @enduml

@@ -1,0 +1,33 @@
+@startuml
+
+package fr.insarouen.asi.notesync {
+class NoteSync {
+	+onCreate(Bundle)
+}
+
+class TaskListAdapter {
+	-TaskList tasks
+	-TaskList origTasks
+	-LayoutInflater inflater
+	-ProjectsAdapter projects
+
+	+TaskAdapter(Context, TaskList)
+	+getCount()
+	+getItem()
+	+getItemId()
+	+getView()
+
+	+ProjectsAdapter getProjectsAdapter()
+
+	+void setTasks(TaskList)
+	+void resetData()
+	+void removeTask(int)
+
+	+Filter getFilter()
+}
+}
+NoteSync <|-- Activity
+TaskListAdapter <|-- BaseAdapter
+TaskListAdapter <|-- Filterable
+
+@enduml

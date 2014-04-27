@@ -1,0 +1,7 @@
+@startuml
+
+package fr.insarouen.asi.notesync.sync {
+
+} 
+
+@enduml
