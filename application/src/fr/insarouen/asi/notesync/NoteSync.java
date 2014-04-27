@@ -40,7 +40,6 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 
-//à fusionner avec WiFiDirectActivity
 
 public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
        TaskEditFragment.Callbacks, 
@@ -120,6 +119,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 	       /* * Fragments callbacks * */
 
 	       /* TaskAddFragment */
+	       /** Switch to the addTask fragment */
 	       @Override
 	       public void addTask(Task t) {
 		       tasks.add(t);
@@ -132,6 +132,12 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 	       }
 
 	       /* TaskEditFragment */
+	       /** Get back from EditTask to TaskList fragment and update the TaskList
+	       according to the changes.
+		@param Task The new task
+		@param boolean True if the task may have changed position in the list.
+		  So it should be true if the due date or the date have changed, false otherwise
+		*/
 	       @Override
 	       public void replaceTask(Task t, boolean orderChanged) {
 		       if(orderChanged) {
@@ -158,6 +164,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 		       return tasks;
 	       }
 
+	       /** Switch to EditTask view:
+		@param int position of the task to edit in the list
+		*/
 	       @Override
 	       public void showDetails(int position) {
 		       FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -169,11 +178,10 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 
 	       @Override
 	       public void removeTask(int position) {
-		       //tasks.remove(adapter.getItem(position));
-		       //adapter.notifyDataSetChanged();
 		       adapter.removeTask(position);
 	       }
-
+	       
+	       /* Menu callbacks */
 	       @Override
 	       public void onAddClick() {
 		       FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -193,8 +201,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 			       this.peerListDialog.reconnect(this);
 		       }
 	       }
-
-
 
 	       public void onInitiateDiscovery() {
 		       progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
@@ -262,16 +268,17 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 	       public boolean isConnecting() {
 		       return this.isConnecting;
 	       }
-
+	       
+	       /** Function to use in order to display toasts from other threads */
 	       public void showToast(final String text) {
 		       runOnUiThread(new Runnable() {
 			       public void run() {
 				       Toast.makeText(NoteSync.this, text, Toast.LENGTH_SHORT).show();
 			       }
-		       }
-		       );
+		       });
 	       }
 
+	       /* Saving and retrieving the local TaskList */
 	       private void saveTaskList(TaskList tl) {
 		       try {
 			       FileOutputStream fos = this.openFileOutput(filename, Context.MODE_PRIVATE);
