@@ -26,7 +26,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
 
-
 import android.widget.Toast;
 
 import android.content.Context;
@@ -41,264 +40,262 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 
-public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
-       TaskEditFragment.Callbacks, 
-       TaskListFragment.Callbacks {
-	       private TaskList tasks; 
-	       private TaskListAdapter adapter;
-	       private String filename = "tasks";
-	       private boolean isWifiP2pEnabled;
-	       private boolean isConnected = false;
-	       private boolean isConnecting = false;
-	       private WifiP2pManager manager;
-	       private boolean retryChannel = false;
-	       private Channel channel;
-	       private BroadcastReceiver receiver = null;
-	       private ProgressDialog progressDialog = null;
-	       private PeerListDialog peerListDialog;
+public class NoteSync extends Activity implements TaskAddFragment.Callbacks, TaskEditFragment.Callbacks, TaskListFragment.Callbacks {
+	private TaskList tasks; 
+	private TaskListAdapter adapter;
+	private String filename = "tasks";
+	private boolean isWifiP2pEnabled;
+	private boolean isConnected = false;
+	private boolean isConnecting = false;
+	private WifiP2pManager manager;
+	private boolean retryChannel = false;
+	private Channel channel;
+	private BroadcastReceiver receiver = null;
+	private ProgressDialog progressDialog = null;
+	private PeerListDialog peerListDialog;
 
-	       private final IntentFilter intentFilter = new IntentFilter();
+	private final IntentFilter intentFilter = new IntentFilter();
 
-	       public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
-		       this.isWifiP2pEnabled = isWifiP2pEnabled;
-	       }
+	public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
+		this.isWifiP2pEnabled = isWifiP2pEnabled;
+	}
 
-	       public boolean isWifiP2pEnabled() {
-		       return this.isWifiP2pEnabled;
-	       }
+	public boolean isWifiP2pEnabled() {
+		return this.isWifiP2pEnabled;
+	}
 
-	       /** Called when the activity is first created. */
-	       @Override
-	       public void onCreate(Bundle savedInstanceState) {
-		       super.onCreate(savedInstanceState);
-		       setContentView(R.layout.main);
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
 
-		       intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-		       intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-		       intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+		intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+		intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+		intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
 
-		       manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-		       channel = manager.initialize(this, getMainLooper(), null);
+		manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+		channel = manager.initialize(this, getMainLooper(), null);
 
-		       tasks = readTaskList();
-		       adapter = new TaskListAdapter(this, tasks);
+		tasks = readTaskList();
+		adapter = new TaskListAdapter(this, tasks);
 
-		       if(savedInstanceState == null) {
-			       final ActionBar actionBar = getActionBar();
-			       actionBar.setHomeButtonEnabled(false);
-			       actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		if(savedInstanceState == null) {
+			final ActionBar actionBar = getActionBar();
+			actionBar.setHomeButtonEnabled(false);
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
-			       FragmentTransaction ft = getFragmentManager().beginTransaction();
-			       ft.replace(R.id.container, new TaskListFragment());
-			       ft.commit();
-		       }
-	       }
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+			ft.replace(R.id.container, new TaskListFragment());
+			ft.commit();
+		}
+	}
 
-	       @Override
-	       public void onResume() {
-		       super.onResume();
-	       }
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
 
-	       @Override
-	       public void onPause() {
-		       super.onPause();
-		       saveTaskList(tasks);
-		       if(receiver != null)
-			       unregisterReceiver(receiver);
-	       }
+	@Override
+	public void onPause() {
+		super.onPause();
+		saveTaskList(tasks);
+		if(receiver != null)
+			unregisterReceiver(receiver);
+	}
 
-	       public void setTaskList(TaskList taskList) {
-		       tasks = taskList;
-		       adapter.setTasks(taskList);
-		       adapter.notifyDataSetChanged();
-		       if (progressDialog != null && progressDialog.isShowing()) {
-			       progressDialog.dismiss();
-		       }
-	       }
+	public void setTaskList(TaskList taskList) {
+		tasks = taskList;
+		adapter.setTasks(taskList);
+		adapter.notifyDataSetChanged();
+		if (progressDialog != null && progressDialog.isShowing()) {
+			progressDialog.dismiss();
+		}
+	}
 
-	       /* * Fragments callbacks * */
+	/* * Fragments callbacks * */
 
-	       /* TaskAddFragment */
-	       /** Switch to the addTask fragment */
-	       @Override
-	       public void addTask(Task t) {
-		       tasks.add(t);
-		       adapter.notifyDataSetChanged();
+	/* TaskAddFragment */
+	/** Switch to the addTask fragment */
+	@Override
+	public void addTask(Task t) {
+		tasks.add(t);
+		adapter.notifyDataSetChanged();
 
-		       FragmentTransaction ft = getFragmentManager().beginTransaction();
-		       ft.replace(R.id.container, new TaskListFragment());
-		       ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-		       ft.commit();
-	       }
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.container, new TaskListFragment());
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+		ft.commit();
+	}
 
-	       /* TaskEditFragment */
-	       /** Get back from EditTask to TaskList fragment and update the TaskList
-	       according to the changes.
-		@param Task The new task
-		@param boolean True if the task may have changed position in the list.
-		  So it should be true if the due date or the date have changed, false otherwise
-		*/
-	       @Override
-	       public void replaceTask(Task t, boolean orderChanged) {
-		       if(orderChanged) {
-			       tasks.remove(t);
-			       addTask(t);
-		       }
-		       adapter.notifyDataSetChanged();
+	/* TaskEditFragment */
+	/** Get back from EditTask to TaskList fragment and update the TaskList
+	  according to the changes.
+	  @param Task The new task
+	  @param boolean True if the task may have changed position in the list.
+	  So it should be true if the due date or the date have changed, false otherwise
+	  */
+	@Override
+	public void replaceTask(Task t, boolean orderChanged) {
+		if(orderChanged) {
+			tasks.remove(t);
+			addTask(t);
+		}
+		adapter.notifyDataSetChanged();
 
-		       FragmentTransaction ft = getFragmentManager().beginTransaction();
-		       ft.replace(R.id.container, new TaskListFragment());
-		       ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-		       ft.commit();
-	       }
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.container, new TaskListFragment());
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+		ft.commit();
+	}
 
-	       /* TaskListFragment */
+	/* TaskListFragment */
 
-	       @Override
-	       public TaskListAdapter getTasksAdapter() {
-		       return adapter;
-	       }
+	@Override
+	public TaskListAdapter getTasksAdapter() {
+		return adapter;
+	}
 
-	       @Override
-	       public TaskList getTasks() {
-		       return tasks;
-	       }
+	@Override
+	public TaskList getTasks() {
+		return tasks;
+	}
 
-	       /** Switch to EditTask view:
-		@param int position of the task to edit in the list
-		*/
-	       @Override
-	       public void showDetails(int position) {
-		       FragmentTransaction ft = getFragmentManager().beginTransaction();
-		       ft.replace(R.id.container, new TaskEditFragment((Task)adapter.getItem(position)));
-		       ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-		       ft.addToBackStack(null);
-		       ft.commit();
-	       }
+	/** Switch to EditTask view:
+	  @param int position of the task to edit in the list
+	  */
+	@Override
+	public void showDetails(int position) {
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.container, new TaskEditFragment((Task)adapter.getItem(position)));
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		ft.addToBackStack(null);
+		ft.commit();
+	}
 
-	       @Override
-	       public void removeTask(int position) {
-		       adapter.removeTask(position);
-	       }
-	       
-	       /* Menu callbacks */
-	       @Override
-	       public void onAddClick() {
-		       FragmentTransaction ft = getFragmentManager().beginTransaction();
-		       ft.replace(R.id.container, new TaskAddFragment());
-		       ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-		       ft.addToBackStack(null);
-		       ft.commit();
-	       }
+	@Override
+	public void removeTask(int position) {
+		adapter.removeTask(position);
+	}
 
-	       @Override
-	       public void onSyncClick() {
-		       if (!isConnected){
-			       receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-			       registerReceiver(receiver, intentFilter);
-			       onInitiateDiscovery();
-		       } else {
-			       this.peerListDialog.reconnect(this);
-		       }
-	       }
+	/* Menu callbacks */
+	@Override
+	public void onAddClick() {
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.container, new TaskAddFragment());
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		ft.addToBackStack(null);
+		ft.commit();
+	}
 
-	       public void onInitiateDiscovery() {
-		       progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
-				       true, new DialogInterface.OnCancelListener() {
-					       @Override
-					       public void onCancel(DialogInterface dialog) {
+	@Override
+	public void onSyncClick() {
+		if (!isConnected){
+			receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
+			registerReceiver(receiver, intentFilter);
+			onInitiateDiscovery();
+		} else {
+			this.peerListDialog.reconnect(this);
+		}
+	}
 
-					       }
-				       });
-		       manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+	public void onInitiateDiscovery() {
+		progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
+				true, new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
 
-			       @Override
-			       public void onSuccess() {
-				       Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryInitiated),
-					       Toast.LENGTH_SHORT).show();
-			       }
+					}
+				});
+		manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
-		       @Override
-		       public void onFailure(int reasonCode) {
-			       Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed),
-				       Toast.LENGTH_SHORT).show();
-			       Log.d("NoteSync","Discovery failed : "+reasonCode);
-			       if (NoteSync.this.progressDialog != null && NoteSync.this.progressDialog.isShowing()) {
-				       NoteSync.this.progressDialog.dismiss();
-			       }
-		       }
-		       });
-	       }
+			@Override
+			public void onSuccess() {
+				Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryInitiated),
+					Toast.LENGTH_SHORT).show();
+			}
 
-	       public ProgressDialog getProgressDialog() {
-		       return this.progressDialog;
-	       }
+		@Override
+		public void onFailure(int reasonCode) {
+			Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed),
+				Toast.LENGTH_SHORT).show();
+			Log.d("NoteSync","Discovery failed : "+reasonCode);
+			if (NoteSync.this.progressDialog != null && NoteSync.this.progressDialog.isShowing()) {
+				NoteSync.this.progressDialog.dismiss();
+			}
+		}
+		});
+	}
 
-	       public void setProgressDialog(ProgressDialog progressDialog) {
-		       this.progressDialog = progressDialog;
-	       }
+	public ProgressDialog getProgressDialog() {
+		return this.progressDialog;
+	}
 
-	       public void onPeerSelection(PeerListDialog peerListDialog) {
-		       this.peerListDialog = peerListDialog;
-		       if (!isConnected && !isConnecting && !peerListDialog.peerListEmpty())
-			       peerListDialog.show(getFragmentManager(), "PeerListDialog");
-	       }
+	public void setProgressDialog(ProgressDialog progressDialog) {
+		this.progressDialog = progressDialog;
+	}
 
-	       public void setConnected(boolean isConnected) {
-		       this.isConnected = isConnected;
-		       if (isConnected){
-			       if (peerListDialog != null) {
-				       peerListDialog.getPeerSelection().setConnected();
-				       peerListDialog.dismiss();
-			       }
-			       if (progressDialog != null && progressDialog.isShowing()) {
-				       progressDialog.dismiss();
-			       }
-		       }
-	       }
+	public void onPeerSelection(PeerListDialog peerListDialog) {
+		this.peerListDialog = peerListDialog;
+		if (!isConnected && !isConnecting && !peerListDialog.peerListEmpty())
+			peerListDialog.show(getFragmentManager(), "PeerListDialog");
+	}
 
-	       public boolean isConnected() {
-		       return isConnected;
-	       }
+	public void setConnected(boolean isConnected) {
+		this.isConnected = isConnected;
+		if (isConnected){
+			if (peerListDialog != null) {
+				peerListDialog.getPeerSelection().setConnected();
+				peerListDialog.dismiss();
+			}
+			if (progressDialog != null && progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
+		}
+	}
 
-	       public void setConnecting(boolean isConnecting) {
-		       this.isConnecting = isConnecting;
-	       }
+	public boolean isConnected() {
+		return isConnected;
+	}
 
-	       public boolean isConnecting() {
-		       return this.isConnecting;
-	       }
-	       
-	       /** Function to use in order to display toasts from other threads */
-	       public void showToast(final String text) {
-		       runOnUiThread(new Runnable() {
-			       public void run() {
-				       Toast.makeText(NoteSync.this, text, Toast.LENGTH_SHORT).show();
-			       }
-		       });
-	       }
+	public void setConnecting(boolean isConnecting) {
+		this.isConnecting = isConnecting;
+	}
 
-	       /* Saving and retrieving the local TaskList */
-	       private void saveTaskList(TaskList tl) {
-		       try {
-			       FileOutputStream fos = this.openFileOutput(filename, Context.MODE_PRIVATE);
-			       ObjectOutputStream os = new ObjectOutputStream(fos);
-			       os.writeObject(tl);
-		       } catch (IOException e) {
-			       Toast toast = Toast.makeText(this,
-					       this.getString(R.string.nosave),
-					       Toast.LENGTH_LONG);
-			       toast.show();
-		       }
-	       }
+	public boolean isConnecting() {
+		return this.isConnecting;
+	}
 
-	       private TaskList readTaskList() {
-		       try {
-			       FileInputStream fis = this.openFileInput(filename);
-			       ObjectInputStream is = new ObjectInputStream(fis);
-			       return (TaskList)is.readObject();
-		       } catch (Exception e) {
-			       return new TaskList();
-		       }
-	       }
+	/** Function to use in order to display toasts from other threads */
+	public void showToast(final String text) {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				Toast.makeText(NoteSync.this, text, Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
+
+	/* Saving and retrieving the local TaskList */
+	private void saveTaskList(TaskList tl) {
+		try {
+			FileOutputStream fos = this.openFileOutput(filename, Context.MODE_PRIVATE);
+			ObjectOutputStream os = new ObjectOutputStream(fos);
+			os.writeObject(tl);
+		} catch (IOException e) {
+			Toast toast = Toast.makeText(this,
+					this.getString(R.string.nosave),
+					Toast.LENGTH_LONG);
+			toast.show();
+		}
+	}
+
+	private TaskList readTaskList() {
+		try {
+			FileInputStream fis = this.openFileInput(filename);
+			ObjectInputStream is = new ObjectInputStream(fis);
+			return (TaskList)is.readObject();
+		} catch (Exception e) {
+			return new TaskList();
+		}
+	}
 }
