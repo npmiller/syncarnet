@@ -32,6 +32,13 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 		return deletedTasks.contains(task.getUUID());
 	}
 
+	/**
+	 * Clears the deleted Tasks 
+	 */
+	public void clearDeleted() {
+		deletedTasks.clear();
+	}
+
 	public ArrayList<String> getProjects() {
 		return projects;
 	}

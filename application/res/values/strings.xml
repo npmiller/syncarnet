@@ -32,6 +32,8 @@
     <string name="IOException">An error occured while transfering ; please try again</string>
     <string name="ClassNotFoundException">An error occured while rebuilding tasks ; please try again</string>
     <string name="AllProjects">All projects</string>
+    <string name="clearDeleted">Clear deleted tasks</string>
+    <string name="deletedTaskCleared">Deleted tasks\' cache cleaned.</string>
     <string-array name="priorities">
         <item>Low</item>
         <item>Medium</item>

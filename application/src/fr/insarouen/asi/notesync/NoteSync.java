@@ -199,6 +199,12 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		}
 	}
 
+	@Override
+	public void onClearDeletedClick() {
+		tasks.clearDeleted();
+		Toast.makeText(this, this.getString(R.string.deletedTaskCleared), Toast.LENGTH_SHORT).show();
+	}
+
 	public void onInitiateDiscovery() {
 		progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
 				true, new DialogInterface.OnCancelListener() {

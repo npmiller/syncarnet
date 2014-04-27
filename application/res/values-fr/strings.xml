@@ -32,6 +32,8 @@
     <string name="IOException">Une erreur de transfert est apparue ; veuillez réessayer</string>
     <string name="ClassNotFoundException">Une erreur dans la reconstruction des tâches est apparue ; veuillez réessayer</string>
     <string name="AllProjects">Tous les projets</string>
+    <string name="clearDeleted">Vider les tâches supprimées</string>
+    <string name="deletedTaskCleared">Cache des tâches supprimées vidé.</string>
     <string-array name="priorities">
         <item>Basse</item>
         <item>Moyenne</item>
