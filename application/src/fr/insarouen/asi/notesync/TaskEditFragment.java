@@ -31,7 +31,7 @@ public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDat
 	private EditText description = null;
 
 	public interface Callbacks {
-		public void replaceTask(Task t, boolean orderChanged);
+		public void replaceTask(Task t);
 	}
 
 	public TaskEditFragment() {
@@ -109,17 +109,10 @@ public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDat
 				String p = project.getText().toString().trim();
 				int pos = priority.getSelectedItemPosition();
 				task.setDescription(d);
-				if(task.getDue() != null && task.getDue().equals(cal) && task.getPriority().equals(PrioritySpinnerHelper.getPriority(pos))) {
-					task.setDue(cal);
-					task.setProject(p);
-					task.setPriority(PrioritySpinnerHelper.getPriority(pos));
-					((Callbacks)getActivity()).replaceTask(task, false);
-				} else {
-					task.setDue(cal);
-					task.setProject(p);
-					task.setPriority(PrioritySpinnerHelper.getPriority(pos));
-					((Callbacks)getActivity()).replaceTask(task, true);
-				}
+				task.setDue(cal);
+				task.setProject(p);
+				task.setPriority(PrioritySpinnerHelper.getPriority(pos));
+				((Callbacks)getActivity()).replaceTask(task);
 			}
 		}
 	}

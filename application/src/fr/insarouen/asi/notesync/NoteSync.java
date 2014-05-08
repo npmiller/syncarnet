@@ -133,15 +133,11 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	/** Get back from EditTask to TaskList fragment and update the TaskList
 	  according to the changes.
 	  @param Task The new task
-	  @param boolean True if the task may have changed position in the list.
-	  So it should be true if the due date or the date have changed, false otherwise
 	  */
 	@Override
-	public void replaceTask(Task t, boolean orderChanged) {
-		if(orderChanged) {
-			tasks.remove(t);
-			addTask(t);
-		}
+	public void replaceTask(Task t) {
+		tasks.remove(t); // We need to do this to update the position of the task as well as the projet list
+		addTask(t);
 		adapter.notifyDataSetChanged();
 
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
