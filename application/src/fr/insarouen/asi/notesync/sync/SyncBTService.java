@@ -77,7 +77,6 @@ public class SyncBTService {
 	 * @param handler  A Handler to send messages back to the UI Activity
 	 */
 	public SyncBTService() {
-		//this.notesync = notesync;
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
 		mHandler = null;
@@ -91,20 +90,6 @@ public class SyncBTService {
 		originalTL = notesync.getTasks();
 		Log.d(TAG, "taskList retrieved : "+originalTL.toString());
 	}
-
-	//public TaskList copyTL(TaskList tl) {
-	//byte[] bytes;
-	//Object object = null;
-	//try {
-	//bytes = ObjectToBytes((Object) tl);
-	//object = bytesToObject(bytes);
-	//} catch (IOException e) {
-	//Log.d(TAG,"IOException : "+e.getStackTrace().toString());
-	//} catch (ClassNotFoundException e){
-	//Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
-	//}
-	//return (TaskList) object;
-	//}
 
 	public void setBytes(byte[] buffer) {
 		this.receivedTLBytes = buffer;
@@ -138,9 +123,6 @@ public class SyncBTService {
 	private synchronized void setState(int state) {
 		if (D) Log.d(TAG, "setState() " + mState + " -> " + state);
 		mState = state;
-
-		// Give the new state to the Handler so the UI Activity can update
-		//mHandler.obtainMessage(NoteSync.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
 	}
 
 	/**
@@ -225,20 +207,11 @@ public class SyncBTService {
 		}
 
 		// Start the thread to manage the connection and perform transmissions
-		if (server) {
+		// chacun a un server et un client séparés pour envoyer et recevoir respectivement
 			mConnectedThreadServer = new ConnectedThreadServer(socket, socketType);
 			mConnectedThreadServer.start();
-		} else {
 			mConnectedThreadClient = new ConnectedThreadClient(socket, socketType);
 			mConnectedThreadClient.start();
-		}
-
-		// Send the name of the connected device back to the UI Activity
-		//Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_DEVICE_NAME);
-		//Bundle bundle = new Bundle();
-		//bundle.putString(NoteSync.DEVICE_NAME, device.getName());
-		//msg.setData(bundle);
-		//mHandler.sendMessage(msg);
 
 		setState(STATE_CONNECTED);
 			}
@@ -276,50 +249,17 @@ public class SyncBTService {
 	}
 
 	/**
-	 * Write to the ConnectedThread in an unsynchronized manner
-	 * @param out The bytes to write
-	 * @see ConnectedThread#write(byte[])
-	 */
-	//public void write(byte[] out) {
-	// Create temporary object
-	//ConnectedThread r;
-	// Synchronize a copy of the ConnectedThread
-	//synchronized (this) {
-	//if (mState != STATE_CONNECTED) return;
-	//r = mConnectedThread;
-	//}
-	// Perform the write unsynchronized
-	//r.write(out);
-	//}
-
-	/**
 	 * Indicate that the connection attempt failed and notify the UI Activity.
 	 */
 	private void connectionFailed() {
-		// Send a failure message back to the Activity
-		//Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_TOAST);
-		//Bundle bundle = new Bundle();
-		//bundle.putString(NoteSync.TOAST, "Unable to connect device");
-		//msg.setData(bundle);
-		//mHandler.sendMessage(msg);
-
-		// Start the service over to restart listening mode
-		//NoteSyncService.this.start();
+		//à faire
 	}
 
 	/**
 	 * Indicate that the connection was lost and notify the UI Activity.
 	 */
 	private void connectionLost() {
-		// Send a failure message back to the Activity
-		//Message msg = mHandler.obtainMessage(NoteSync.MESSAGE_TOAST);
-		//Bundle bundle = new Bundle();
-		//bundle.putString(NoteSync.TOAST, "Device connection was lost");
-		//msg.setData(bundle);
-		//mHandler.sendMessage(msg);
-
-		// Start the service over to restart listening mode
-		//NoteSyncService.this.start();
+		//à faire
 	}
 
 	/**
@@ -333,7 +273,6 @@ public class SyncBTService {
 		private String mSocketType;
 
 		public AcceptThread(boolean secure) {
-			//notesync.showToast("Accept thread created");
 			BluetoothServerSocket tmp = null;
 			mSocketType = secure ? "Secure":"Insecure";
 
@@ -429,11 +368,9 @@ public class SyncBTService {
 				if (secure) {
 					tmp = device.createRfcommSocketToServiceRecord(
 							MY_UUID_SECURE);
-					//Toast.makeText(notesync, "secure", Toast.LENGTH_SHORT).show();
 				} else {
 					tmp = device.createInsecureRfcommSocketToServiceRecord(
 							MY_UUID_INSECURE);
-					//Toast.makeText(notesync, "insecure", Toast.LENGTH_SHORT).show();
 				}
 			} catch (IOException e) {
 				Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
@@ -537,219 +474,104 @@ public class SyncBTService {
 				int i=0;
 				for (i=0 ; i<bytes.length ; i+=BIG_NUM) {
 					int j = ((i+BIG_NUM) < bytes.length) ? BIG_NUM : bytes.length - i ;
-					//b.write(bytes,i,j);
 					mmOutStream.write(bytes,i,j);
-					//b.flush();
 					mmOutStream.flush();
 				}
-				//ObjectOutputStream oos = new ObjectOutputStream(mmOutStream);
-				//oos.writeObject(originalTL);
-				//oos.writeObject(new String("testClient"));
 				Log.d(TAG,"task list sent");
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
 			}
 
+			SyncBTService.this.endSync(true);
+		}
+
+		public void cancel() {
+			try {
+				mmSocket.close();
+				Log.e(TAG, "mConnectedThreadServer closed");
+			} catch (IOException e) {
+				Log.e(TAG, "close() of connect socket failed", e);
+			}
+		}
+	}
+
+	/**
+	 * This thread runs during a connection with a remote device.
+	 * It handles all incoming and outgoing transmissions.
+	 */
+	private class ConnectedThreadClient extends Thread {
+		private final BluetoothSocket mmSocket;
+		private final InputStream mmInStream;
+		//private final OutputStream mmOutStream;
+
+		public ConnectedThreadClient(BluetoothSocket socket, String socketType) {
+			Log.d(TAG, "create ConnectedThreadClient: " + socketType);
+			mmSocket = socket;
+			InputStream tmpIn = null;
+			//OutputStream tmpOut = null;
+
+			// Get the BluetoothSocket input and output streams
+			try {
+				tmpIn = socket.getInputStream();
+				//tmpOut = socket.getOutputStream();
+			} catch (IOException e) {
+				Log.e(TAG, "temp sockets not created", e);
+			}
+
+			mmInStream = tmpIn;
+			//mmOutStream = tmpOut;
+		}
+
+		public void run() {
+			Log.i(TAG, "BEGIN mConnectedThreadClient");
+			byte[] buffer;
+
 			// Keep listening to the InputStream while connected
 			//boolean received = false;
-			//try {
-			//ObjectInputStream ois = new ObjectInputStream(mmInStream);
-			//Log.d(TAG,"reading and merging...");
-			//notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge((TaskList) ois.readObject(), originalTL)));
-			//Log.d(TAG,"task list merged");
-			//TaskList receivedTL = (TaskList) ois.readObject();
-			//Log.d(TAG,"task list received");
-			//TaskList mergedTL = TaskList.merge(originalTL, receivedTL);
-			//Log.d(TAG, (String) ois.readObject()+" received");
-			//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
-			//DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream));
-			//Log.d(TAG,"now reading");
-			//int TLSize = d.readInt();
-			//Log.e(TAG, "Taille TL : " + TLSize);
-			//int bytes = 0;
-			//buffer = new byte[TLSize];
-			//while (bytes < TLSize) {
-			//bytes += d.read(buffer,bytes,TLSize-bytes);
-			//}
-			//Log.e(TAG, "data received");
-			//Log.e(TAG, bytes + " bytes received");
-			//SyncBTService.this.setBytes(buffer);
-			//Log.e(TAG, "buffer set in outer class ");
-			//Log.e(TAG, "TL received : " + buffer.hashCode()); //test
-			//String st = new String(buffer);
-			//Log.e(TAG, "TL received : " + st); //test
-			//TaskList receivedTL = bytesToTL(buffer);
-			//this.sleep(06000);
-			//d.close();
-			//Log.d(TAG,"socket closed");
-			//} catch (IOException e) {
-			//Log.e(TAG, "disconnected", e);
-			//connectionLost();
-			// Start the service over to restart listening mode
-			//NoteSyncService.this.start();
-			//break;
-			//} catch (InterruptedException e) {
-			//Log.d(TAG,"InterruptedException : "+e.getStackTrace().toString());
-			//} catch (ClassNotFoundException e) {
-			//Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
-			//}
-			//} catch (IOException e) {
-			//Log.e(TAG, "Exception during write", e);
-			//mConnectedThreadServer = new ConnectedThreadServer(mmSocket, "second server");
-			//mConnectedThreadServer.start();
-			//}
-			SyncBTService.this.endSync(true);
-	}
-
-	public void cancel() {
-		try {
-			mmSocket.close();
-			Log.e(TAG, "mConnectedThreadServer closed");
-		} catch (IOException e) {
-			Log.e(TAG, "close() of connect socket failed", e);
-		}
-	}
-}
-
-/**
- * This thread runs during a connection with a remote device.
- * It handles all incoming and outgoing transmissions.
- */
-private class ConnectedThreadClient extends Thread {
-	private final BluetoothSocket mmSocket;
-	private final InputStream mmInStream;
-	//private final OutputStream mmOutStream;
-
-	public ConnectedThreadClient(BluetoothSocket socket, String socketType) {
-		Log.d(TAG, "create ConnectedThreadClient: " + socketType);
-		mmSocket = socket;
-		InputStream tmpIn = null;
-		//OutputStream tmpOut = null;
-
-		// Get the BluetoothSocket input and output streams
-		try {
-			tmpIn = socket.getInputStream();
-			//tmpOut = socket.getOutputStream();
-		} catch (IOException e) {
-			Log.e(TAG, "temp sockets not created", e);
-		}
-
-		mmInStream = tmpIn;
-		//mmOutStream = tmpOut;
-	}
-
-	public void run() {
-		Log.i(TAG, "BEGIN mConnectedThreadClient");
-		byte[] buffer;
-
-		// Keep listening to the InputStream while connected
-		//boolean received = false;
-		try {
-			DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream));
-			int TLSize = d.readInt();
-		Log.e(TAG, "Taille TL client : " + TLSize);
-			BufferedInputStream b = new BufferedInputStream(mmInStream);
-			int bytes = 0;
-			buffer = new byte[TLSize];
-			while (bytes < TLSize) {
-				//bytes += b.read(buffer,bytes,TLSize-bytes);
-				bytes += mmInStream.read(buffer,bytes,TLSize-bytes);
-				//Log.e(TAG, "bytes=" + bytes);
-			}
-			Log.e(TAG, "data received");
-			Log.e(TAG, bytes + " bytes received");
-			SyncBTService.this.setBytes(buffer);
-			Log.e(TAG, "buffer set in outer class ");
-			//TaskList receivedTL = bytesToTL(buffer);
-			//String st = new String(buffer);
-			//Log.e(TAG, "TL received : " + st); //test
-			//ObjectInputStream ois = new ObjectInputStream(mmInStream);
-			//Log.d(TAG,"reading and merging...");
-			//notesync.runOnUiThread(new SetTaskListRun(notesync, TaskList.merge((TaskList) ois.readObject(), originalTL)));
-			//Log.d(TAG,"task list merged");
-			//TaskList receivedTL = (TaskList) ois.readObject();
-			//Log.d(TAG,"task list received");
-			//TaskList mergedTL = TaskList.merge(originalTL, receivedTL);
-			//Log.d(TAG, (String) ois.readObject()+" received");
-			//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
-		} catch (IOException e) {
-			Log.e(TAG, "disconnected", e);
-			connectionLost();
-			// Start the service over to restart listening mode
-			//NoteSyncService.this.start();
-			//break;
-			//} catch (ClassNotFoundException e) {
-			//Log.d(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
+			try {
+				DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream));
+				int TLSize = d.readInt();
+				Log.e(TAG, "Taille TL client : " + TLSize);
+				BufferedInputStream b = new BufferedInputStream(mmInStream);
+				int bytes = 0;
+				buffer = new byte[TLSize];
+				while (bytes < TLSize) {
+					bytes += mmInStream.read(buffer,bytes,TLSize-bytes);
+				}
+				Log.e(TAG, "data received");
+				Log.e(TAG, bytes + " bytes received");
+				SyncBTService.this.setBytes(buffer);
+				Log.e(TAG, "buffer set in outer class ");
+			} catch (IOException e) {
+				Log.e(TAG, "disconnected", e);
+				connectionLost();
 			}
 
-	//try {
-	//ObjectOutputStream oos = new ObjectOutputStream(mmOutStream);
-	//Log.d(TAG,"writing object...");
-	//oos.writeObject(originalTL);
-	//Log.d(TAG,"task list sent");
-	//oos.writeObject(new String("testServer"));
-	//Test ot = new Test(88);
-	//ot.addString("chat");
-	//ot.addString("miaou");
-	//ot.addString("lait");
-	//ot.addString("mu");
-	//ot.addString("dou");
-	//ot.addString("moustache soyeuse");
-	//for (int j=0 ; j<3 ; j++)
-	//ot.addString("chaton "+j);
-	//byte[] bytes = ObjectToBytes((Object) ot);
-	//byte[] bytes = ObjectToBytes((Object) originalTL);
-	//int TLSize = bytes.length;
-	//int BIG_NUM = 1000;
-	//DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,TLSize+4));
-	//this.sleep(04000);
-	//Log.e(TAG, "Taille TL : " + TLSize);
-	//d.writeInt(TLSize);
-	//Log.e(TAG, "Taille TL sent");
-	//this.sleep(04000);
-	//int i=0;
-	//for (i=0 ; i<bytes.length ; i+=BIG_NUM) {
-	//int b = ((i+BIG_NUM) < bytes.length) ? BIG_NUM : bytes.length - i ;
-	//d.write(bytes,i,b);
-	//d.flush();
-	//}
-	//Log.e(TAG, "TL sent : " + bytes.hashCode()); //test
-	//Log.d(TAG,"task list sent");
-	//this.sleep(10000);
-	//d.close();
-	//Log.d(TAG,"socket closed");
-	//} catch (IOException e) {
-	//Log.e(TAG, "Exception during write", e);
-	//} catch (InterruptedException e) {
-	//Log.d(TAG,"InterruptedException : "+e.getStackTrace().toString());
-	//}
-	//mConnectedThreadClient = new ConnectedThreadClient(mmSocket, "second client");
-	//mConnectedThreadClient.start();
-	SyncBTService.this.endSync(false);
+			SyncBTService.this.endSync(false);
 
-	}
+		}
 
-	public void cancel() {
-		try {
-			mmSocket.close();
-			Log.e(TAG, "mConnectedThreadClient closed");
-		} catch (IOException e) {
-			Log.e(TAG, "close() of connect socket failed", e);
+		public void cancel() {
+			try {
+				mmSocket.close();
+				Log.e(TAG, "mConnectedThreadClient closed");
+			} catch (IOException e) {
+				Log.e(TAG, "close() of connect socket failed", e);
+			}
 		}
 	}
-}
 
-private static byte[] ObjectToBytes(Object object) throws IOException {
-	ByteArrayOutputStream b = new ByteArrayOutputStream();
-	ObjectOutputStream o = new ObjectOutputStream(b);
-	o.writeObject(object);
-	return b.toByteArray();
-}
+	private static byte[] ObjectToBytes(Object object) throws IOException {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+		ObjectOutputStream o = new ObjectOutputStream(b);
+		o.writeObject(object);
+		return b.toByteArray();
+	}
 
-private static Object bytesToObject(byte[] bytes) throws IOException, ClassNotFoundException {
-	ByteArrayInputStream b = new ByteArrayInputStream(bytes);
-	ObjectInputStream o = new ObjectInputStream(b);
-	return  o.readObject();
-}
+	private static Object bytesToObject(byte[] bytes) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+		ObjectInputStream o = new ObjectInputStream(b);
+		return  o.readObject();
+	}
 
 }
