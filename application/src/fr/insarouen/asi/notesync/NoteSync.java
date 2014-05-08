@@ -233,11 +233,11 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks,
 				   Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				   startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
 			   } else {
-						   mChatService = new SyncBTService(this);
-						   mChatService.start();
-						   Intent serverIntent = null;
-						   serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
-						   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+				   mChatService = new SyncBTService(this);
+				   mChatService.start();
+				   Intent serverIntent = null;
+				   serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
+				   startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 			   }
 		   }
 

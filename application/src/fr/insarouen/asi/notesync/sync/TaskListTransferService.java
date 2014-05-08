@@ -57,8 +57,9 @@ public class TaskListTransferService extends IntentService {
 				outputStream.writeObject(originalTL);
 
 				ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+				TaskList receivedTL = (TaskList) inputStream.readObject();
 
-				TaskList mergedTL = TaskList.merge(noteSync.getTasks(), (TaskList) inputStream.readObject());
+				TaskList mergedTL = TaskList.merge(noteSync.getTasks(), receivedTL);
 
 				noteSync.runOnUiThread(new SetTaskListRun(noteSync, mergedTL));
 
@@ -107,8 +108,10 @@ public class TaskListTransferService extends IntentService {
 
 				Socket client = serverSocket.accept();
 				ObjectInputStream inputStream = new ObjectInputStream(client.getInputStream());
+				TaskList receivedTL = (TaskList) inputStream.readObject();
 
-				TaskList mergedTL = TaskList.merge(noteSync.getTasks(), (TaskList) inputStream.readObject());
+
+				TaskList mergedTL = TaskList.merge(noteSync.getTasks(), receivedTL);
 
 				noteSync.runOnUiThread(new SetTaskListRun(noteSync, mergedTL));
 

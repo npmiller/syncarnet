@@ -102,12 +102,14 @@ public class SyncBTService {
 			//doit fermer la fenêtre de synchro bt
 		} else {
 			try {
-				TaskList receivedTL = (TaskList) bytesToObject(this.receivedTLBytes);
-				Log.d(TAG,"task list rebuilt : "+receivedTL.toString());
-				TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
-				Log.d(TAG,"task list merged : "+mergedTL.toString());
-				notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
-				Log.e(TAG, "finally sync !");
+				Test ot = (Test) bytesToObject(this.receivedTLBytes);
+				Log.d(TAG, "objet test reçu : "+ot.toStringShort());
+				//TaskList receivedTL = (TaskList) bytesToObject(this.receivedTLBytes);
+				//Log.d(TAG,"task list rebuilt : "+receivedTL.toString());
+				//TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
+				//Log.d(TAG,"task list merged : "+mergedTL.toString());
+				//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
+				//Log.e(TAG, "finally sync !");
 			} catch (IOException e) {
 				Log.e(TAG, "IOException during bytesToObject", e);
 			} catch (ClassNotFoundException e) {
@@ -452,18 +454,19 @@ public class SyncBTService {
 			byte[] buffer;
 
 			try {
-				//Test ot = new Test(62);
-				//ot.addString("otarie");
-				//ot.addString("ocean");
-				//ot.addString("plouf");
-				//ot.addString("glou");
-				//ot.addString("honk");
-				//ot.addString("nageoire");
-				//ot.addString("huile pas pouih");
-				//for (int j=0 ; j<3000 ; j++)
-				//ot.addString("otarie "+j);
-				//byte[] bytes = ObjectToBytes((Object) ot);
-				byte[] bytes = ObjectToBytes((Object) originalTL);
+				Test ot = new Test(new Random().nextInt());
+				ot.addString("otarie");
+				ot.addString("ocean");
+				ot.addString("plouf");
+				ot.addString("glou");
+				ot.addString("honk");
+				ot.addString("nageoire");
+				ot.addString("huile pas pouih");
+				for (int j=1 ; j<=40 ; j++)
+				ot.addString("otarie "+j);
+				ot.addString("honk");
+				byte[] bytes = ObjectToBytes((Object) ot);
+				//byte[] bytes = ObjectToBytes((Object) originalTL);
 				int TLSize = bytes.length;
 				int BIG_NUM = 1000;
 				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,4));

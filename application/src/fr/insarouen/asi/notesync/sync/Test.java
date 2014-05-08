@@ -17,10 +17,14 @@ public class Test extends ArrayList<String> implements Serializable {
 		super.add(string);
 	}
 
+	public String toStringShort() {
+		return this.valeur + " " + this.get(0) + " " + this.get(this.size()-1);
+	}
+
 	public String toString() {
 		String res = "" + this.valeur;
 		for (String s : this) 
-			res = res + " i";
+			res = res + " " + s;
 		return res;
 	}
 
