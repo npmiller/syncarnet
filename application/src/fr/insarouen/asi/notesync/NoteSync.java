@@ -125,6 +125,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		ft.replace(R.id.container, new TaskListFragment());
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+		getFragmentManager().popBackStack();
 		ft.commit();
 	}
 
@@ -146,6 +147,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		ft.replace(R.id.container, new TaskListFragment());
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+		getFragmentManager().popBackStack();
 		ft.commit();
 	}
 
