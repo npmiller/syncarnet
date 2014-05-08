@@ -102,8 +102,9 @@ public class SyncBTService {
 			//doit fermer la fenêtre de synchro bt
 		} else {
 			try {
-				Test ot = (Test) bytesToObject(this.receivedTLBytes);
-				Log.d(TAG, "objet test reçu : "+ot.toStringShort());
+				//Test ot = (Test) bytesToObject(this.receivedTLBytes);
+				String stReceived = (String) bytesToObject(this.receivedTLBytes);
+				Log.d(TAG, "objet test reçu : " + stReceived);
 				//TaskList receivedTL = (TaskList) bytesToObject(this.receivedTLBytes);
 				//Log.d(TAG,"task list rebuilt : "+receivedTL.toString());
 				//TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
@@ -455,30 +456,30 @@ public class SyncBTService {
 
 			try {
 				Test ot = new Test(new Random().nextInt());
-				ot.addString("otarie");
+				Log.e(TAG, "Creating test object...");
 				ot.addString("ocean");
+				ot.addString("otarie");
 				ot.addString("plouf");
 				ot.addString("glou");
 				ot.addString("honk");
 				ot.addString("nageoire");
 				ot.addString("huile pas pouih");
-				for (int j=1 ; j<=40 ; j++)
+				for (int j=1 ; j<=400 ; j++)
 				ot.addString("otarie "+j);
 				ot.addString("honk");
-				byte[] bytes = ObjectToBytes((Object) ot);
+				Log.e(TAG, "toString...");
+				String stSent = ot.toString();
+				Log.e(TAG, "ObjectToBytes...");
+				byte[] bytes = ObjectToBytes((Object) stSent);
 				//byte[] bytes = ObjectToBytes((Object) originalTL);
+				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,400));
 				int TLSize = bytes.length;
-				int BIG_NUM = 1000;
-				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,4));
 				Log.e(TAG, "Taille TL server : " + TLSize);
 				d.writeInt(TLSize);
 				Log.e(TAG, "Taille TL sent");
-				BufferedOutputStream b = new BufferedOutputStream(mmOutStream,TLSize);
-				int i=0;
-				for (i=0 ; i<bytes.length ; i+=BIG_NUM) {
-					int j = ((i+BIG_NUM) < bytes.length) ? BIG_NUM : bytes.length - i ;
-					mmOutStream.write(bytes,i,j);
-					mmOutStream.flush();
+				for (int i=0 ; i<bytes.length ; i++) {
+					d.write(bytes[i]);
+					d.flush();
 				}
 				Log.d(TAG,"task list sent");
 			} catch (IOException e) {
@@ -532,18 +533,19 @@ public class SyncBTService {
 			// Keep listening to the InputStream while connected
 			//boolean received = false;
 			try {
-				DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream));
+				DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
 				int TLSize = d.readInt();
 				Log.e(TAG, "Taille TL client : " + TLSize);
-				BufferedInputStream b = new BufferedInputStream(mmInStream);
-				int bytes = 0;
-				buffer = new byte[TLSize];
-				while (bytes < TLSize) {
-					bytes += mmInStream.read(buffer,bytes,TLSize-bytes);
+				int bytesRead;
+				byte[] dataBytes = new byte[TLSize];
+				byte[] tmpByte = new byte[1];
+				for(bytesRead=0; bytesRead < TLSize; bytesRead++) {
+					d.read(tmpByte, 0, 1);
+					dataBytes[bytesRead] = tmpByte[0];
 				}
 				Log.e(TAG, "data received");
-				Log.e(TAG, bytes + " bytes received");
-				SyncBTService.this.setBytes(buffer);
+				Log.e(TAG, bytesRead + " bytes received");
+				SyncBTService.this.setBytes(dataBytes);
 				Log.e(TAG, "buffer set in outer class ");
 			} catch (IOException e) {
 				Log.e(TAG, "disconnected", e);

@@ -3,29 +3,32 @@ package fr.insarouen.asi.notesync.sync;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.lang.StringBuilder;
 
 import java.io.Serializable;
 
-public class Test extends ArrayList<String> implements Serializable {
+public class Test  implements Serializable {
 	private int valeur;
+	private String chaine = "";
 
 	public Test(int valeur) {
 		this.valeur = valeur;
 	}
 
 	public void addString(String string) {
-		super.add(string);
+		StringBuilder sb = new StringBuilder(this.chaine);
+		sb.append(" " + string);
+		this.chaine = sb.toString();
 	}
 
 	public String toStringShort() {
-		return this.valeur + " " + this.get(0) + " " + this.get(this.size()-1);
+		return this.valeur + this.chaine.substring(0,5) + this.chaine.substring(this.chaine.length()-5,this.chaine.length());
 	}
 
 	public String toString() {
-		String res = "" + this.valeur;
-		for (String s : this) 
-			res = res + " " + s;
-		return res;
+		StringBuilder sb = new StringBuilder(this.chaine);
+		sb.insert(0,this.valeur + " ");
+		return sb.toString();
 	}
 
 }
