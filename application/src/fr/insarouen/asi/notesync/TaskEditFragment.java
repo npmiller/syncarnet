@@ -81,6 +81,10 @@ public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDat
 			@Override
 			public void onClick(View V) {
 				TaskEditFragment.this.cal = null;
+				Toast toast = Toast.makeText(getActivity(),
+						getActivity().getString(R.string.dateCleared),
+						Toast.LENGTH_SHORT);
+				toast.show();
 			}
 		});
 

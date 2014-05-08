@@ -34,6 +34,7 @@
     <string name="AllProjects">Tous les projets</string>
     <string name="clearDeleted">Vider les tâches supprimées</string>
     <string name="deletedTaskCleared">Cache des tâches supprimées vidé.</string>
+	<string name="dateCleared">Date d\'échéance supprimée</string>
     <string-array name="priorities">
         <item>Basse</item>
         <item>Moyenne</item>
