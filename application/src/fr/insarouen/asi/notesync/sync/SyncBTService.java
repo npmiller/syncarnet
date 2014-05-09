@@ -103,14 +103,14 @@ public class SyncBTService {
 		} else {
 			try {
 				//Test ot = (Test) bytesToObject(this.receivedTLBytes);
-				String stReceived = (String) bytesToObject(this.receivedTLBytes);
-				Log.d(TAG, "objet test reçu : " + stReceived);
-				//TaskList receivedTL = (TaskList) bytesToObject(this.receivedTLBytes);
-				//Log.d(TAG,"task list rebuilt : "+receivedTL.toString());
-				//TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
-				//Log.d(TAG,"task list merged : "+mergedTL.toString());
-				//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
-				//Log.e(TAG, "finally sync !");
+				//String stReceived = (String) bytesToObject(this.receivedTLBytes);
+				//Log.d(TAG, "objet test reçu : " + stReceived);
+				TaskList receivedTL = (TaskList) bytesToObject(this.receivedTLBytes);
+				Log.d(TAG,"task list rebuilt : "+receivedTL.toString());
+				TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
+				Log.d(TAG,"task list merged : "+mergedTL.toString());
+				notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
+				Log.e(TAG, "finally sync !");
 			} catch (IOException e) {
 				Log.e(TAG, "IOException during bytesToObject", e);
 			} catch (ClassNotFoundException e) {
@@ -455,23 +455,23 @@ public class SyncBTService {
 			byte[] buffer;
 
 			try {
-				Test ot = new Test(new Random().nextInt());
-				Log.e(TAG, "Creating test object...");
-				ot.addString("ocean");
-				ot.addString("otarie");
-				ot.addString("plouf");
-				ot.addString("glou");
-				ot.addString("honk");
-				ot.addString("nageoire");
-				ot.addString("huile pas pouih");
-				for (int j=1 ; j<=400 ; j++)
-				ot.addString("otarie "+j);
-				ot.addString("honk");
-				Log.e(TAG, "toString...");
-				String stSent = ot.toString();
-				Log.e(TAG, "ObjectToBytes...");
-				byte[] bytes = ObjectToBytes((Object) stSent);
-				//byte[] bytes = ObjectToBytes((Object) originalTL);
+				//Test ot = new Test(new Random().nextInt());
+				//Log.e(TAG, "Creating test object...");
+				//ot.addString("ocean");
+				//ot.addString("otarie");
+				//ot.addString("plouf");
+				//ot.addString("glou");
+				//ot.addString("honk");
+				//ot.addString("nageoire");
+				//ot.addString("huile pas pouih");
+				//for (int j=1 ; j<=400 ; j++)
+				//ot.addString("otarie "+j);
+				//ot.addString("honk");
+				//Log.e(TAG, "toString...");
+				//String stSent = ot.toString();
+				//Log.e(TAG, "ObjectToBytes...");
+				//byte[] bytes = ObjectToBytes((Object) stSent);
+				byte[] bytes = ObjectToBytes((Object) originalTL);
 				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,400));
 				int TLSize = bytes.length;
 				Log.e(TAG, "Taille TL server : " + TLSize);
