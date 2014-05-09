@@ -3,6 +3,13 @@
 package fr.insarouen.asi.notesync {
 class NoteSync {
 	+onCreate(Bundle)
+	+void setIsWifiP2pEnabled(boolean)
+	+boolean isWifiP2pEnabled()
+	+void setTaskList(TaskList)
+	+void onSyncBTClick()
+	+void onSyncWifiClick()
+	+void onActivityResult(int, int, Intent)
+	+void onInitiateDiscovery()
 }
 
 class TaskListAdapter {
