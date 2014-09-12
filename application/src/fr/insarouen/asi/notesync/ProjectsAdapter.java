@@ -25,14 +25,5 @@ public class ProjectsAdapter extends ArrayAdapter<String> {
 	public int getCount() {
 		return super.getCount() + 1;
 	}
-
-	@Override
-	public long getItemId(int position) {
-		if(position == 0) {
-			return 45122;
-		} else {
-			return super.getItemId(position - 1);
-		}
-	}
 }
 

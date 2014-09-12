@@ -1,0 +1,9 @@
+@startuml
+
+!include task.pluml
+
+!include sync.pluml
+
+!include notesync.pluml
+
+@enduml

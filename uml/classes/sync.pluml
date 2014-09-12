@@ -1,0 +1,148 @@
+@startuml
+
+package fr.insarouen.asi.notesync.sync {
+
+class DeviceListActivity {
+	{static} String EXTRA_DEVICE_ADDRESS = "device_address"
+
+	#onCreate(Bundle)
+	#onDestroy()
+	-void doDiscovery()
+}
+
+DeviceListActivity <|- Activity
+
+class NoteSyncBroadcastReceiver {
+	+NoteSyncBroadcastReceiver NoteSyncBroadcastReceiver(WifiP2pManager, Channel, NoteSync)
+	+onReceive(Context, Intent)
+}
+
+NoteSyncBroadcastReceiver <|- BroadcastReceiver
+
+interface PeerListListener
+interface ConnectionInfoListener
+class PeerList {
+	+PeerList PeerList(NoteSync, WifiP2pManager, Channel)
+	+void setIntent(Intent)
+	+void onPeersAvailable(WifiP2pDeviceList)
+	+void onConnectionInfoAvailable(final WifiP2pInfo)
+}
+
+PeerList <|- PeerListListener
+PeerList <|- ConnectionInfoListener
+
+'static
+class ServiceStatic {
+   +{static} Intent
+   +{static} NoteSync
+   +{static} String
+   +{static} boolean
+
+   +{static} void set(Intent, NoteSync, String, boolean)
+   +{static} Intent getIntent()
+   +{static} Intent getNoteSync()
+   +{static} Intent getHost()
+   +{static} Intent getIsGroupOwner()
+}
+
+PeerList +-- ServiceStatic
+
+class PeerListAdapter {
+	+PeerListAdapter PeerListAdapter(Context, List<WifiP2pDevice>)
+	+int getCount()
+	+Object getItem(int)
+	+long getItemId(int)
+	+View getView(int, View, ViewGroup)
+}
+
+PeerListAdapter <|- BaseAdapter
+
+class PeerListDialog {
+	+PeerListDialog PeerListDialog(List<WifiP2pDevice>, OnPeerSelected)
+	+Dialog onCreateDialog(Bundle)
+	+setPeerList(List<WifiP2pDevice>)
+	+boolean peerListEmpty()
+	+void reconnect(NoteSync)
+
+	+interface OnPeerSelected
+}
+
+PeerListDialog <|- DialogFragment
+
+class PeerSelection {
+	+PeerSelection PeerSelection(WifiP2pManager, Channel, NoteSync)
+	+void onPeerSelected(WifiP2pDevice)
+	+void setConnected()
+}
+
+PeerSelection <|- OnPeerSelected
+
+class SyncBTService {
+	+{static} final int STATE_NONE = 0
+	+{static} final int STATE_LISTEN = 1
+	+{static} final int STATE_CONNECTING = 2
+	+{static} final int STATE_CONNECTED = 3
+
+	+SyncBTService SyncBTService()
+	+SyncBTService SyncBTService(NoteSync)
+	+void endSync(boolean)
+	+synchronized int getState()
+	+synchronized void start()
+	+synchronized void connect(BluetoothDevice, boolean)
+	+synchronized void connected(BluetoothSocket, BluetoothDevice, final String, boolean)
+	+synchronized void stop()
+}
+
+' private
+class AcceptThread {
+}
+class ConnectThread {
+}
+class ConnectedThreadClient {
+}
+class ConnectedThreadServer {
+}
+
+AcceptThread <|- Thread
+ConnectThread <|- Thread
+ConnectedThreadClient <|- Thread
+ConnectedThreadServer <|- Thread
+
+SyncBTService *-- AcceptThread
+SyncBTService *-- ConnectThread
+SyncBTService *-- ConnectedThreadClient
+SyncBTService *-- ConnectedThreadServer
+
+class TaskListTransferService {
+	+TaskListTransferService TaskListTransferService()
+	+int onStartCommand(Intent, int, int)
+	#void onHandleIntent (Intent)
+}
+
+TaskListTransferService <|- IntentService
+
+' static public
+class TaskListAsync {
+	+TaskListAsync TaskListAsync(NoteSync)
+	#String doInBackground(Void...)
+	#void onPostExecute(String)
+	#void onPreExecute()
+}
+
+TaskListAsync <|- AsyncTask
+
+TaskListTransferService +-- TaskListAsync
+
+' protected
+class SetTaskListRun {
+	+SetTaskListRun SetTaskListRun(NoteSync, TaskList)
+	+void run()
+}
+
+SetTaskListRun <|- Runnable
+
+TaskListTransferService *-- SetTaskListRun
+
+}
+
+@enduml

@@ -41,6 +41,9 @@
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
     <string name="AllProjects">All projects</string>
+    <string name="clearDeleted">Clear deleted tasks</string>
+    <string name="deletedTaskCleared">Deleted tasks\' cache cleaned.</string>
+	<string name="dateCleared">Due date cleared</string>
     <string-array name="priorities">
         <item>Low</item>
         <item>Medium</item>

@@ -25,9 +25,7 @@ import android.content.DialogInterface.OnClickListener;
 
 import android.util.Log;
 
-public class TaskListFragment extends ListFragment implements OnItemLongClickListener,
-							      ActionBar.OnNavigationListener
-{
+public class TaskListFragment extends ListFragment implements OnItemLongClickListener, ActionBar.OnNavigationListener {
 
 	public interface Callbacks {
 		public TaskList getTasks();
@@ -37,6 +35,7 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		public void onSyncWifiClick();
 		public void onSyncBTClick();
 		public void onAddClick();
+		public void onClearDeletedClick();
 	}
 
 	private ProjectsAdapter projects;
@@ -44,7 +43,7 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		
+
 		this.setListAdapter(((Callbacks)getActivity()).getTasksAdapter());
 		getListView().setOnItemLongClickListener(this);
 		setHasOptionsMenu(true);
@@ -70,7 +69,7 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		((Callbacks)getActivity()).showDetails(position);
 	}
-	
+
 	private class OnListItemLongClickListener implements OnClickListener {
 		private int position;
 
@@ -96,20 +95,19 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		adb.show();
 		return true;
 	}
-	
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.ab, menu);
-		//getActivity().onCreateOptionsMenu(menu);
 	}
 
 	public void filterByProject(String project) {
 		((TaskListAdapter)getListAdapter()).getFilter().filter(project);
 	}
 
+	/* Handle presses on the action bar items */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle presses on the action bar items
 		switch (item.getItemId()) {
 			case R.id.syncWifi:
 				((Callbacks)getActivity()).onSyncWifiClick();
@@ -120,10 +118,11 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 			case R.id.add:
 				((Callbacks)getActivity()).onAddClick();
 				return true;
+			case R.id.clearDeleted:
+				((Callbacks)getActivity()).onClearDeletedClick();
+				return true;
 			default:
 				return getActivity().onOptionsItemSelected(item);
 		}
 	}
-
-	
 }

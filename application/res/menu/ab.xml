@@ -11,4 +11,7 @@
 		android:icon="@drawable/ic_action_bluetooth"
 		android:title="@string/syncBT"
 		android:showAsAction="ifRoom" />
+	<item android:id="@+id/clearDeleted"
+		android:title="@string/clearDeleted"
+		android:showAsAction="never" />
 </menu>

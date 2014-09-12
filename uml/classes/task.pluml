@@ -1,0 +1,55 @@
+@startuml
+package fr.insarouen.asi.notesync.tasks {
+class Task <<Serializable>> {
+	-String description
+	-Calendar due
+	-long entry
+	-long modified
+	-String project
+	-Status status
+	-Priority priority
+	-UUID uuid
+	
+	+Task Task(String, Calendar, String, Priority)
+
+	+void setDescription(String)
+	+void setDue(Calendar)
+	+void setProject(String)
+	+void setPriority(Priority)
+
+	+String getDescription()
+	+String getFormattedDue()
+	+Calendar getDue()
+	+String getProject()
+	+Priority getPriority()
+	+UUID getUUID()
+
+	+boolean equals(Object)
+	+int hashCode()
+	+String toString()
+}
+
+enum Priority {
+	HIGH
+	MEDIUM
+	LOW
+}
+
+class TaskList <<Serializable>> {
+	-ArrayList<UUID> deletedTasks
+	-ArrayList<String> projects
+
+	+boolean add(Task)
+	+boolean remove(Object)
+	+Task remove(int)
+
+	+boolean deleted(Task)
+	+ArrayList<String> getProjects()
+
+	+static Tasklist merge(TaskList, TaskList)
+
+}
+}
+TaskList <|-- ArrayList
+
+@enduml
