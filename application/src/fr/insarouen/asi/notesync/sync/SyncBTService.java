@@ -455,33 +455,49 @@ public class SyncBTService {
 			byte[] buffer;
 
 			try {
-				//Test ot = new Test(new Random().nextInt());
-				//Log.e(TAG, "Creating test object...");
-				//ot.addString("ocean");
-				//ot.addString("otarie");
-				//ot.addString("plouf");
-				//ot.addString("glou");
-				//ot.addString("honk");
-				//ot.addString("nageoire");
-				//ot.addString("huile pas pouih");
-				//for (int j=1 ; j<=400 ; j++)
-				//ot.addString("otarie "+j);
-				//ot.addString("honk");
-				//Log.e(TAG, "toString...");
-				//String stSent = ot.toString();
-				//Log.e(TAG, "ObjectToBytes...");
-				//byte[] bytes = ObjectToBytes((Object) stSent);
-				byte[] bytes = ObjectToBytes((Object) originalTL);
+				Log.e(TAG, "Creating test object...");
+				Test ot = new Test(new Random().nextInt());
+				ot.addString("ocean");
+				ot.addString("otarie");
+				ot.addString("plouf");
+				ot.addString("glou");
+				ot.addString("honk");
+				ot.addString("nageoire");
+				ot.addString("huile pas pouih");
+				for (int j=1 ; j<=400 ; j++)
+				ot.addString("otarie "+j);
+				ot.addString("honk");
+
+				Log.e(TAG, "jsonifying...");
+				String stSent = ot.jsonify();
+
+				Log.e(TAG, "ObjectToBytes...");
+				byte[] bytes = ObjectToBytes((Object) stSent);
 				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,400));
+
 				int TLSize = bytes.length;
-				Log.e(TAG, "Taille TL server : " + TLSize);
+				Log.e(TAG, "Server test object size : " + TLSize);
+
 				d.writeInt(TLSize);
-				Log.e(TAG, "Taille TL sent");
+				Log.e(TAG, "Test object size sent");
+
 				for (int i=0 ; i<bytes.length ; i++) {
 					d.write(bytes[i]);
 					d.flush();
 				}
-				Log.d(TAG,"task list sent");
+				Log.d(TAG,"test object sent");
+
+				//byte[] bytes = ObjectToBytes((Object) originalTL);
+				//DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,400));
+				//int TLSize = bytes.length;
+				//Log.e(TAG, "Server TL size : " + TLSize);
+				//d.writeInt(TLSize);
+				//Log.e(TAG, "TL size sent");
+				//for (int i=0 ; i<bytes.length ; i++) {
+					//d.write(bytes[i]);
+					//d.flush();
+				//}
+				//Log.d(TAG,"task list sent");
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
 			}
@@ -535,7 +551,8 @@ public class SyncBTService {
 			try {
 				DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
 				int TLSize = d.readInt();
-				Log.e(TAG, "Taille TL client : " + TLSize);
+				Log.e(TAG, "Client test object size : " + TLSize);
+
 				int bytesRead;
 				byte[] dataBytes = new byte[TLSize];
 				byte[] tmpByte = new byte[1];
@@ -545,8 +562,28 @@ public class SyncBTService {
 				}
 				Log.e(TAG, "data received");
 				Log.e(TAG, bytesRead + " bytes received");
-				SyncBTService.this.setBytes(dataBytes);
-				Log.e(TAG, "buffer set in outer class ");
+
+				Test otReceived = new Test();
+				Log.e(TAG, "rebuilding test object");
+				String stringReceived = new String(dataBytes);
+				otReceived.unJsonify(stringReceived);
+				Log.e(TAG, "object received :");
+				Log.e(TAG, otReceived.toStringShort());
+
+				//DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
+				//int TLSize = d.readInt();
+				//Log.e(TAG, "Client TL size : " + TLSize);
+				//int bytesRead;
+				//byte[] dataBytes = new byte[TLSize];
+				//byte[] tmpByte = new byte[1];
+				//for(bytesRead=0; bytesRead < TLSize; bytesRead++) {
+					//d.read(tmpByte, 0, 1);
+					//dataBytes[bytesRead] = tmpByte[0];
+				//}
+				//Log.e(TAG, "data received");
+				//Log.e(TAG, bytesRead + " bytes received");
+				//SyncBTService.this.setBytes(dataBytes);
+				//Log.e(TAG, "buffer set in outer class ");
 			} catch (IOException e) {
 				Log.e(TAG, "disconnected", e);
 				connectionLost();
