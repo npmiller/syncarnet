@@ -102,14 +102,19 @@ public class SyncBTService {
 			//doit fermer la fenêtre de synchro bt
 		} else {
 			try {
-				//Test ot = (Test) bytesToObject(this.receivedTLBytes);
-				//String stReceived = (String) bytesToObject(this.receivedTLBytes);
-				//Log.d(TAG, "objet test reçu : " + stReceived);
-				TaskList receivedTL = (TaskList) bytesToObject(this.receivedTLBytes);
-				Log.d(TAG,"task list rebuilt : "+receivedTL.toString());
-				TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
-				Log.d(TAG,"task list merged : "+mergedTL.toString());
-				notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
+				Log.d(TAG, "rebuilding test object");
+				String st = (String) bytesToObject(this.receivedTLBytes);
+				Log.d(TAG, "string rebuilt : "+st);
+				Test ot = new Test();
+				//ot.unJsonifyFalse(st);
+				Log.d(TAG, "test object rebuilt");
+				Log.d(TAG, "test object received : " + ot.toStringShort());
+
+				//TaskList receivedTL = (TaskList) bytesToObject(this.receivedTLBytes);
+				//Log.d(TAG,"task list rebuilt : "+receivedTL.toString());
+				//TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
+				//Log.d(TAG,"task list merged : "+mergedTL.toString());
+				//notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
 				Log.e(TAG, "finally sync !");
 			} catch (IOException e) {
 				Log.e(TAG, "IOException during bytesToObject", e);
@@ -467,9 +472,10 @@ public class SyncBTService {
 				for (int j=1 ; j<=400 ; j++)
 				ot.addString("otarie "+j);
 				ot.addString("honk");
+				Log.e(TAG, "Test object created : "+ot.toStringShort());
 
 				Log.e(TAG, "jsonifying...");
-				String stSent = ot.jsonify();
+				String stSent = ot.jsonifyFalse();
 
 				Log.e(TAG, "ObjectToBytes...");
 				byte[] bytes = ObjectToBytes((Object) stSent);
@@ -562,13 +568,7 @@ public class SyncBTService {
 				}
 				Log.e(TAG, "data received");
 				Log.e(TAG, bytesRead + " bytes received");
-
-				Test otReceived = new Test();
-				Log.e(TAG, "rebuilding test object");
-				String stringReceived = new String(dataBytes);
-				otReceived.unJsonify(stringReceived);
-				Log.e(TAG, "object received :");
-				Log.e(TAG, otReceived.toStringShort());
+				SyncBTService.this.setBytes(dataBytes);
 
 				//DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
 				//int TLSize = d.readInt();
