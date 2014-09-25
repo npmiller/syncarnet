@@ -1,12 +1,19 @@
 package fr.insarouen.asi.notesync.tasks;
 
+import android.util.Log;
+
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class TaskList extends ArrayList<Task> implements Serializable {
+	private static final String TAG = "NoteSyncService";
 	private ArrayList<UUID> deletedTasks = new ArrayList<UUID>();
 	private ArrayList<String> projects = new ArrayList<String>();
 
@@ -112,5 +119,27 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 			}
 		}
 		return tf;
+	}
+
+	public String jsonify() {
+		StringBuilder sb = new StringBuilder();
+		JSONObject jsonTL = new JSONObject();
+		JSONArray jsonDeletedTasks = new JSONArray();
+		JSONArray jsonProjects = new JSONArray();
+		try {
+			for (int i = 0; i < deletedTasks.size(); i++)
+				jsonDeletedTasks.put(deletedTasks.get(i).toString());
+			jsonTL.put("deleted tasks", jsonDeletedTasks.toString());
+			for (int i = 0; i < projects.size(); i++)
+				jsonProjects.put(projects.get(i));
+			jsonTL.put("projects", jsonProjects.toString());
+			return jsonTL.toString();
+		} catch (JSONException e) {
+			Log.d(TAG, "Exception while jsonifying");
+			return "";
+		}
+	}
+
+	public void unJsonify(String json) {
 	}
 }
