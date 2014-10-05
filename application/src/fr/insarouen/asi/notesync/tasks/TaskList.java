@@ -122,7 +122,6 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 	}
 
 	public String jsonify() {
-		StringBuilder sb = new StringBuilder();
 		JSONObject jsonTL = new JSONObject();
 		JSONArray jsonDeletedTasks = new JSONArray();
 		JSONArray jsonProjects = new JSONArray();
@@ -141,5 +140,16 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 	}
 
 	public void unJsonify(String json) {
+		try {
+			JSONObject jsonTL = new JSONObject(json);
+			JSONArray jsonDeletedTasks = new JSONArray(jsonTL.getString("deletedTasks"));
+			for (int i = 0; i< jsonDeletedTasks.length(); i++)
+				this.deletedTasks.add(UUID.fromString(jsonDeletedTasks.getString(i)));
+			JSONArray jsonProjects = new JSONArray(jsonTL.getString("projects"));
+			for (int i = 0; i< jsonProjects.length(); i++)
+				this.projects.add(jsonProjects.getString(i));
+		} catch (JSONException e) {
+			Log.d(TAG, "Exception while unjsonifying");
+		}
 	}
 }
