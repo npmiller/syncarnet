@@ -54,6 +54,9 @@ public class Task implements Serializable {
 		this.priority = priority;
 	}
 
+	public Task() {
+	}
+
 	/* Setters */ 
 
 	public void setDescription(String description) {
@@ -161,5 +164,12 @@ public class Task implements Serializable {
 
 	public int hashCode() {
 		return uuid.hashCode();
+	}
+
+	public String jsonify() {
+		return "";
+	}
+
+	public void unJsonify(String json) {
 	}
 }

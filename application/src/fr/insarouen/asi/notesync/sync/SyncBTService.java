@@ -100,32 +100,6 @@ public class SyncBTService {
 		if (server) {
 			Log.d(TAG, "endSync server");
 			//doit fermer la fenêtre de synchro bt
-			try {
-				//Log.d(TAG, "rebuilding test object");
-				//String st = (String) bytesToObject(this.receivedTLBytes);
-				//Log.d(TAG, "string rebuilt");
-				//Test ot = new Test();
-				//ot.unJsonify(st);
-				//Log.d(TAG, "test object rebuilt");
-				//Log.d(TAG, "test object received : " + ot.toStringShort());
-
-				Log.d(TAG, "Rebuilding task list");
-				String st = (String) bytesToObject(this.receivedTLBytes);
-				Log.d(TAG, "String rebuilt");
-				TaskList receivedTL = new TaskList();
-				Log.d(TAG, "Unjsonifying");
-				receivedTL.unJsonify(st);
-				Log.d(TAG,"Task list rebuilt");
-				TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
-				Log.d(TAG,"Task list merged");
-				notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
-
-				Log.e(TAG, "finally sync !");
-			} catch (IOException e) {
-				Log.e(TAG, "IOException during bytesToObject", e);
-			} catch (ClassNotFoundException e) {
-				Log.e(TAG, "ClassNotFoundException during bytesToObject", e);
-			}
 		} else {
 			try {
 				//Log.d(TAG, "rebuilding test object");
@@ -527,7 +501,8 @@ public class SyncBTService {
 				//Log.d(TAG,"test object sent");
 
 				Log.e(TAG, "Jsonifying");
-				String TLString originalTL.jsonify();
+				String TLString = originalTL.jsonify();
+				Log.e(TAG, "Jsonifyed : "+TLString);
 				Log.e(TAG, "ObjectToBytes");
 				byte[] bytes = ObjectToBytes((Object) TLString);
 				int TLSize = bytes.length;
@@ -538,7 +513,7 @@ public class SyncBTService {
 				for (int i=0 ; i<bytes.length ; i++) {
 					d.write(bytes[i]);
 					d.flush();
-					Log.d(TAG,"Sent "+i+" bytes");
+					if (i % 1000 == 0) Log.d(TAG,"Sent "+i+" bytes");
 				}
 				Log.d(TAG,"Task list sent");
 			} catch (IOException e) {
@@ -616,7 +591,7 @@ public class SyncBTService {
 				for(bytesRead=0; bytesRead < TLSize; bytesRead++) {
 					d.read(tmpByte, 0, 1);
 					dataBytes[bytesRead] = tmpByte[0];
-					Log.d(TAG,"Received "+bytesRead+" bytes");
+					if (bytesRead % 1000 == 0) Log.d(TAG,"Received "+bytesRead+" bytes");
 				}
 				Log.e(TAG, "Data received");
 				Log.e(TAG, bytesRead + " bytes received");
