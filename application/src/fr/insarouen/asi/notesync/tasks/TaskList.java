@@ -134,7 +134,7 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 			for (int i = 0; i < deletedTasks.size(); i++)
 				jsonDeletedTasks.put(deletedTasks.get(i).toString());
 			jsonTL.put("deletedTasks", jsonDeletedTasks.toString());
-			Log.d(TAG, "Added delted tasks to json");
+			Log.d(TAG, "Added deleted tasks to json");
 			for (int i = 0; i < projects.size(); i++)
 				jsonProjects.put(projects.get(i));
 			jsonTL.put("projects", jsonProjects.toString());

@@ -112,7 +112,7 @@ public class SyncBTService {
 
 				Log.d(TAG, "Rebuilding task list");
 				String st = (String) bytesToObject(this.receivedTLBytes);
-				Log.d(TAG, "String rebuilt");
+				Log.d(TAG, "String rebuilt : "+st);
 				TaskList receivedTL = new TaskList();
 				Log.d(TAG, "Unjsonifying");
 				receivedTL.unJsonify(st);

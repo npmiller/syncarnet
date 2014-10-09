@@ -2,10 +2,15 @@ package fr.insarouen.asi.notesync.tasks;
 
 import java.text.DateFormat; // Use theses two classes for any other manipulations with dates
 
+import android.util.Log;
+
 import java.util.Date; // rightNow = new Date().getTime(); (In Unix Time)
 import java.util.UUID;
 import java.util.Calendar;
 import java.util.Comparator;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 
@@ -13,6 +18,7 @@ import java.io.Serializable;
  * Each task in our todo list is an instance of this class
  */
 public class Task implements Serializable {
+	private static final String TAG = "NoteSyncService";
 	private String description;
 	private String project=null;
 	private Priority priority=Priority.MEDIUM;
@@ -167,9 +173,45 @@ public class Task implements Serializable {
 	}
 
 	public String jsonify() {
-		return "";
+		JSONObject jsonTask = new JSONObject();
+		try {
+			jsonTask.put("description", this.description);
+			String project = this.project != null ? this.project : "VAR_NULL";
+			jsonTask.put("project", project);
+			String priority = this.priority.toString();
+			jsonTask.put("priority", priority);
+			String uuid = this.uuid.toString();
+			jsonTask.put("uuid", uuid);
+			long due = this.due != null ? this.due.getTimeInMillis() : 0;
+			jsonTask.put("due", due);
+			jsonTask.put("entry", this.entry);
+			jsonTask.put("modified", this.modified);
+			return jsonTask.toString();
+		} catch (JSONException e) {
+			Log.d(TAG, "Exception while jsonifying");
+			return "";
+		}
 	}
 
 	public void unJsonify(String json) {
+		try {
+			JSONObject jsonTask = new JSONObject(json);
+			this.description = jsonTask.getString("description");
+			String project = jsonTask.getString("project");
+			this.project = !project.equals("VAR_NULL") ? project : null;
+			this.priority = Priority.valueOf(jsonTask.getString("priority"));
+			this.uuid = UUID.fromString(jsonTask.getString("uuid"));
+			Calendar due = null;
+			long dueMillis = jsonTask.getLong("due");
+			if (dueMillis != 0) {
+				due = Calendar.getInstance();
+				due.setTimeInMillis(dueMillis);
+			}
+			this.due = due;
+			this.entry = jsonTask.getLong("entry");
+			this.modified = jsonTask.getLong("modified");
+		} catch (JSONException e) {
+			Log.d(TAG, "Exception while unjsonifying");
+		}
 	}
 }
