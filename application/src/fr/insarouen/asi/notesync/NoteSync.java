@@ -276,7 +276,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 					mChatService.start();
 					Intent serverIntent = null;
 					serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
-					startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+					startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
 				} else {
 					// User did not enable Bluetooth or an error occurred
 				}
