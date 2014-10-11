@@ -96,32 +96,24 @@ public class SyncBTService {
 	}
 
 	public void endSync(boolean server) {
-		Log.d(TAG, "last step to sync !");
+		Log.d(TAG, "Last step to sync !");
 		if (server) {
-			Log.d(TAG, "endSync server");
+			Log.d(TAG, "EndSync server");
 			//doit fermer la fenêtre de synchro bt
 		} else {
 			try {
-				//Log.d(TAG, "rebuilding test object");
-				//String st = (String) bytesToObject(this.receivedTLBytes);
-				//Log.d(TAG, "string rebuilt");
-				//Test ot = new Test();
-				//ot.unJsonify(st);
-				//Log.d(TAG, "test object rebuilt");
-				//Log.d(TAG, "test object received : " + ot.toStringShort());
-
 				Log.d(TAG, "Rebuilding task list");
 				String st = (String) bytesToObject(this.receivedTLBytes);
-				Log.d(TAG, "String rebuilt : "+st);
+				Log.d(TAG, "String rebuilt");
 				TaskList receivedTL = new TaskList();
 				Log.d(TAG, "Unjsonifying");
 				receivedTL.unJsonify(st);
-				Log.d(TAG,"Task list rebuilt");
+				Log.d(TAG, "Task list rebuilt");
 				TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
-				Log.d(TAG,"Task list merged");
+				Log.d(TAG, "Task list merged");
 				notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
 
-				Log.e(TAG, "finally sync !");
+				Log.e(TAG, "Finally sync !");
 			} catch (IOException e) {
 				Log.e(TAG, "IOException during bytesToObject", e);
 			} catch (ClassNotFoundException e) {
@@ -466,40 +458,6 @@ public class SyncBTService {
 			byte[] buffer;
 
 			try {
-				//Log.e(TAG, "Creating test object...");
-				//Test ot = new Test(new Random().nextInt());
-				//ot.addString("ocean");
-				//ot.addString("otarie");
-				//ot.addString("plouf");
-				//ot.addString("glou");
-				//ot.addString("honk");
-				//ot.addString("nageoire");
-				//ot.addString("huile pas pouih");
-				//for (int j=1 ; j<=400 ; j++)
-				//ot.addString("otarie "+j);
-				//ot.addString("honk");
-				//ot.addString(UUID.randomUUID().toString());
-				//Log.e(TAG, "Test object created : "+ot.toStringShort());
-
-				//Log.e(TAG, "jsonifying...");
-				//String stSent = ot.jsonify();
-
-				//Log.e(TAG, "ObjectToBytes...");
-				//byte[] bytes = ObjectToBytes((Object) stSent);
-				//DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,400));
-
-				//int TLSize = bytes.length;
-				//Log.e(TAG, "Server test object size : " + TLSize);
-
-				//d.writeInt(TLSize);
-				//Log.e(TAG, "Test object size sent");
-
-				//for (int i=0 ; i<bytes.length ; i++) {
-					//d.write(bytes[i]);
-					//d.flush();
-				//}
-				//Log.d(TAG,"test object sent");
-
 				Log.e(TAG, "Jsonifying");
 				String TLString = originalTL.jsonify();
 				Log.e(TAG, "Jsonifyed : "+TLString);
@@ -567,21 +525,6 @@ public class SyncBTService {
 			// Keep listening to the InputStream while connected
 			//boolean received = false;
 			try {
-				//DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
-				//int TLSize = d.readInt();
-				//Log.e(TAG, "Client test object size : " + TLSize);
-
-				//int bytesRead;
-				//byte[] dataBytes = new byte[TLSize];
-				//byte[] tmpByte = new byte[1];
-				//for(bytesRead=0; bytesRead < TLSize; bytesRead++) {
-					//d.read(tmpByte, 0, 1);
-					//dataBytes[bytesRead] = tmpByte[0];
-				//}
-				//Log.e(TAG, "data received");
-				//Log.e(TAG, bytesRead + " bytes received");
-				//SyncBTService.this.setBytes(dataBytes);
-
 				DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
 				int TLSize = d.readInt();
 				Log.e(TAG, "Client TL size : " + TLSize);
