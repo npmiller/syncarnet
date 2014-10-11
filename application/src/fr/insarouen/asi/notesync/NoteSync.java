@@ -230,39 +230,53 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		ft.commit();
 	}
 
-	public static class SyncActionChoiceDialog extends DialogFragment {
+	@Override
+	public void onClearDeletedClick() {
+		tasks.clearDeleted();
+		Toast.makeText(this, this.getString(R.string.deletedTaskCleared), Toast.LENGTH_SHORT).show();
+	}
 
-		int choice;
-		static SyncActionChoiceDialog newInstance(int choice) {
-			SyncActionChoiceDialog df = new SyncActionChoiceDialog();
-			Bundle args = new Bundle();
-			args.putInt("choice", choice);
-			df.setArguments(args);
-			return df;
+	/* Saving and retrieving the local TaskList */
+	private void saveTaskList(TaskList tl) {
+		try {
+			FileOutputStream fos = this.openFileOutput(filename, Context.MODE_PRIVATE);
+			ObjectOutputStream os = new ObjectOutputStream(fos);
+			os.writeObject(tl);
+		} catch (IOException e) {
+			Toast toast = Toast.makeText(this,
+					this.getString(R.string.nosave),
+					Toast.LENGTH_LONG);
+			toast.show();
 		}
+	}
+
+	private TaskList readTaskList() {
+		try {
+			FileInputStream fis = this.openFileInput(filename);
+			ObjectInputStream is = new ObjectInputStream(fis);
+			return (TaskList)is.readObject();
+		} catch (Exception e) {
+			return new TaskList();
+		}
+	}
+
+	//wifi part
+
+	public class WifiActionChoiceDialog extends DialogFragment {
 
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			choice = getArguments().getInt("choice");
 			// Use the Builder class for convenient dialog construction
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setMessage(R.string.syncActionChoice)
 				.setPositiveButton(R.string.discoverable, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						if (choice == 1) { //wifi
-							Log.d("NoteSync","discoverable wifi");
-						} else { //bt
-							Log.d("NoteSync","discoverable bt");
-						}
+						wifiDiscoverable();
 					}
 				})
 			.setNegativeButton(R.string.searchToSync, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
-						if (choice == 1) { //wifi
-							Log.d("NoteSync","search wifi");
-						} else { //bt
-							Log.d("NoteSync","search bt");
-						}
+					wifiConnectToPeer();
 				}
 			});
 			// Create the AlertDialog object and return it
@@ -272,19 +286,85 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 
 	@Override
 	public void onSyncWifiClick() {
-		DialogFragment choiceFragment = SyncActionChoiceDialog.newInstance(1);
+		DialogFragment choiceFragment = new WifiActionChoiceDialog();
 		choiceFragment.show(getFragmentManager(), "actionSyncChoice");
-		//if (!isConnected){
-			//receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-			//registerReceiver(receiver, intentFilter);
-			//onInitiateDiscovery();
-		//} else {
-			//this.peerListDialog.reconnect(this);
-		//}
+	}
+
+	public void wifiDiscoverable() {
+	}
+
+	public void wifiConnectToPeer() {
+		if (!isConnected){
+			receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
+			registerReceiver(receiver, intentFilter);
+			onInitiateDiscovery();
+		} else {
+			this.peerListDialog.reconnect(this);
+		}
+	}
+
+	public void onInitiateDiscovery() {
+		progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
+				true, new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+
+					}
+				});
+		manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+
+			@Override
+			public void onSuccess() {
+				Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryInitiated),
+						Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void onFailure(int reasonCode) {
+				Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed),
+						Toast.LENGTH_SHORT).show();
+				Log.d("NoteSync","Discovery failed : "+reasonCode);
+				if (NoteSync.this.progressDialog != null && NoteSync.this.progressDialog.isShowing()) {
+					NoteSync.this.progressDialog.dismiss();
+				}
+			}
+		});
+	}
+
+	//bt part
+
+	public class BtActionChoiceDialog extends DialogFragment {
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			// Use the Builder class for convenient dialog construction
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setMessage(R.string.syncActionChoice)
+				.setPositiveButton(R.string.discoverable, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						btDiscoverable();
+					}
+				})
+			.setNegativeButton(R.string.searchToSync, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					btConnectToPeer();
+				}
+			});
+			// Create the AlertDialog object and return it
+			return builder.create();
+		}
 	}
 
 	@Override
 	public void onSyncBTClick() {
+		DialogFragment choiceFragment = new BtActionChoiceDialog();
+		choiceFragment.show(getFragmentManager(), "actionSyncChoice");
+	}
+
+	public void btDiscoverable() {
+	}
+
+	public void btConnectToPeer() {
 		// If BT is not on, request that it be enabled.
 		// setupChat() will then be called during onActivityResult
 		if (!mBluetoothAdapter.isEnabled()) {
@@ -347,34 +427,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 				}
 	}
 
-
-	public void onInitiateDiscovery() {
-		progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
-				true, new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-
-					}
-				});
-		manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
-
-			@Override
-			public void onSuccess() {
-				Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryInitiated),
-						Toast.LENGTH_SHORT).show();
-			}
-
-			@Override
-			public void onFailure(int reasonCode) {
-				Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed),
-						Toast.LENGTH_SHORT).show();
-				Log.d("NoteSync","Discovery failed : "+reasonCode);
-				if (NoteSync.this.progressDialog != null && NoteSync.this.progressDialog.isShowing()) {
-					NoteSync.this.progressDialog.dismiss();
-				}
-			}
-		});
-	}
+	//various methods used for verbosity in sync
 
 	public ProgressDialog getProgressDialog() {
 		return this.progressDialog;
@@ -416,12 +469,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	}
 
 
-	@Override
-	public void onClearDeletedClick() {
-		tasks.clearDeleted();
-		Toast.makeText(this, this.getString(R.string.deletedTaskCleared), Toast.LENGTH_SHORT).show();
-	}
-
 	/** Function to use in order to display toasts from other threads */
 	public void showToast(final String text) {
 		runOnUiThread(new Runnable() {
@@ -429,29 +476,5 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 				Toast.makeText(NoteSync.this, text, Toast.LENGTH_SHORT).show();
 			}
 		});
-	}
-
-	/* Saving and retrieving the local TaskList */
-	private void saveTaskList(TaskList tl) {
-		try {
-			FileOutputStream fos = this.openFileOutput(filename, Context.MODE_PRIVATE);
-			ObjectOutputStream os = new ObjectOutputStream(fos);
-			os.writeObject(tl);
-		} catch (IOException e) {
-			Toast toast = Toast.makeText(this,
-					this.getString(R.string.nosave),
-					Toast.LENGTH_LONG);
-			toast.show();
-		}
-	}
-
-	private TaskList readTaskList() {
-		try {
-			FileInputStream fis = this.openFileInput(filename);
-			ObjectInputStream is = new ObjectInputStream(fis);
-			return (TaskList)is.readObject();
-		} catch (Exception e) {
-			return new TaskList();
-		}
 	}
 }
