@@ -49,5 +49,8 @@
         <item>Medium</item>
         <item>High</item>
     </string-array>
+    <string name="syncActionChoice">What do you want to do ?</string>
+    <string name="discoverable">Wait for a connection</string>
+    <string name="searchToSync">Find pear to connect to</string>
 </resources>
 

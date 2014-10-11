@@ -49,5 +49,8 @@
         <item>Moyenne</item>
         <item>Haute</item>
     </string-array>
+    <string name="syncActionChoice">Que souhaitez-vous faire ?</string>
+    <string name="discoverable">Attendre une connection</string>
+    <string name="searchToSync">Trouver un pair pour se connecter</string>
 </resources>
 

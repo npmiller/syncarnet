@@ -23,6 +23,9 @@ import fr.insarouen.asi.notesync.sync.*;
 
 import android.app.Activity;
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -227,15 +230,57 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		ft.commit();
 	}
 
+	public static class SyncActionChoiceDialog extends DialogFragment {
+
+		int choice;
+		static SyncActionChoiceDialog newInstance(int choice) {
+			SyncActionChoiceDialog df = new SyncActionChoiceDialog();
+			Bundle args = new Bundle();
+			args.putInt("choice", choice);
+			df.setArguments(args);
+			return df;
+		}
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			choice = getArguments().getInt("choice");
+			// Use the Builder class for convenient dialog construction
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setMessage(R.string.syncActionChoice)
+				.setPositiveButton(R.string.discoverable, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						if (choice == 1) { //wifi
+							Log.d("NoteSync","discoverable wifi");
+						} else { //bt
+							Log.d("NoteSync","discoverable bt");
+						}
+					}
+				})
+			.setNegativeButton(R.string.searchToSync, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+						if (choice == 1) { //wifi
+							Log.d("NoteSync","search wifi");
+						} else { //bt
+							Log.d("NoteSync","search bt");
+						}
+				}
+			});
+			// Create the AlertDialog object and return it
+			return builder.create();
+		}
+	}
+
 	@Override
 	public void onSyncWifiClick() {
-		if (!isConnected){
-			receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-			registerReceiver(receiver, intentFilter);
-			onInitiateDiscovery();
-		} else {
-			this.peerListDialog.reconnect(this);
-		}
+		DialogFragment choiceFragment = SyncActionChoiceDialog.newInstance(1);
+		choiceFragment.show(getFragmentManager(), "actionSyncChoice");
+		//if (!isConnected){
+			//receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
+			//registerReceiver(receiver, intentFilter);
+			//onInitiateDiscovery();
+		//} else {
+			//this.peerListDialog.reconnect(this);
+		//}
 	}
 
 	@Override
