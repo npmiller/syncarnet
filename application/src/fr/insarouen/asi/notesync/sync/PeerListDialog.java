@@ -30,6 +30,8 @@ import android.os.Bundle;
 
 import android.content.DialogInterface;
 
+import android.util.Log;
+
 import java.util.List;
 
 import fr.insarouen.asi.notesync.*;
@@ -88,7 +90,7 @@ public class PeerListDialog extends DialogFragment {
 
 					}
 				});
-		noteSync.setProgressDialog(progressDialog);
+		noteSync.syncService.setProgressDialog(progressDialog);
 		noteSync.startService(serviceIntent);
 	}
 

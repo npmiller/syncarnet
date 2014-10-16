@@ -56,7 +56,7 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 		this.channel = channel;
 		this.intent = intent;
 		this.peerSelection = new PeerSelection(manager, channel, noteSync);
-		this.peerListDialog = new PeerListDialog(peerList,peerSelection);
+		this.peerListDialog = new PeerListDialog(peerList, peerSelection);
 	}
 
 	public void setIntent(Intent intent) {
@@ -70,12 +70,12 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 		if (peerList.size() == 0) {
 			Toast.makeText(noteSync, noteSync.getString(R.string.noPair), Toast.LENGTH_SHORT).show();
 		}
-		progressDialog = noteSync.getProgressDialog();
+		progressDialog = noteSync.syncService.getProgressDialog();
 		if (progressDialog != null && progressDialog.isShowing()) {
 			progressDialog.dismiss();
 		}
 		peerListDialog.setPeerList(peerList);
-		noteSync.onPeerSelection(peerListDialog);
+		noteSync.syncService.onPeerSelection(peerListDialog);
 
 	}
 
@@ -92,7 +92,7 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 
 					}
 				});
-		noteSync.setProgressDialog(progressDialog);
+		noteSync.syncService.setProgressDialog(progressDialog);
 		noteSync.startService(serviceIntent);
 	}
 

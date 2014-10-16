@@ -45,7 +45,7 @@ public class PeerSelection implements OnPeerSelected {
 		this.manager = manager;
 		this.channel = channel;
 		this.noteSync = noteSync;
-		this.progressDialog = this.noteSync.getProgressDialog();
+		this.progressDialog = this.noteSync.syncService.getProgressDialog();
 	}
 
 	@Override
@@ -53,6 +53,7 @@ public class PeerSelection implements OnPeerSelected {
 		WifiP2pConfig config = new WifiP2pConfig();
 		config.deviceAddress = device.deviceAddress;
 		config.wps.setup = WpsInfo.PBC;
+		noteSync.syncService.setConnecting(true);
 		progressDialog = ProgressDialog.show(noteSync, noteSync.getString(R.string.backCancel),
 		noteSync.getString(R.string.connectingTo) + device.deviceAddress, true, true
 		);
@@ -70,7 +71,6 @@ public class PeerSelection implements OnPeerSelected {
 				
 			}
 		});
-		noteSync.setConnecting(true);
 	}
 
 	@Override
