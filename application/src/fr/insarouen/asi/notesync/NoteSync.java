@@ -71,6 +71,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	public ProgressDialog progressDialog = null;
 	public final IntentFilter intentFilter = new IntentFilter();
 	private WifiP2pManager manager;
+	public PeerListDialog peerListDialog;
 	// Local Bluetooth adapter
 	private BluetoothAdapter mBluetoothAdapter = null;
 	// Manage SyncService
@@ -257,5 +258,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 
 	public void onSyncBTClick() {
 		syncService.onSyncBTClick();
+	}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		syncService.onBTActivityResult(requestCode, resultCode, data);
 	}
 }

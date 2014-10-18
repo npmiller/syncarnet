@@ -46,16 +46,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class SyncService {
-	
+
 	private NoteSync notesync;
 	private WifiP2pManager manager;
-	public boolean isConnected = false;
-	public boolean isConnecting = false;
+	private boolean isConnected = false;
+	private boolean isConnecting = false;
 	private boolean isWifiP2pEnabled;
-	public boolean hasPeerList = false;
 	private Channel channel;
 	public BroadcastReceiver receiver = null;
-	private PeerListDialog peerListDialog;
 	private SyncBTService mBTService;
 	// Intent request codes
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
@@ -120,7 +118,7 @@ public class SyncService {
 			notesync.registerReceiver(receiver, notesync.intentFilter);
 			onInitiateDiscovery();
 		} else {
-			this.peerListDialog.reconnect(notesync);
+			notesync.peerListDialog.reconnect(notesync);
 		}
 	}
 
@@ -199,7 +197,7 @@ public class SyncService {
 		}
 	}
 
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onBTActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case REQUEST_CONNECT_DEVICE_SECURE:
 				// When DeviceListActivity returns with a device to connect
@@ -258,18 +256,19 @@ public class SyncService {
 	}
 
 	public void onPeerSelection(PeerListDialog peerListDialog) {
-		this.peerListDialog = peerListDialog;
-		if (!isConnected && !isConnecting && !peerListDialog.peerListEmpty())
-Log.d("NoteSync","balise");
-			peerListDialog.show(notesync.getFragmentManager(), "PeerListDialog");
+		if (notesync.peerListDialog == null) {
+			notesync.peerListDialog = peerListDialog;
+			if (!isConnected && !isConnecting && !notesync.peerListDialog.peerListEmpty())
+				notesync.peerListDialog.show(notesync.getFragmentManager(), "PeerListDialog");
+		}
 	}
 
 	public void setConnected(boolean isConnected) {
 		this.isConnected = isConnected;
 		if (isConnected){
-			if (peerListDialog != null) {
-				peerListDialog.getPeerSelection().setConnected();
-				peerListDialog.dismiss();
+			if (notesync.peerListDialog != null) {
+				notesync.peerListDialog.getPeerSelection().setConnected();
+				notesync.peerListDialog.dismiss();
 			}
 			if (notesync.progressDialog != null && notesync.progressDialog.isShowing()) {
 				notesync.progressDialog.dismiss();
