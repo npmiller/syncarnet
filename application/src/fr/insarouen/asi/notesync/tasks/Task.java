@@ -145,6 +145,11 @@ public class Task implements Serializable {
 	public Priority getPriority() {
 		return priority;
 	}
+
+	public long getEntry() {
+		return entry;
+	}
+
 	public long getModified() {
 		return modified;
 	}

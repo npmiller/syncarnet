@@ -32,7 +32,7 @@ import java.io.Serializable;
 
 public class TaskList extends ArrayList<Task> implements Serializable {
 	private static final String TAG = "NoteSyncService";
-	private ArrayList<UUID> deletedTasks = new ArrayList<UUID>();
+	private DeletedTasks deletedTasks = new DeletedTasks();
 	private ArrayList<String> projects = new ArrayList<String>();
 
 	/**
@@ -137,6 +137,10 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 			}
 		}
 		return tf;
+	}
+
+	public void setDeletedTasks(DeletedTasks dt) {
+		this.deletedTasks = dt;
 	}
 
 	public String jsonify() {
