@@ -54,6 +54,7 @@ import android.widget.Toast;
 import android.content.Context;
 
 import java.util.Calendar;
+import java.util.ArrayList;
 
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
@@ -64,8 +65,10 @@ import java.io.FileNotFoundException;
 
 public class NoteSync extends Activity implements TaskAddFragment.Callbacks, TaskEditFragment.Callbacks, TaskListFragment.Callbacks {
 	private TaskList tasks; 
+	private ArrayList<SyncedDevice> savedPeers;
 	private TaskListAdapter adapter;
-	private String filename = "tasks";
+	private String tasks_file = "tasks";
+	private String peers_file = "peers";
 	private boolean isWifiP2pEnabled;
 	private boolean isConnected = false;
 	private boolean isConnecting = false;
@@ -110,6 +113,8 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		channel = manager.initialize(this, getMainLooper(), null);
 
 		tasks = readTaskList();
+		savedPeers = readSavedPeers();
+
 		adapter = new TaskListAdapter(this, tasks);
 
 		if(savedInstanceState == null) {
@@ -141,6 +146,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	public void onPause() {
 		super.onPause();
 		saveTaskList(tasks);
+		savePeers(savedPeers);
 		if(receiver != null)
 			unregisterReceiver(receiver);
 	}
@@ -386,10 +392,34 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		});
 	}
 
+	/* Save and retrieve local peer list */
+	private void savePeers(ArrayList<SyncedDevice> savedPeers) {
+		try {
+			FileOutputStream fos = this.openFileOutput(peers_file, Context.MODE_PRIVATE);
+			ObjectOutputStream os = new ObjectOutputStream(fos);
+			os.writeObject(savedPeers);
+		} catch (IOException e) {
+			Toast toast = Toast.makeText(this,
+					this.getString(R.string.nosave),
+					Toast.LENGTH_LONG);
+			toast.show();
+		}
+	}
+
+	private ArrayList<SyncedDevice> readSavedPeers() {
+		try {
+			FileInputStream fis = this.openFileInput(peers_file);
+			ObjectInputStream is = new ObjectInputStream(fis);
+			return (ArrayList<SyncedDevice>)is.readObject();
+		} catch (Exception e) {
+			return new ArrayList<SyncedDevice>();
+		}
+	}
+
 	/* Saving and retrieving the local TaskList */
 	private void saveTaskList(TaskList tl) {
 		try {
-			FileOutputStream fos = this.openFileOutput(filename, Context.MODE_PRIVATE);
+			FileOutputStream fos = this.openFileOutput(tasks_file, Context.MODE_PRIVATE);
 			ObjectOutputStream os = new ObjectOutputStream(fos);
 			os.writeObject(tl);
 		} catch (IOException e) {
@@ -402,7 +432,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 
 	private TaskList readTaskList() {
 		try {
-			FileInputStream fis = this.openFileInput(filename);
+			FileInputStream fis = this.openFileInput(tasks_file);
 			ObjectInputStream is = new ObjectInputStream(fis);
 			return (TaskList)is.readObject();
 		} catch (Exception e) {
