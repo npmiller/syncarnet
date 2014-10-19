@@ -21,8 +21,9 @@ package fr.insarouen.asi.notesync;
 import fr.insarouen.asi.notesync.tasks.*;
 import java.io.Serializable;
 import java.util.Date; // rightNow = new Date().getTime(); (In Unix Time)
+import java.util.UUID;
 
-public class SyncedDevice {
+public class SyncedDevice implements Serializable {
 	// unix timestamp
 	private long lastSynchronized;
 
@@ -45,6 +46,17 @@ public class SyncedDevice {
 				diffTaskList.add(t);
 			}
 		}
+
+		// Retrieve deleted tasks that needs to be synchronized
+		DeletedTasks deletedTasks = tl.getDeletedTasks();
+		DeletedTasks diffDeletedTasks = new DeletedTasks();
+		for (UUID uuid : deletedTasks) {
+			if (deletedTasks.getTimestamp(uuid) < lastSynchronized) {
+				diffDeletedTasks.add(uuid, deletedTasks.getTimestamp(uuid));
+			}
+		}
+		diffTaskList.setDeletedTasks(diffDeletedTasks);
+
 		return diffTaskList;
 	}
 }

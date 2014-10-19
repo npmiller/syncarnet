@@ -32,6 +32,11 @@ public class DeletedTasks extends ArrayList<UUID> implements Serializable {
 		return super.add(uuid);
 	}
 
+	public boolean add(UUID uuid, long timestamp) {
+		timestamps.put(uuid, new Long(timestamp));
+		return super.add(uuid);
+	}
+
 	public long getTimestamp(UUID uuid) {
 		return (timestamps.get(uuid)).longValue();
 	}

@@ -143,6 +143,10 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 		this.deletedTasks = dt;
 	}
 
+	public DeletedTasks getDeletedTasks() {
+		return deletedTasks;
+	}
+
 	public String jsonify() {
 		JSONObject jsonTL = new JSONObject();
 		JSONArray jsonTasks = new JSONArray();
