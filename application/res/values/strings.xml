@@ -10,13 +10,14 @@
     <string name="nosave">Error : Couldn\'t save task list</string>
     <string name="done">Done ?</string>
     <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="cancel">Cancel</string>
     <string name="choosepeer">Choose a peer : </string>
     <string name="description">Description</string>
     <string name="project">Project</string>
     <string name="filter">Filter</string>
     <string name="clearDate">Clear date</string>
-    <string name="nowifi">Wifi is not turned on</string>
+    <string name="noWifi">Wifi is not turned on</string>
     <string name="successSync">Synchronization successful</string>
     <string name="openingSocket">Opening a server socket</string>
     <string name="connexionSuccessful">Connexion successfully established</string>
@@ -52,5 +53,6 @@
     <string name="syncActionChoice">What do you want to do ?</string>
     <string name="discoverable">Wait for a connection</string>
     <string name="searchToSync">Find peer to connect to</string>
+    <string name="needWifi">You need to Wifi to use this. Do you want to activate it ?</string>
 </resources>
 

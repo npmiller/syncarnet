@@ -32,12 +32,17 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
+
+import android.net.wifi.WifiManager;
 
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
 import android.os.Bundle;
+
+import android.provider.Settings;
 
 import android.util.Log;
 
@@ -102,9 +107,38 @@ public class SyncService {
 		}
 	}
 
+	protected void enableWifiDialog() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(notesync);
+		builder.setMessage(notesync.getString(R.string.needWifi))
+			.setTitle(notesync.getString(R.string.noWifi))
+			.setCancelable(false)
+			.setPositiveButton(notesync.getString(R.string.yes),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							Intent i = new Intent(Settings.ACTION_WIFI_SETTINGS);
+							notesync.startActivity(i);
+						}
+			}
+			)
+			.setNegativeButton(notesync.getString(R.string.no),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						}
+			}
+			);
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
 	public void onSyncWifiClick() {
-		DialogFragment choiceFragment = new WifiActionChoiceDialog();
-		choiceFragment.show(notesync.getFragmentManager(), "actionSyncChoice");
+		WifiManager wifi = (WifiManager) notesync.getSystemService(Context.WIFI_SERVICE);
+		if (!wifi.isWifiEnabled()) {
+			enableWifiDialog();
+		} else {
+			DialogFragment choiceFragment = new WifiActionChoiceDialog();
+			choiceFragment.show(notesync.getFragmentManager(), "actionSyncChoice");
+		}
 	}
 
 	public void wifiDiscoverable() {
@@ -173,8 +207,13 @@ public class SyncService {
 	}
 
 	public void onSyncBTClick() {
-		DialogFragment choiceFragment = new BtActionChoiceDialog();
-		choiceFragment.show(notesync.getFragmentManager(), "actionSyncChoice");
+		if (!mBluetoothAdapter.isEnabled()) {
+			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			notesync.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+		} else {
+			DialogFragment choiceFragment = new BtActionChoiceDialog();
+			choiceFragment.show(notesync.getFragmentManager(), "actionSyncChoice");
+		}
 	}
 
 	public void btDiscoverable() {
@@ -183,16 +222,11 @@ public class SyncService {
 	public void btConnectToPeer() {
 		// If BT is not on, request that it be enabled.
 		// setupChat() will then be called during onActivityResult
-		if (!mBluetoothAdapter.isEnabled()) {
-			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			notesync.startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-		} else {
-			mBTService = new SyncBTService(notesync);
-			mBTService.start();
-			Intent serverIntent = null;
-			serverIntent = new Intent(notesync, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
-			notesync.startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-		}
+		mBTService = new SyncBTService(notesync);
+		mBTService.start();
+		Intent serverIntent = null;
+		serverIntent = new Intent(notesync, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
+		notesync.startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 	}
 
 	public void onBTActivityResult(int requestCode, int resultCode, Intent data) {

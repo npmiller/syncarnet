@@ -10,13 +10,14 @@
     <string name="nosave">Erreur : La sauvegarde de la liste de tâches à échouée</string>
     <string name="done">Fini ?</string>
     <string name="yes">Oui</string>
+    <string name="no">Non</string>
     <string name="cancel">Annuler</string>
     <string name="choosepeer">Choisissez un pair : </string>
     <string name="description">Description</string>
     <string name="project">Projet</string>
     <string name="filter">Filtrer</string>
     <string name="clearDate">Retirer la date</string>
-    <string name="nowifi">Le wifi n\'est pas activé</string>
+    <string name="noWifi">Le wifi n\'est pas activé</string>
     <string name="successSync">Synchronization effectuée avec succès</string>
     <string name="openingSocket">Mise en place de la connexion</string>
     <string name="connexionSuccessful">Connection effectuée avec succès</string>
@@ -52,5 +53,6 @@
     <string name="syncActionChoice">Que souhaitez-vous faire ?</string>
     <string name="discoverable">Attendre une connection</string>
     <string name="searchToSync">Trouver un pair pour se connecter</string>
+    <string name="needWifi">Vous avez besoin du Wifi pour utiliser ceci. Voulez-vous l\'activer ?</string>
 </resources>
 
