@@ -36,7 +36,7 @@ import java.io.Serializable;
  * Each task in our todo list is an instance of this class
  */
 public class Task implements Serializable {
-	private static final String TAG = "NoteSyncService";
+	private static final String TAG = "NoteSyncTask";
 	private String description;
 	private String project=null;
 	private Priority priority=Priority.MEDIUM;
@@ -206,7 +206,7 @@ public class Task implements Serializable {
 			jsonTask.put("modified", this.modified);
 			return jsonTask.toString();
 		} catch (JSONException e) {
-			Log.d(TAG, "Exception while jsonifying");
+			Log.e(TAG, "Exception while jsonifying");
 			return "";
 		}
 	}
@@ -229,7 +229,7 @@ public class Task implements Serializable {
 			this.entry = jsonTask.getLong("entry");
 			this.modified = jsonTask.getLong("modified");
 		} catch (JSONException e) {
-			Log.d(TAG, "Exception while unjsonifying");
+			Log.e(TAG, "Exception while unjsonifying");
 		}
 	}
 }

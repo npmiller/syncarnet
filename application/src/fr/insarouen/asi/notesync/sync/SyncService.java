@@ -34,8 +34,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 
-import android.content.BroadcastReceiver;
-
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
@@ -47,13 +45,13 @@ import android.widget.Toast;
 
 public class SyncService {
 
+	private String TAG = "NoteSyncSyncService";
 	private NoteSync notesync;
 	private WifiP2pManager manager;
 	private boolean isConnected = false;
 	private boolean isConnecting = false;
 	private boolean isWifiP2pEnabled;
 	private Channel channel;
-	public BroadcastReceiver receiver = null;
 	private SyncBTService mBTService;
 	// Intent request codes
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
@@ -114,8 +112,8 @@ public class SyncService {
 
 	public void wifiConnectToPeer() {
 		if (!isConnected){
-			receiver = new NoteSyncBroadcastReceiver(manager, channel, notesync);
-			notesync.registerReceiver(receiver, notesync.intentFilter);
+			notesync.receiver = new NoteSyncBroadcastReceiver(manager, channel, notesync);
+			notesync.registerReceiver(notesync.receiver, notesync.intentFilter);
 			onInitiateDiscovery();
 		} else {
 			notesync.peerListDialog.reconnect(notesync);

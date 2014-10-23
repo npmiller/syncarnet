@@ -49,7 +49,7 @@ import android.widget.AdapterView.OnItemClickListener;
  */
 public class DeviceListActivity extends Activity {
     // Debugging
-    private static final String TAG = "DeviceListActivity";
+    private static final String TAG = "NoteSyncDeviceListActivity";
     private static final boolean D = true;
 
     // Return Intent extra

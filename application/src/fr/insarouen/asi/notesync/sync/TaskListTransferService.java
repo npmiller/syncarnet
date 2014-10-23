@@ -35,6 +35,7 @@ import fr.insarouen.asi.notesync.tasks.*;
 import fr.insarouen.asi.notesync.sync.PeerList.ServiceStatic;
 
 public class TaskListTransferService extends IntentService {
+	private String TAG = "NoteSyncTaskListTransferService";
 	private static final int SOCKET_TIMEOUT = 5000;
 	private Intent intent;
 	private NoteSync noteSync;
@@ -67,7 +68,8 @@ public class TaskListTransferService extends IntentService {
 			new TaskListAsync(noteSync).execute();
 		} else {
 			try {
-				TaskList originalTL = noteSync.getTasks();
+				TaskList originalTL = new TaskList();
+				originalTL.unJsonify(noteSync.getTasks().jsonify());
 				socket.bind(null);
 				socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
 
@@ -87,10 +89,10 @@ Log.d("NoteSync","balise2");
 				noteSync.showToast(noteSync.getString(R.string.successSync));
 			} catch (IOException e) {
 				noteSync.showToast(noteSync.getString(R.string.IOException));
-				Log.d("NoteSync","IOException : "+e.getStackTrace().toString());
+				Log.e(TAG,"IOException : "+e.getStackTrace().toString());
 			} catch (ClassNotFoundException e) {
 				noteSync.showToast(noteSync.getString(R.string.ClassNotFoundException));
-				Log.d("NoteSync","ClassNotFoundException : "+e.getStackTrace().toString());
+				Log.e(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
 			} finally {
 				socketClose(socket);
 				socketClose(client);
@@ -111,6 +113,7 @@ Log.d("NoteSync","balise2");
 
 	public static class TaskListAsync extends AsyncTask<Void, Void, String> {
 		private NoteSync noteSync;
+		private String TAG = "NoteSyncTaskListAsync";
 
 		/**
 		 * @param context
@@ -123,7 +126,8 @@ Log.d("NoteSync","balise2");
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				TaskList originalTL = noteSync.getTasks();
+				TaskList originalTL = new TaskList();
+				originalTL.unJsonify(noteSync.getTasks().jsonify());
 
 				ServerSocket serverSocket = new ServerSocket(8988);
 
@@ -150,12 +154,12 @@ Log.d("NoteSync","balise9");
 			}
 			catch (IOException e) {
 				noteSync.showToast(noteSync.getString(R.string.IOException));
-				Log.d("NoteSync","IOException : "+e.getStackTrace().toString());
+				Log.e(TAG,"IOException : "+e.getStackTrace().toString());
 				return null;
 			}
 			catch (ClassNotFoundException e) {
 				noteSync.showToast(noteSync.getString(R.string.ClassNotFoundException));
-				Log.d("NoteSync","ClassNotFoundException : "+e.getStackTrace().toString());
+				Log.e(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
 				return null;
 			}
 		}

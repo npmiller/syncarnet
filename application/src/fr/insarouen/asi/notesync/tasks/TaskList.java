@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class TaskList extends ArrayList<Task> implements Serializable {
-	private static final String TAG = "NoteSyncService";
+	private static final String TAG = "NoteSyncTaskList";
 	private ArrayList<UUID> deletedTasks = new ArrayList<UUID>();
 	private ArrayList<String> projects = new ArrayList<String>();
 
@@ -159,7 +159,7 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 			Log.d(TAG, "Added projects to json");
 			return jsonTL.toString();
 		} catch (JSONException e) {
-			Log.d(TAG, "Exception while jsonifying");
+			Log.e(TAG, "Exception while jsonifying");
 			return "";
 		}
 	}
@@ -184,7 +184,7 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 				this.projects.add(jsonProjects.getString(i));
 			Log.d(TAG, "Recreated projects from json");
 		} catch (JSONException e) {
-			Log.d(TAG, "Exception while unjsonifying");
+			Log.e(TAG, "Exception while unjsonifying");
 		}
 	}
 }

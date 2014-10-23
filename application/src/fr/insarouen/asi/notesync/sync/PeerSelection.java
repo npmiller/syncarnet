@@ -36,6 +36,7 @@ import fr.insarouen.asi.notesync.sync.PeerListDialog.OnPeerSelected;
 
 public class PeerSelection implements OnPeerSelected {
 
+	private String TAG = "NoteSyncPeerSelection";
 	private ProgressDialog progressDialog = null;
 	private WifiP2pManager manager;
 	private Channel channel;
@@ -67,7 +68,7 @@ public class PeerSelection implements OnPeerSelected {
 			public void onFailure(int reason) {
 				Toast.makeText(noteSync, noteSync.getString(R.string.connectFailed),
 				Toast.LENGTH_SHORT).show();
-				Log.d("NoteSync","Connect failed : "+reason);
+				Log.d(TAG, "Connect failed : "+reason);
 				
 			}
 		});

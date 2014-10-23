@@ -35,6 +35,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -64,6 +65,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 public class NoteSync extends Activity implements TaskAddFragment.Callbacks, TaskEditFragment.Callbacks, TaskListFragment.Callbacks {
+	private static final String TAG = "NoteSync";
 	private TaskList tasks; 
 	private TaskListAdapter adapter;
 	private String filename = "tasks";
@@ -76,6 +78,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	private BluetoothAdapter mBluetoothAdapter = null;
 	// Manage SyncService
 	public SyncService syncService;
+	public BroadcastReceiver receiver = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -125,8 +128,13 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	public void onPause() {
 		super.onPause();
 		saveTaskList(tasks);
-		if(syncService.receiver != null)
-			unregisterReceiver(syncService.receiver);
+		if(receiver != null) { 
+			try {
+				unregisterReceiver(receiver);
+			} catch (IllegalArgumentException e) {
+				Log.e(TAG, "IllegalArgumentException : "+e);
+			}
+		}
 	}
 
 	public void setTaskList(TaskList taskList) {

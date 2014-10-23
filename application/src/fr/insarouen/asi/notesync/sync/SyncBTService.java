@@ -57,7 +57,7 @@ import android.widget.Toast;
  */
 public class SyncBTService {
 	// Debugging
-	private static final String TAG = "NoteSyncService";
+	private static final String TAG = "NoteSyncSyncBTService";
 	private static final boolean D = true;
 
 	// Name for the SDP record when creating server socket
@@ -105,7 +105,8 @@ public class SyncBTService {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
 		mHandler = null;
-		originalTL = notesync.getTasks();
+		originalTL = new TaskList();
+		originalTL.unJsonify(notesync.getTasks().jsonify());
 		Log.d(TAG, "taskList retrieved : "+originalTL.toString());
 	}
 
@@ -131,7 +132,7 @@ public class SyncBTService {
 				Log.d(TAG, "Task list merged");
 				notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
 
-				Log.e(TAG, "Finally sync !");
+				Log.d(TAG, "Finally sync !");
 			} catch (IOException e) {
 				Log.e(TAG, "IOException during bytesToObject", e);
 			} catch (ClassNotFoundException e) {
@@ -356,7 +357,7 @@ public class SyncBTService {
 					}
 				}
 			}
-			if (D) Log.i(TAG, "END mAcceptThread, socket Type: " + mSocketType);
+			if (D) Log.d(TAG, "END mAcceptThread, socket Type: " + mSocketType);
 
 		}
 
@@ -403,7 +404,7 @@ public class SyncBTService {
 		}
 
 		public void run() {
-			Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
+			Log.d(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
 			setName("ConnectThread" + mSocketType);
 
 			// Always cancel discovery because it will slow down a connection
@@ -472,20 +473,20 @@ public class SyncBTService {
 		}
 
 		public void run() {
-			Log.i(TAG, "BEGIN mConnectedThreadServer");
+			Log.d(TAG, "BEGIN mConnectedThreadServer");
 			byte[] buffer;
 
 			try {
-				Log.e(TAG, "Jsonifying");
+				Log.d(TAG, "Jsonifying");
 				String TLString = originalTL.jsonify();
-				Log.e(TAG, "Jsonifyed : "+TLString);
-				Log.e(TAG, "ObjectToBytes");
+				Log.d(TAG, "Jsonifyed : "+TLString);
+				Log.d(TAG, "ObjectToBytes");
 				byte[] bytes = ObjectToBytes((Object) TLString);
 				int TLSize = bytes.length;
-				Log.e(TAG, "Server TL size : " + TLSize);
+				Log.d(TAG, "Server TL size : " + TLSize);
 				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,400));
 				d.writeInt(TLSize);
-				Log.e(TAG, "TL size sent");
+				Log.d(TAG, "TL size sent");
 				for (int i=0 ; i<bytes.length ; i++) {
 					d.write(bytes[i]);
 					d.flush();
@@ -502,7 +503,7 @@ public class SyncBTService {
 		public void cancel() {
 			try {
 				mmSocket.close();
-				Log.e(TAG, "mConnectedThreadServer closed");
+				Log.d(TAG, "mConnectedThreadServer closed");
 			} catch (IOException e) {
 				Log.e(TAG, "close() of connect socket failed", e);
 			}
@@ -537,7 +538,7 @@ public class SyncBTService {
 		}
 
 		public void run() {
-			Log.i(TAG, "BEGIN mConnectedThreadClient");
+			Log.d(TAG, "BEGIN mConnectedThreadClient");
 			byte[] buffer;
 
 			// Keep listening to the InputStream while connected
@@ -545,7 +546,7 @@ public class SyncBTService {
 			try {
 				DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
 				int TLSize = d.readInt();
-				Log.e(TAG, "Client TL size : " + TLSize);
+				Log.d(TAG, "Client TL size : " + TLSize);
 				int bytesRead;
 				byte[] dataBytes = new byte[TLSize];
 				byte[] tmpByte = new byte[1];
@@ -554,10 +555,10 @@ public class SyncBTService {
 					dataBytes[bytesRead] = tmpByte[0];
 					if (bytesRead % 1000 == 0) Log.d(TAG,"Received "+bytesRead+" bytes");
 				}
-				Log.e(TAG, "Data received");
-				Log.e(TAG, bytesRead + " bytes received");
+				Log.d(TAG, "Data received");
+				Log.d(TAG, bytesRead + " bytes received");
 				SyncBTService.this.setBytes(dataBytes);
-				Log.e(TAG, "Buffer set in outer class ");
+				Log.d(TAG, "Buffer set in outer class ");
 			} catch (IOException e) {
 				Log.e(TAG, "disconnected", e);
 				connectionLost();
@@ -570,7 +571,7 @@ public class SyncBTService {
 		public void cancel() {
 			try {
 				mmSocket.close();
-				Log.e(TAG, "mConnectedThreadClient closed");
+				Log.d(TAG, "mConnectedThreadClient closed");
 			} catch (IOException e) {
 				Log.e(TAG, "close() of connect socket failed", e);
 			}
