@@ -32,6 +32,7 @@
     <string name="discoveryFailed">La découverte des pairs à échoué ; veuillez réactiver le Wifi et réessayer </string>
     <string name="IOException">Une erreur de transfert est apparue ; veuillez réessayer</string>
     <string name="ClassNotFoundException">Une erreur dans la reconstruction des tâches est apparue ; veuillez réessayer</string>
+    <string name="unpair">Désassocier ?</string>
     <!--  DeviceListActivity -->
     <string name="scanning">scanning for devices...</string>
     <string name="select_device">select a device to connect</string>
@@ -42,6 +43,7 @@
     <string name="button_scan">Scan for devices</string>
     <string name="AllProjects">Tous les projets</string>
     <string name="clearDeleted">Vider les tâches supprimées</string>
+    <string name="manageSyncedDevices">Gérer les appareils synchronisés</string>
     <string name="deletedTaskCleared">Cache des tâches supprimées vidé.</string>
 	<string name="dateCleared">Date d\'échéance supprimée</string>
     <string-array name="priorities">

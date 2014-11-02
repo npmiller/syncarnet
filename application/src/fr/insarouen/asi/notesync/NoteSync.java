@@ -63,7 +63,7 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 
-public class NoteSync extends Activity implements TaskAddFragment.Callbacks, TaskEditFragment.Callbacks, TaskListFragment.Callbacks {
+public class NoteSync extends Activity implements TaskAddFragment.Callbacks, TaskEditFragment.Callbacks, TaskListFragment.Callbacks, SyncedDevicesFragment.Callbacks {
 	private TaskList tasks; 
 	private ArrayList<SyncedDevice> savedPeers;
 	private TaskListAdapter adapter;
@@ -223,6 +223,15 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		adapter.removeTask(position);
 	}
 
+	/* SyncedDevicesFragment */
+	public ArrayList<SyncedDevice> getSyncedDevices() {
+		return savedPeers;
+	}
+
+	public void removeSyncedDevice(int pos) {
+		savedPeers.remove(pos);
+	}
+
 	/* Menu callbacks */
 	@Override
 	public void onAddClick() {
@@ -258,6 +267,15 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 			serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
 			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 		}
+	}
+
+	@Override
+	public void onManageSyncedDevicesClick() {
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.container, new SyncedDevicesFragment()); // FIXME: Do it in some sort of popup
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		ft.addToBackStack(null);
+		ft.commit();
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {

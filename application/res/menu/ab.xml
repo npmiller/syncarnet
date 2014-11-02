@@ -14,4 +14,7 @@
 	<item android:id="@+id/clearDeleted"
 		android:title="@string/clearDeleted"
 		android:showAsAction="never" />
+	<item android:id="@+id/manageSyncedDevices"
+		android:title="@string/manageSyncedDevices"
+		android:showAsAction="never" />
 </menu>

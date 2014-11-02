@@ -59,4 +59,9 @@ public class SyncedDevice implements Serializable {
 
 		return diffTaskList;
 	}
+
+	public String toString() {
+		// The toString is used in the ArrayAdapter
+		return new Long(lastSynchronized).toString();
+	}
 }

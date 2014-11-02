@@ -54,6 +54,7 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 		public void onSyncBTClick();
 		public void onAddClick();
 		public void onClearDeletedClick();
+		public void onManageSyncedDevicesClick();
 	}
 
 	private ProjectsAdapter projects;
@@ -139,6 +140,8 @@ public class TaskListFragment extends ListFragment implements OnItemLongClickLis
 			case R.id.clearDeleted:
 				((Callbacks)getActivity()).onClearDeletedClick();
 				return true;
+			case R.id.manageSyncedDevices:
+				((Callbacks)getActivity()).onManageSyncedDevicesClick();
 			default:
 				return getActivity().onOptionsItemSelected(item);
 		}
