@@ -217,6 +217,9 @@ public class SyncService {
 	}
 
 	public void btDiscoverable() {
+		ensureDiscoverable();
+		mBTService = new SyncBTService(notesync);
+		mBTService.start();
 	}
 
 	public void btConnectToPeer() {
@@ -246,12 +249,8 @@ public class SyncService {
 			case REQUEST_ENABLE_BT:
 				// When the request to enable Bluetooth returns
 				if (resultCode == Activity.RESULT_OK) {
-					// Initialize the BluetoothChatService to perform bluetooth connections
-					mBTService = new SyncBTService(notesync);
-					mBTService.start();
-					Intent serverIntent = null;
-					serverIntent = new Intent(notesync, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
-					notesync.startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+					DialogFragment choiceFragment = new BtActionChoiceDialog();
+					choiceFragment.show(notesync.getFragmentManager(), "actionSyncChoice");
 				} else {
 					// User did not enable Bluetooth or an error occurred
 				}
@@ -269,12 +268,11 @@ public class SyncService {
 	}
 
 	private void ensureDiscoverable() {
-		if (mBluetoothAdapter.getScanMode() !=
-				BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+		if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
 			Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 			discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 			notesync.startActivity(discoverableIntent);
-				}
+		}
 	}
 
 	//various methods used for verbosity in sync

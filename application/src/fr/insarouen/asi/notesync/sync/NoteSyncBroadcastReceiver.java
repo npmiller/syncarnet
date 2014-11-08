@@ -74,7 +74,7 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 				if (progressDialog != null && progressDialog.isShowing()) {
 					progressDialog.dismiss();
 				}
-				Toast.makeText(this.noteSync, noteSync.getString(R.string.nowifi),
+				Toast.makeText(this.noteSync, noteSync.getString(R.string.noWifi),
 				       Toast.LENGTH_SHORT).show();
 
 			}

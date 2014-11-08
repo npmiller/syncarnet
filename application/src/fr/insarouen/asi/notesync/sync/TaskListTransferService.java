@@ -69,18 +69,17 @@ public class TaskListTransferService extends IntentService {
 		} else {
 			try {
 				TaskList originalTL = new TaskList();
-				originalTL.unJsonify(noteSync.getTasks().jsonify());
+				String originalTLString = noteSync.getTasks().jsonify();
 				socket.bind(null);
 				socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
 
 				ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-				outputStream.writeObject(originalTL);
+				outputStream.writeObject(originalTLString);
 
-Log.d("NoteSync","balise");
 				ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-Log.d("NoteSync","balise1");
-				TaskList receivedTL = (TaskList) inputStream.readObject();
-Log.d("NoteSync","balise2");
+				String receivedTLString = (String) inputStream.readObject();
+				TaskList receivedTL = new TaskList();
+				receivedTL.unJsonify(receivedTLString);
 
 				TaskList mergedTL = TaskList.merge(noteSync.getTasks(), receivedTL);
 
@@ -127,27 +126,22 @@ Log.d("NoteSync","balise2");
 		protected String doInBackground(Void... params) {
 			try {
 				TaskList originalTL = new TaskList();
-				originalTL.unJsonify(noteSync.getTasks().jsonify());
+				String originalTLString = noteSync.getTasks().jsonify();
 
 				ServerSocket serverSocket = new ServerSocket(8988);
 
 				Socket client = serverSocket.accept();
 				ObjectInputStream inputStream = new ObjectInputStream(client.getInputStream());
-Log.d("NoteSync","balise4");
-				TaskList receivedTL = (TaskList) inputStream.readObject();
-Log.d("NoteSync","balise5");
-
+				String receivedTLString = (String) inputStream.readObject();
+				TaskList receivedTL = new TaskList();
+				receivedTL.unJsonify(receivedTLString);
 
 				TaskList mergedTL = TaskList.merge(noteSync.getTasks(), receivedTL);
-Log.d("NoteSync","balise6");
 
 				noteSync.runOnUiThread(new SetTaskListRun(noteSync, mergedTL));
-Log.d("NoteSync","balise7");
 
 				ObjectOutputStream outputStream = new ObjectOutputStream(client.getOutputStream());
-Log.d("NoteSync","balise8");
-				outputStream.writeObject(originalTL);
-Log.d("NoteSync","balise9");
+				outputStream.writeObject(originalTLString);
 
 				serverSocket.close();
 				return "succes";
