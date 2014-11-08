@@ -19,6 +19,7 @@
 package fr.insarouen.asi.notesync.sync;
 
 import android.app.IntentService;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;

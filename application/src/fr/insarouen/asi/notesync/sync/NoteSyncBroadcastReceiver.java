@@ -20,6 +20,7 @@ package fr.insarouen.asi.notesync.sync;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.app.ProgressDialog;
 import android.os.SystemClock;;
@@ -48,13 +49,15 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 	private NoteSync noteSync;
 	private PeerList peerList;
 	private ProgressDialog progressDialog; 
+	private Boolean displayPeers;
 
-	public NoteSyncBroadcastReceiver(WifiP2pManager manager, Channel channel, NoteSync noteSync) {
+	public NoteSyncBroadcastReceiver(WifiP2pManager manager, Channel channel, NoteSync noteSync, Boolean displayPeers) {
 		super();
 		this.manager = manager;
 		this.channel = channel;
 		this.noteSync = noteSync;
-		this.peerList = new PeerList(noteSync, manager, channel);
+		this.peerList = new PeerList(noteSync, manager, channel, displayPeers);
+		this.displayPeers = displayPeers;
 	}
 
 	@Override
@@ -75,7 +78,7 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 					progressDialog.dismiss();
 				}
 				Toast.makeText(this.noteSync, noteSync.getString(R.string.noWifi),
-				       Toast.LENGTH_SHORT).show();
+						Toast.LENGTH_SHORT).show();
 
 			}
 		} else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
@@ -100,9 +103,13 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 				// info to find group owner IP
 
 				noteSync.syncService.setConnected(true);
+				progressDialog = noteSync.syncService.getProgressDialog();
 				Toast.makeText(noteSync, noteSync.getString(R.string.connexionSuccessful), Toast.LENGTH_SHORT).show();
 				peerList.setIntent(intent);
 				manager.requestConnectionInfo(channel, peerList);
+				if (!displayPeers) {
+					Toast.makeText(noteSync, noteSync.getString(R.string.syncing), Toast.LENGTH_SHORT).show();
+				}
 			} else {
 				noteSync.syncService.setConnected(false);
 			}

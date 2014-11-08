@@ -40,6 +40,7 @@
 	<string name="nosave">Erreur : La sauvegarde de la liste de tâches à échouée</string>
 	<string name="noWifi">Le wifi n\'est pas activé</string>
 	<string name="openingSocket">Mise en place de la connexion</string>
+	<string name="peeredWifi">Vous êtes déjà connecté à un pair, réactivez le wifi pour attendre une connexion d\'un autre pair</string>
 	<string name="pickdate">Choisir date d\'échéance</string>
 	<string name="project">Projet</string>
 	<string name="scanning">Recherche de pair...</string>
@@ -52,5 +53,6 @@
 	<string name="syncWifi">Synchroniser avec le Wifi</string>
 	<string name="title_other_devices">Autres pairs disponibles</string>
 	<string name="title_paired_devices">Pairs connectés</string>
+	<string name="wifiDiscoverable">Votre appareil est maintenant trouvable en Wifi P2P</string>
 	<string name="yes">Oui</string>
 </resources>

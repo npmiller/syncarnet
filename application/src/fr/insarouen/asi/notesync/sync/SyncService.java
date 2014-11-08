@@ -142,11 +142,35 @@ public class SyncService {
 	}
 
 	public void wifiDiscoverable() {
+		if (!isConnected){
+			notesync.receiver = new NoteSyncBroadcastReceiver(manager, channel, notesync, false);
+			notesync.registerReceiver(notesync.receiver, notesync.intentFilter);
+		manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+
+			@Override
+			public void onSuccess() {
+				Toast.makeText(notesync, notesync.getString(R.string.wifiDiscoverable),
+						Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void onFailure(int reasonCode) {
+				Toast.makeText(notesync, notesync.getString(R.string.discoveryFailed),
+						Toast.LENGTH_SHORT).show();
+				Log.d("NoteSync","Discovery failed : "+reasonCode);
+				if (notesync.progressDialog != null && notesync.progressDialog.isShowing()) {
+					notesync.progressDialog.dismiss();
+				}
+			}
+		});
+		} else {
+			Toast.makeText(this.notesync, notesync.getString(R.string.peeredWifi), Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	public void wifiConnectToPeer() {
 		if (!isConnected){
-			notesync.receiver = new NoteSyncBroadcastReceiver(manager, channel, notesync);
+			notesync.receiver = new NoteSyncBroadcastReceiver(manager, channel, notesync, true);
 			notesync.registerReceiver(notesync.receiver, notesync.intentFilter);
 			onInitiateDiscovery();
 		} else {

@@ -48,8 +48,9 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 	private String host;
 	private Intent serviceIntent;
 	private Intent intent;
+	private Boolean display;
 
-	public PeerList(NoteSync noteSync, WifiP2pManager manager, Channel channel) {
+	public PeerList(NoteSync noteSync, WifiP2pManager manager, Channel channel, Boolean display) {
 		this.peerList = new ArrayList<WifiP2pDevice>();
 		this.noteSync = noteSync;
 		this.manager = manager;
@@ -57,6 +58,7 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 		this.intent = intent;
 		this.peerSelection = new PeerSelection(manager, channel, noteSync);
 		this.peerListDialog = new PeerListDialog(peerList, peerSelection);
+		this.display = display;
 	}
 
 	public void setIntent(Intent intent) {
@@ -65,17 +67,19 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 
 	@Override
 	public void onPeersAvailable(WifiP2pDeviceList peers) {
-		peerList.clear();
-		peerList.addAll(peers.getDeviceList());
-		if (peerList.size() == 0) {
-			Toast.makeText(noteSync, noteSync.getString(R.string.noPair), Toast.LENGTH_SHORT).show();
+		if (display) {
+			peerList.clear();
+			peerList.addAll(peers.getDeviceList());
+			if (peerList.size() == 0) {
+				Toast.makeText(noteSync, noteSync.getString(R.string.noPair), Toast.LENGTH_SHORT).show();
+			}
+			progressDialog = noteSync.syncService.getProgressDialog();
+			if (progressDialog != null && progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
+			peerListDialog.setPeerList(peerList);
+			noteSync.syncService.onPeerSelection(peerListDialog);
 		}
-		progressDialog = noteSync.syncService.getProgressDialog();
-		if (progressDialog != null && progressDialog.isShowing()) {
-			progressDialog.dismiss();
-		}
-		peerListDialog.setPeerList(peerList);
-		noteSync.syncService.onPeerSelection(peerListDialog);
 
 	}
 

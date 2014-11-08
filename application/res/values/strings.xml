@@ -40,6 +40,7 @@
 	<string name="nosave">Error : Couldn\'t save task list</string>
 	<string name="noWifi">Wifi is not turned on</string>
 	<string name="openingSocket">Opening a server socket</string>
+	<string name="peeredWifi">You are already peered, reactivate wifi to wait for another peer</string>
 	<string name="pickdate">Pick due date</string>
 	<string name="project">Project</string>
 	<string name="scanning">Scanning for devices...</string>
@@ -52,5 +53,6 @@
 	<string name="syncWifi">Synchronise using Wifi</string>
 	<string name="title_other_devices">Other Available Devices</string>
 	<string name="title_paired_devices">Paired Devices</string>
+	<string name="wifiDiscoverable">Your device is now discoverable for Wifi P2P</string>
 	<string name="yes">Yes</string>
 </resources>
