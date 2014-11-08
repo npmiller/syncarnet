@@ -1,56 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="priorities">
-		<item>Basse</item>
-		<item>Haute</item>
-		<item>Moyenne</item>
-	</string-array>
-	<string name="add">Ajouter</string>
-	<string name="AllProjects">Tous les projets</string>
-	<string name="apply">Appliquer</string>
-	<string name="app_name">NoteSync</string>
-	<string name="backCancel">Appuyer sur précédent pour annuler</string>
-	<string name="button_scan">Scan for devices</string>
-	<string name="cancel">Annuler</string>
-	<string name="choosepeer">Choisissez un pair : </string>
-	<string name="ClassNotFoundException">Une erreur dans la reconstruction des tâches est apparue ; veuillez réessayer</string>
-	<string name="clearDate">Retirer la date</string>
-	<string name="clearDeleted">Vider les tâches supprimées</string>
-	<string name="clearFilter">Supprimer les filtres</string>
-	<string name="connectFailed">La connexion a échoué ; veuillez réessayer</string>
-	<string name="connectingTo">Connexion à : </string>
-	<string name="connexionSuccessful">Connection effectuée avec succès</string>
+    <string name="app_name">NoteSync</string>
+    <string name="add">Ajouter</string>
+    <string name="apply">Appliquer</string>
+    <string name="syncWifi">Synchroniser avec le Wifi</string>
+    <string name="syncBT">Synchroniser avec le Bluetooth</string>
+    <string name="pickdate">Choisir date d\'échéance</string>
+    <string name="nodescription">Vous devez fixez une description</string>
+    <string name="nosave">Erreur : La sauvegarde de la liste de tâches à échouée</string>
+    <string name="done">Fini ?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="cancel">Annuler</string>
+    <string name="choosepeer">Choisissez un pair : </string>
+    <string name="description">Description</string>
+    <string name="project">Projet</string>
+    <string name="filter">Filtrer</string>
+    <string name="clearDate">Retirer la date</string>
+    <string name="noWifi">Le wifi n\'est pas activé</string>
+    <string name="successSync">Synchronization effectuée avec succès</string>
+    <string name="openingSocket">Mise en place de la connexion</string>
+    <string name="connexionSuccessful">Connection effectuée avec succès</string>
+    <string name="noPair">Aucun pair trouvé</string>
+    <string name="backCancel">Appuyer sur précédent pour annuler</string>
+    <string name="syncing">Synchronization en cours</string>
+    <string name="connectingTo">Connexion à : </string>
+    <string name="connectFailed">La connexion a échoué ; veuillez réessayer</string>
+    <string name="findingPeers">Recherche des pairs en cours</string>
+    <string name="discoveryInitiated">Découverte des pairs lancée</string>
+    <string name="filterByProject">Filtrer par projet</string>
+    <string name="clearFilter">Supprimer les filtres</string>
+    <string name="discoveryFailed">La découverte des pairs à échoué ; veuillez réactiver le Wifi et réessayer </string>
+    <string name="IOException">Une erreur de transfert est apparue ; veuillez réessayer</string>
+    <string name="ClassNotFoundException">Une erreur dans la reconstruction des tâches est apparue ; veuillez réessayer</string>
+    <!--  DeviceListActivity -->
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+    <string name="AllProjects">Tous les projets</string>
+    <string name="clearDeleted">Vider les tâches supprimées</string>
+    <string name="deletedTaskCleared">Cache des tâches supprimées vidé.</string>
 	<string name="dateCleared">Date d\'échéance supprimée</string>
-	<string name="deletedTaskCleared">Cache des tâches supprimées vidé.</string>
-	<string name="description">Description</string>
-	<string name="discoverable">Attendre une connection</string>
-	<string name="discoveryFailed">La découverte des pairs à échoué ; veuillez réactiver le Wifi et réessayer </string>
-	<string name="discoveryInitiated">Découverte des pairs lancée</string>
-	<string name="done">Fini ?</string>
-	<string name="filterByProject">Filtrer par projet</string>
-	<string name="filter">Filtrer</string>
-	<string name="findingPeers">Recherche des pairs en cours</string>
-	<string name="IOException">Une erreur de transfert est apparue ; veuillez réessayer</string>
-	<string name="needWifi">Vous avez besoin du Wifi pour utiliser ceci. Voulez-vous l\'activer ?</string>
-	<string name="nodescription">Vous devez fixez une description</string>
-	<string name="none_found">No devices found</string>
-	<string name="none_paired">No devices have been paired</string>
-	<string name="no">Non</string>
-	<string name="noPair">Aucun pair trouvé</string>
-	<string name="nosave">Erreur : La sauvegarde de la liste de tâches à échouée</string>
-	<string name="noWifi">Le wifi n\'est pas activé</string>
-	<string name="openingSocket">Mise en place de la connexion</string>
-	<string name="pickdate">Choisir date d\'échéance</string>
-	<string name="project">Projet</string>
-	<string name="scanning">scanning for devices...</string>
-	<string name="searchToSync">Trouver un pair pour se connecter</string>
-	<string name="select_device">select a device to connect</string>
-	<string name="successSync">Synchronization effectuée avec succès</string>
-	<string name="syncActionChoice">Que souhaitez-vous faire ?</string>
-	<string name="syncBT">Synchroniser avec le Bluetooth</string>
-	<string name="syncing">Synchronization en cours</string>
-	<string name="syncWifi">Synchroniser avec le Wifi</string>
-	<string name="title_other_devices">Other Available Devices</string>
-	<string name="title_paired_devices">Paired Devices</string>
-	<string name="yes">Oui</string>
+    <string-array name="priorities">
+        <item>Basse</item>
+        <item>Moyenne</item>
+        <item>Haute</item>
+    </string-array>
+    <string name="syncActionChoice">Que souhaitez-vous faire ?</string>
+    <string name="discoverable">Attendre une connection</string>
+    <string name="searchToSync">Trouver un pair pour se connecter</string>
+    <string name="needWifi">Vous avez besoin du Wifi pour utiliser ceci. Voulez-vous l\'activer ?</string>
 </resources>
+
