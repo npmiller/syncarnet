@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2013-14 Nicolas Miller, Florian Paindorge
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package fr.insarouen.asi.notesync.sync;
 
 import fr.insarouen.asi.notesync.tasks.*;
@@ -39,7 +57,7 @@ import android.widget.Toast;
  */
 public class SyncBTService {
 	// Debugging
-	private static final String TAG = "NoteSyncService";
+	private static final String TAG = "NoteSync";
 	private static final boolean D = true;
 
 	// Name for the SDP record when creating server socket
@@ -87,7 +105,8 @@ public class SyncBTService {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
 		mHandler = null;
-		originalTL = notesync.getTasks();
+		originalTL = new TaskList();
+		originalTL.unJsonify(notesync.getTasks().jsonify());
 		Log.d(TAG, "taskList retrieved : "+originalTL.toString());
 	}
 
@@ -96,32 +115,24 @@ public class SyncBTService {
 	}
 
 	public void endSync(boolean server) {
-		Log.d(TAG, "last step to sync !");
+		Log.d(TAG, "Last step to sync !");
 		if (server) {
-			Log.d(TAG, "endSync server");
+			Log.d(TAG, "EndSync server");
 			//doit fermer la fenêtre de synchro bt
 		} else {
 			try {
-				//Log.d(TAG, "rebuilding test object");
-				//String st = (String) bytesToObject(this.receivedTLBytes);
-				//Log.d(TAG, "string rebuilt");
-				//Test ot = new Test();
-				//ot.unJsonify(st);
-				//Log.d(TAG, "test object rebuilt");
-				//Log.d(TAG, "test object received : " + ot.toStringShort());
-
 				Log.d(TAG, "Rebuilding task list");
 				String st = (String) bytesToObject(this.receivedTLBytes);
-				Log.d(TAG, "String rebuilt : "+st);
+				Log.d(TAG, "String rebuilt");
 				TaskList receivedTL = new TaskList();
 				Log.d(TAG, "Unjsonifying");
 				receivedTL.unJsonify(st);
-				Log.d(TAG,"Task list rebuilt");
+				Log.d(TAG, "Task list rebuilt");
 				TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
-				Log.d(TAG,"Task list merged");
+				Log.d(TAG, "Task list merged");
 				notesync.runOnUiThread(new SetTaskListRun(notesync, mergedTL));
 
-				Log.e(TAG, "finally sync !");
+				Log.d(TAG, "Finally sync !");
 			} catch (IOException e) {
 				Log.e(TAG, "IOException during bytesToObject", e);
 			} catch (ClassNotFoundException e) {
@@ -346,7 +357,7 @@ public class SyncBTService {
 					}
 				}
 			}
-			if (D) Log.i(TAG, "END mAcceptThread, socket Type: " + mSocketType);
+			if (D) Log.d(TAG, "END mAcceptThread, socket Type: " + mSocketType);
 
 		}
 
@@ -393,7 +404,7 @@ public class SyncBTService {
 		}
 
 		public void run() {
-			Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
+			Log.d(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
 			setName("ConnectThread" + mSocketType);
 
 			// Always cancel discovery because it will slow down a connection
@@ -462,54 +473,20 @@ public class SyncBTService {
 		}
 
 		public void run() {
-			Log.i(TAG, "BEGIN mConnectedThreadServer");
+			Log.d(TAG, "BEGIN mConnectedThreadServer");
 			byte[] buffer;
 
 			try {
-				//Log.e(TAG, "Creating test object...");
-				//Test ot = new Test(new Random().nextInt());
-				//ot.addString("ocean");
-				//ot.addString("otarie");
-				//ot.addString("plouf");
-				//ot.addString("glou");
-				//ot.addString("honk");
-				//ot.addString("nageoire");
-				//ot.addString("huile pas pouih");
-				//for (int j=1 ; j<=400 ; j++)
-				//ot.addString("otarie "+j);
-				//ot.addString("honk");
-				//ot.addString(UUID.randomUUID().toString());
-				//Log.e(TAG, "Test object created : "+ot.toStringShort());
-
-				//Log.e(TAG, "jsonifying...");
-				//String stSent = ot.jsonify();
-
-				//Log.e(TAG, "ObjectToBytes...");
-				//byte[] bytes = ObjectToBytes((Object) stSent);
-				//DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,400));
-
-				//int TLSize = bytes.length;
-				//Log.e(TAG, "Server test object size : " + TLSize);
-
-				//d.writeInt(TLSize);
-				//Log.e(TAG, "Test object size sent");
-
-				//for (int i=0 ; i<bytes.length ; i++) {
-					//d.write(bytes[i]);
-					//d.flush();
-				//}
-				//Log.d(TAG,"test object sent");
-
-				Log.e(TAG, "Jsonifying");
+				Log.d(TAG, "Jsonifying");
 				String TLString = originalTL.jsonify();
-				Log.e(TAG, "Jsonifyed : "+TLString);
-				Log.e(TAG, "ObjectToBytes");
+				Log.d(TAG, "Jsonifyed : "+TLString);
+				Log.d(TAG, "ObjectToBytes");
 				byte[] bytes = ObjectToBytes((Object) TLString);
 				int TLSize = bytes.length;
-				Log.e(TAG, "Server TL size : " + TLSize);
+				Log.d(TAG, "Server TL size : " + TLSize);
 				DataOutputStream d = new DataOutputStream(new BufferedOutputStream(mmOutStream,400));
 				d.writeInt(TLSize);
-				Log.e(TAG, "TL size sent");
+				Log.d(TAG, "TL size sent");
 				for (int i=0 ; i<bytes.length ; i++) {
 					d.write(bytes[i]);
 					d.flush();
@@ -526,7 +503,7 @@ public class SyncBTService {
 		public void cancel() {
 			try {
 				mmSocket.close();
-				Log.e(TAG, "mConnectedThreadServer closed");
+				Log.d(TAG, "mConnectedThreadServer closed");
 			} catch (IOException e) {
 				Log.e(TAG, "close() of connect socket failed", e);
 			}
@@ -561,30 +538,15 @@ public class SyncBTService {
 		}
 
 		public void run() {
-			Log.i(TAG, "BEGIN mConnectedThreadClient");
+			Log.d(TAG, "BEGIN mConnectedThreadClient");
 			byte[] buffer;
 
 			// Keep listening to the InputStream while connected
 			//boolean received = false;
 			try {
-				//DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
-				//int TLSize = d.readInt();
-				//Log.e(TAG, "Client test object size : " + TLSize);
-
-				//int bytesRead;
-				//byte[] dataBytes = new byte[TLSize];
-				//byte[] tmpByte = new byte[1];
-				//for(bytesRead=0; bytesRead < TLSize; bytesRead++) {
-					//d.read(tmpByte, 0, 1);
-					//dataBytes[bytesRead] = tmpByte[0];
-				//}
-				//Log.e(TAG, "data received");
-				//Log.e(TAG, bytesRead + " bytes received");
-				//SyncBTService.this.setBytes(dataBytes);
-
 				DataInputStream d = new DataInputStream(new BufferedInputStream(mmInStream,400));
 				int TLSize = d.readInt();
-				Log.e(TAG, "Client TL size : " + TLSize);
+				Log.d(TAG, "Client TL size : " + TLSize);
 				int bytesRead;
 				byte[] dataBytes = new byte[TLSize];
 				byte[] tmpByte = new byte[1];
@@ -593,10 +555,10 @@ public class SyncBTService {
 					dataBytes[bytesRead] = tmpByte[0];
 					if (bytesRead % 1000 == 0) Log.d(TAG,"Received "+bytesRead+" bytes");
 				}
-				Log.e(TAG, "Data received");
-				Log.e(TAG, bytesRead + " bytes received");
+				Log.d(TAG, "Data received");
+				Log.d(TAG, bytesRead + " bytes received");
 				SyncBTService.this.setBytes(dataBytes);
-				Log.e(TAG, "Buffer set in outer class ");
+				Log.d(TAG, "Buffer set in outer class ");
 			} catch (IOException e) {
 				Log.e(TAG, "disconnected", e);
 				connectionLost();
@@ -609,7 +571,7 @@ public class SyncBTService {
 		public void cancel() {
 			try {
 				mmSocket.close();
-				Log.e(TAG, "mConnectedThreadClient closed");
+				Log.d(TAG, "mConnectedThreadClient closed");
 			} catch (IOException e) {
 				Log.e(TAG, "close() of connect socket failed", e);
 			}

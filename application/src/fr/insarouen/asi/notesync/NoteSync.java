@@ -23,23 +23,27 @@ import fr.insarouen.asi.notesync.sync.*;
 
 import android.app.Activity;
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import android.content.BroadcastReceiver;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
-import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 
 import android.os.Bundle;
 
@@ -50,8 +54,6 @@ import android.view.MenuItem;
 import android.view.MenuInflater;
 
 import android.widget.Toast;
-
-import android.content.Context;
 
 import java.util.Calendar;
 import java.util.ArrayList;
@@ -64,6 +66,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 public class NoteSync extends Activity implements TaskAddFragment.Callbacks, TaskEditFragment.Callbacks, TaskListFragment.Callbacks, SyncedDevicesFragment.Callbacks {
+	private static final String TAG = "NoteSync";
 	private TaskList tasks; 
 	private ArrayList<SyncedDevice> savedPeers;
 	private TaskListAdapter adapter;
@@ -72,32 +75,17 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	private boolean isWifiP2pEnabled;
 	private boolean isConnected = false;
 	private boolean isConnecting = false;
-	private WifiP2pManager manager;
 	private boolean retryChannel = false;
 	private Channel channel;
-	private BroadcastReceiver receiver = null;
-	private ProgressDialog progressDialog = null;
-	private PeerListDialog peerListDialog;
-	// Intent request codes
-	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
-	private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
-	private static final int REQUEST_ENABLE_BT = 3;
-	// Name of the connected device
-	private String mConnectedDeviceName = null;
+	public ProgressDialog progressDialog = null;
+	public final IntentFilter intentFilter = new IntentFilter();
+	private WifiP2pManager manager;
+	public PeerListDialog peerListDialog;
 	// Local Bluetooth adapter
 	private BluetoothAdapter mBluetoothAdapter = null;
-	// Member object for the chat services
-	private SyncBTService mChatService = null;
-
-	private final IntentFilter intentFilter = new IntentFilter();
-
-	public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
-		this.isWifiP2pEnabled = isWifiP2pEnabled;
-	}
-
-	public boolean isWifiP2pEnabled() {
-		return this.isWifiP2pEnabled;
-	}
+	// Manage SyncService
+	public SyncService syncService;
+	public BroadcastReceiver receiver = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -135,6 +123,9 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 			finish();
 			return;
 		}
+
+		// Create a SyncService
+		syncService = new SyncService(this, manager, channel, mBluetoothAdapter);
 	}
 
 	@Override
@@ -147,8 +138,13 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		super.onPause();
 		saveTaskList(tasks);
 		savePeers(savedPeers);
-		if(receiver != null)
-			unregisterReceiver(receiver);
+		if(receiver != null) { 
+			try {
+				unregisterReceiver(receiver);
+			} catch (IllegalArgumentException e) {
+				Log.e(TAG, "IllegalArgumentException : "+e);
+			}
+		}
 	}
 
 	public void setTaskList(TaskList taskList) {
@@ -243,159 +239,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	}
 
 	@Override
-	public void onSyncWifiClick() {
-		if (!isConnected){
-			receiver = new NoteSyncBroadcastReceiver(manager, channel, this);
-			registerReceiver(receiver, intentFilter);
-			onInitiateDiscovery();
-		} else {
-			this.peerListDialog.reconnect(this);
-		}
-	}
-
-	@Override
-	public void onSyncBTClick() {
-		// If BT is not on, request that it be enabled.
-		// setupChat() will then be called during onActivityResult
-		if (!mBluetoothAdapter.isEnabled()) {
-			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-		} else {
-			mChatService = new SyncBTService(this);
-			mChatService.start();
-			Intent serverIntent = null;
-			serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
-			startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-		}
-	}
-
-	@Override
-	public void onManageSyncedDevicesClick() {
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		ft.replace(R.id.container, new SyncedDevicesFragment()); // FIXME: Do it in some sort of popup
-		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-		ft.addToBackStack(null);
-		ft.commit();
-	}
-
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
-			case REQUEST_CONNECT_DEVICE_SECURE:
-				// When DeviceListActivity returns with a device to connect
-				if (resultCode == Activity.RESULT_OK) {
-					connectDevice(data, true);
-				}
-				break;
-			case REQUEST_CONNECT_DEVICE_INSECURE:
-				// When DeviceListActivity returns with a device to connect
-				if (resultCode == Activity.RESULT_OK) {
-					connectDevice(data, false);
-				}
-				break;
-			case REQUEST_ENABLE_BT:
-				// When the request to enable Bluetooth returns
-				if (resultCode == Activity.RESULT_OK) {
-					// Initialize the BluetoothChatService to perform bluetooth connections
-					mChatService = new SyncBTService(this);
-					mChatService.start();
-					Intent serverIntent = null;
-					serverIntent = new Intent(this, fr.insarouen.asi.notesync.sync.DeviceListActivity.class);
-					startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-				} else {
-					// User did not enable Bluetooth or an error occurred
-				}
-		}
-	}
-
-	private void connectDevice(Intent data, boolean secure) {
-		// Get the device MAC address
-		String address = data.getExtras()
-			.getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-		// Get the BluetoothDevice object
-		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-		// Attempt to connect to the device
-		mChatService.connect(device, secure);
-	}
-
-	private void ensureDiscoverable() {
-		if (mBluetoothAdapter.getScanMode() !=
-				BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-			Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-			discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-			startActivity(discoverableIntent);
-				}
-	}
-
-
-	public void onInitiateDiscovery() {
-		progressDialog = ProgressDialog.show(this, this.getString(R.string.backCancel), this.getString(R.string.findingPeers), true,
-				true, new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-
-					}
-				});
-		manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
-
-			@Override
-			public void onSuccess() {
-				Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryInitiated),
-						Toast.LENGTH_SHORT).show();
-			}
-
-			@Override
-			public void onFailure(int reasonCode) {
-				Toast.makeText(NoteSync.this, NoteSync.this.getString(R.string.discoveryFailed),
-						Toast.LENGTH_SHORT).show();
-				Log.d("NoteSync","Discovery failed : "+reasonCode);
-				if (NoteSync.this.progressDialog != null && NoteSync.this.progressDialog.isShowing()) {
-					NoteSync.this.progressDialog.dismiss();
-				}
-			}
-		});
-	}
-
-	public ProgressDialog getProgressDialog() {
-		return this.progressDialog;
-	}
-
-	public void setProgressDialog(ProgressDialog progressDialog) {
-		this.progressDialog = progressDialog;
-	}
-
-	public void onPeerSelection(PeerListDialog peerListDialog) {
-		this.peerListDialog = peerListDialog;
-		if (!isConnected && !isConnecting && !peerListDialog.peerListEmpty())
-			peerListDialog.show(getFragmentManager(), "PeerListDialog");
-	}
-
-	public void setConnected(boolean isConnected) {
-		this.isConnected = isConnected;
-		if (isConnected){
-			if (peerListDialog != null) {
-				peerListDialog.getPeerSelection().setConnected();
-				peerListDialog.dismiss();
-			}
-			if (progressDialog != null && progressDialog.isShowing()) {
-				progressDialog.dismiss();
-			}
-		}
-	}
-
-	public boolean isConnected() {
-		return isConnected;
-	}
-
-	public void setConnecting(boolean isConnecting) {
-		this.isConnecting = isConnecting;
-	}
-
-	public boolean isConnecting() {
-		return this.isConnecting;
-	}
-
-
-	@Override
 	public void onClearDeletedClick() {
 		tasks.clearDeleted();
 		Toast.makeText(this, this.getString(R.string.deletedTaskCleared), Toast.LENGTH_SHORT).show();
@@ -456,5 +299,28 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		} catch (Exception e) {
 			return new TaskList();
 		}
+	}
+
+	//sync service
+
+	@Override
+	public void onManageSyncedDevicesClick() {
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.container, new SyncedDevicesFragment()); // FIXME: Do it in some sort of popup
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		ft.addToBackStack(null);
+		ft.commit();
+	}
+
+	public void onSyncWifiClick() {
+		syncService.onSyncWifiClick();
+	}
+
+	public void onSyncBTClick() {
+		syncService.onSyncBTClick();
+	}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		syncService.onBTActivityResult(requestCode, resultCode, data);
 	}
 }

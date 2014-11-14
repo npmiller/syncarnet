@@ -20,6 +20,7 @@ package fr.insarouen.asi.notesync.sync;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.app.ProgressDialog;
 import android.os.SystemClock;;
@@ -31,6 +32,8 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.app.Fragment;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.widget.Toast;
+
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,13 +49,15 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 	private NoteSync noteSync;
 	private PeerList peerList;
 	private ProgressDialog progressDialog; 
+	private Boolean displayPeers;
 
-	public NoteSyncBroadcastReceiver(WifiP2pManager manager, Channel channel, NoteSync noteSync) {
+	public NoteSyncBroadcastReceiver(WifiP2pManager manager, Channel channel, NoteSync noteSync, Boolean displayPeers) {
 		super();
 		this.manager = manager;
 		this.channel = channel;
 		this.noteSync = noteSync;
-		this.peerList = new PeerList(noteSync, manager, channel);
+		this.peerList = new PeerList(noteSync, manager, channel, displayPeers);
+		this.displayPeers = displayPeers;
 	}
 
 	@Override
@@ -64,16 +69,16 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 			int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
 			if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
 				// Wifi Direct mode is enabled
-				noteSync.setIsWifiP2pEnabled(true);
+				noteSync.syncService.setIsWifiP2pEnabled(true);
 			} else {
-				noteSync.setIsWifiP2pEnabled(false);
-				noteSync.setConnected(false);
-				progressDialog = noteSync.getProgressDialog();
+				noteSync.syncService.setIsWifiP2pEnabled(false);
+				noteSync.syncService.setConnected(false);
+				progressDialog = noteSync.syncService.getProgressDialog();
 				if (progressDialog != null && progressDialog.isShowing()) {
 					progressDialog.dismiss();
 				}
-				Toast.makeText(this.noteSync, noteSync.getString(R.string.nowifi),
-				       Toast.LENGTH_SHORT).show();
+				Toast.makeText(this.noteSync, noteSync.getString(R.string.noWifi),
+						Toast.LENGTH_SHORT).show();
 
 			}
 		} else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
@@ -81,7 +86,7 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 			// asynchronous call and the calling activity is notified with a
 			// callback on PeerListListener.onPeersAvailable()
 			if (manager != null) {
-				if (!noteSync.isConnected() && noteSync.isWifiP2pEnabled())
+				if (!noteSync.syncService.isConnected() && noteSync.syncService.isWifiP2pEnabled())
 					manager.requestPeers(channel, peerList);
 			}
 		} else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
@@ -97,12 +102,16 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 				// we are connected with the other device, request connection
 				// info to find group owner IP
 
-				noteSync.setConnected(true);
+				noteSync.syncService.setConnected(true);
+				progressDialog = noteSync.syncService.getProgressDialog();
 				Toast.makeText(noteSync, noteSync.getString(R.string.connexionSuccessful), Toast.LENGTH_SHORT).show();
 				peerList.setIntent(intent);
 				manager.requestConnectionInfo(channel, peerList);
+				if (!displayPeers) {
+					Toast.makeText(noteSync, noteSync.getString(R.string.syncing), Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				noteSync.setConnected(false);
+				noteSync.syncService.setConnected(false);
 			}
 		}
 	}

@@ -19,6 +19,7 @@
 package fr.insarouen.asi.notesync.sync;
 
 import android.app.IntentService;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -35,6 +36,7 @@ import fr.insarouen.asi.notesync.tasks.*;
 import fr.insarouen.asi.notesync.sync.PeerList.ServiceStatic;
 
 public class TaskListTransferService extends IntentService {
+	private String TAG = "NoteSync";
 	private static final int SOCKET_TIMEOUT = 5000;
 	private Intent intent;
 	private NoteSync noteSync;
@@ -67,15 +69,18 @@ public class TaskListTransferService extends IntentService {
 			new TaskListAsync(noteSync).execute();
 		} else {
 			try {
-				TaskList originalTL = noteSync.getTasks();
+				TaskList originalTL = new TaskList();
+				String originalTLString = noteSync.getTasks().jsonify();
 				socket.bind(null);
 				socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
 
 				ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-				outputStream.writeObject(originalTL);
+				outputStream.writeObject(originalTLString);
 
 				ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-				TaskList receivedTL = (TaskList) inputStream.readObject();
+				String receivedTLString = (String) inputStream.readObject();
+				TaskList receivedTL = new TaskList();
+				receivedTL.unJsonify(receivedTLString);
 
 				TaskList mergedTL = TaskList.merge(noteSync.getTasks(), receivedTL);
 
@@ -84,10 +89,10 @@ public class TaskListTransferService extends IntentService {
 				noteSync.showToast(noteSync.getString(R.string.successSync));
 			} catch (IOException e) {
 				noteSync.showToast(noteSync.getString(R.string.IOException));
-				Log.d("NoteSync","IOException : "+e.getStackTrace().toString());
+				Log.e(TAG,"IOException : "+e.getStackTrace().toString());
 			} catch (ClassNotFoundException e) {
 				noteSync.showToast(noteSync.getString(R.string.ClassNotFoundException));
-				Log.d("NoteSync","ClassNotFoundException : "+e.getStackTrace().toString());
+				Log.e(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
 			} finally {
 				socketClose(socket);
 				socketClose(client);
@@ -108,6 +113,7 @@ public class TaskListTransferService extends IntentService {
 
 	public static class TaskListAsync extends AsyncTask<Void, Void, String> {
 		private NoteSync noteSync;
+		private String TAG = "NoteSync";
 
 		/**
 		 * @param context
@@ -120,33 +126,35 @@ public class TaskListTransferService extends IntentService {
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				TaskList originalTL = noteSync.getTasks();
+				TaskList originalTL = new TaskList();
+				String originalTLString = noteSync.getTasks().jsonify();
 
 				ServerSocket serverSocket = new ServerSocket(8988);
 
 				Socket client = serverSocket.accept();
 				ObjectInputStream inputStream = new ObjectInputStream(client.getInputStream());
-				TaskList receivedTL = (TaskList) inputStream.readObject();
-
+				String receivedTLString = (String) inputStream.readObject();
+				TaskList receivedTL = new TaskList();
+				receivedTL.unJsonify(receivedTLString);
 
 				TaskList mergedTL = TaskList.merge(noteSync.getTasks(), receivedTL);
 
 				noteSync.runOnUiThread(new SetTaskListRun(noteSync, mergedTL));
 
 				ObjectOutputStream outputStream = new ObjectOutputStream(client.getOutputStream());
-				outputStream.writeObject(originalTL);
+				outputStream.writeObject(originalTLString);
 
 				serverSocket.close();
 				return "succes";
 			}
 			catch (IOException e) {
 				noteSync.showToast(noteSync.getString(R.string.IOException));
-				Log.d("NoteSync","IOException : "+e.getStackTrace().toString());
+				Log.e(TAG,"IOException : "+e.getStackTrace().toString());
 				return null;
 			}
 			catch (ClassNotFoundException e) {
 				noteSync.showToast(noteSync.getString(R.string.ClassNotFoundException));
-				Log.d("NoteSync","ClassNotFoundException : "+e.getStackTrace().toString());
+				Log.e(TAG,"ClassNotFoundException : "+e.getStackTrace().toString());
 				return null;
 			}
 		}

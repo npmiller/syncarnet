@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class TaskList extends ArrayList<Task> implements Serializable {
-	private static final String TAG = "NoteSyncService";
+	private static final String TAG = "NoteSync";
 	private DeletedTasks deletedTasks = new DeletedTasks();
 	private ArrayList<String> projects = new ArrayList<String>();
 
@@ -150,24 +150,23 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 	public String jsonify() {
 		JSONObject jsonTL = new JSONObject();
 		JSONArray jsonTasks = new JSONArray();
-		JSONArray jsonDeletedTasks = new JSONArray();
 		JSONArray jsonProjects = new JSONArray();
 		try {
 			for (int i = 0; i < this.size(); i++)
 				jsonTasks.put(this.get(i).jsonify());
 			jsonTL.put("tasks", jsonTasks.toString());
 			Log.d(TAG, "Added tasks to json");
-			for (int i = 0; i < deletedTasks.size(); i++)
-				jsonDeletedTasks.put(deletedTasks.get(i).toString());
-			jsonTL.put("deletedTasks", jsonDeletedTasks.toString());
+
+			jsonTL.put("deletedTasks", deletedTasks.jsonify());
 			Log.d(TAG, "Added deleted tasks to json");
+
 			for (int i = 0; i < projects.size(); i++)
 				jsonProjects.put(projects.get(i));
 			jsonTL.put("projects", jsonProjects.toString());
 			Log.d(TAG, "Added projects to json");
 			return jsonTL.toString();
 		} catch (JSONException e) {
-			Log.d(TAG, "Exception while jsonifying");
+			Log.e(TAG, "Exception while jsonifying");
 			return "";
 		}
 	}
@@ -183,16 +182,16 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 				this.add(taskTemp);
 			}
 			Log.d(TAG, "Recreated tasks from json");
-			JSONArray jsonDeletedTasks = new JSONArray(jsonTL.getString("deletedTasks"));
-			for (int i = 0; i< jsonDeletedTasks.length(); i++)
-				this.deletedTasks.add(UUID.fromString(jsonDeletedTasks.getString(i)));
+
+			deletedTasks.unJsonify(jsonTL.getString("deletedTasks"));
 			Log.d(TAG, "Recreated deleted tasks from json");
+
 			JSONArray jsonProjects = new JSONArray(jsonTL.getString("projects"));
 			for (int i = 0; i< jsonProjects.length(); i++)
 				this.projects.add(jsonProjects.getString(i));
 			Log.d(TAG, "Recreated projects from json");
 		} catch (JSONException e) {
-			Log.d(TAG, "Exception while unjsonifying");
+			Log.e(TAG, "Exception while unjsonifying");
 		}
 	}
 }

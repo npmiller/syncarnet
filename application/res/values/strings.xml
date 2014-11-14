@@ -1,55 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NoteSync</string>
-    <string name="add">Add</string>
-    <string name="apply">Apply</string>
-    <string name="syncWifi">Synchronise using Wifi</string>
-    <string name="syncBT">Synchronise using Bluetooth</string>
-    <string name="pickdate">Pick due date</string>
-    <string name="nodescription">You have to define a description.</string>
-    <string name="nosave">Error : Couldn\'t save task list</string>
-    <string name="done">Done ?</string>
-    <string name="yes">Yes</string>
-    <string name="cancel">Cancel</string>
-    <string name="choosepeer">Choose a peer : </string>
-    <string name="description">Description</string>
-    <string name="project">Project</string>
-    <string name="filter">Filter</string>
-    <string name="clearDate">Clear date</string>
-    <string name="nowifi">Wifi is not turned on</string>
-    <string name="successSync">Synchronization successful</string>
-    <string name="openingSocket">Opening a server socket</string>
-    <string name="connexionSuccessful">Connexion successfully established</string>
-    <string name="noPair">No pair found</string>
-    <string name="backCancel">Press back to cancel</string>
-    <string name="syncing">Synchronizing</string>
-    <string name="connectingTo">Connecting to : </string>
-    <string name="connectFailed">Connect failed ; please try again </string>
-    <string name="findingPeers">Finding peers</string>
-    <string name="discoveryInitiated">Discovery initiated</string>
-    <string name="filterByProject">Filter by project</string>
-    <string name="clearFilter">Clear filter</string>
-    <string name="discoveryFailed">Discovery failed ; please reactivate Wifi and try again </string>
-    <string name="IOException">An error occured while transfering ; please try again</string>
-    <string name="ClassNotFoundException">An error occured while rebuilding tasks ; please try again</string>
-    <string name="unpair">Unpair?</string>
-    <!--  DeviceListActivity -->
-    <string name="scanning">scanning for devices...</string>
-    <string name="select_device">select a device to connect</string>
-    <string name="none_paired">No devices have been paired</string>
-    <string name="none_found">No devices found</string>
-    <string name="title_paired_devices">Paired Devices</string>
-    <string name="title_other_devices">Other Available Devices</string>
-    <string name="button_scan">Scan for devices</string>
-    <string name="AllProjects">All projects</string>
-    <string name="clearDeleted">Clear deleted tasks</string>
-    <string name="manageSyncedDevices">Manage synced devices</string>
-    <string name="deletedTaskCleared">Deleted tasks\' cache cleaned.</string>
+	<string-array name="priorities">
+		<item>Low</item>
+		<item>Medium</item>
+		<item>High</item>
+	</string-array>
+	<string name="add">Add</string>
+	<string name="AllProjects">All projects</string>
+	<string name="apply">Apply</string>
+	<string name="app_name">NoteSync</string>
+	<string name="backCancel">Press back to cancel</string>
+	<string name="button_scan">Scan for devices</string>
+	<string name="cancel">Cancel</string>
+	<string name="choosepeer">Choose a peer : </string>
+	<string name="ClassNotFoundException">An error occured while rebuilding tasks ; please try again</string>
+	<string name="clearDate">Clear date</string>
+	<string name="clearDeleted">Clear deleted tasks</string>
+	<string name="clearFilter">Clear filter</string>
+	<string name="connectFailed">Connect failed ; please try again </string>
+	<string name="connectingTo">Connecting to : </string>
+	<string name="connexionSuccessful">Connexion successfully established</string>
 	<string name="dateCleared">Due date cleared</string>
-    <string-array name="priorities">
-        <item>Low</item>
-        <item>Medium</item>
-        <item>High</item>
-    </string-array>
+	<string name="deletedTaskCleared">Deleted tasks\' cache cleaned.</string>
+	<string name="description">Description</string>
+	<string name="discoverable">Wait for a connection</string>
+	<string name="discoveryFailed">Discovery failed ; please reactivate Wifi and try again </string>
+	<string name="discoveryInitiated">Discovery initiated</string>
+	<string name="done">Done ?</string>
+	<string name="filterByProject">Filter by project</string>
+	<string name="filter">Filter</string>
+	<string name="findingPeers">Finding peers</string>
+	<string name="IOException">An error occured while transfering ; please try again</string>
+	<string name="manageSyncedDevices">Manage synced devices</string>
+	<string name="needWifi">You need to Wifi to use this. Do you want to activate it ?</string>
+	<string name="nodescription">You have to define a description.</string>
+	<string name="none_found">No devices found</string>
+	<string name="none_paired">No devices have been paired</string>
+	<string name="no">No</string>
+	<string name="noPair">No pair found</string>
+	<string name="nosave">Error : Couldn\'t save task list</string>
+	<string name="noWifi">Wifi is not turned on</string>
+	<string name="openingSocket">Opening a server socket</string>
+	<string name="peeredWifi">You are already peered, reactivate wifi to wait for another peer</string>
+	<string name="pickdate">Pick due date</string>
+	<string name="project">Project</string>
+	<string name="scanning">Scanning for devices...</string>
+	<string name="searchToSync">Find peer to connect to</string>
+	<string name="select_device">Select a device to connect</string>
+	<string name="successSync">Synchronization successful</string>
+	<string name="syncActionChoice">What do you want to do ?</string>
+	<string name="syncBT">Synchronise using Bluetooth</string>
+	<string name="syncing">Synchronizing</string>
+	<string name="syncWifi">Synchronise using Wifi</string>
+	<string name="title_other_devices">Other Available Devices</string>
+	<string name="title_paired_devices">Paired Devices</string>
+	<string name="unpair">Unpair?</string>
+	<string name="wifiDiscoverable">Your device is now discoverable for Wifi P2P</string>
+	<string name="yes">Yes</string>
 </resources>
-
