@@ -16,9 +16,10 @@
  *
  */
 
-package fr.insarouen.asi.notesync;
+package fr.insarouen.asi.notesync.sync;
 
 import fr.insarouen.asi.notesync.tasks.*;
+import fr.insarouen.asi.notesync.*;
 
 import android.app.AlertDialog;
 import android.app.ListFragment;

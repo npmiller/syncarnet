@@ -55,8 +55,9 @@ import android.view.MenuInflater;
 
 import android.widget.Toast;
 
-import java.util.Calendar;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
@@ -120,7 +121,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		// If the adapter is null, then Bluetooth is not supported
 		if (mBluetoothAdapter == null) {
 			Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-			finish();
 			return;
 		}
 
@@ -226,6 +226,10 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 
 	public void removeSyncedDevice(int pos) {
 		savedPeers.remove(pos);
+	}
+
+	public void savePeer(String name, String id) {
+		this.savedPeers.add(new SyncedDevice(name, id, new Date().getTime()));
 	}
 
 	/* Menu callbacks */

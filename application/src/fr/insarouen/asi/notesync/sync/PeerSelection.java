@@ -32,6 +32,7 @@ import android.widget.Toast;
 import fr.insarouen.asi.notesync.*;
 import fr.insarouen.asi.notesync.tasks.*;
 import fr.insarouen.asi.notesync.sync.*;
+import fr.insarouen.asi.notesync.sync.PeerList.ServiceStatic;
 import fr.insarouen.asi.notesync.sync.PeerListDialog.OnPeerSelected;
 
 public class PeerSelection implements OnPeerSelected {
@@ -56,8 +57,8 @@ public class PeerSelection implements OnPeerSelected {
 		config.wps.setup = WpsInfo.PBC;
 		noteSync.syncService.setConnecting(true);
 		progressDialog = ProgressDialog.show(noteSync, noteSync.getString(R.string.backCancel),
-		noteSync.getString(R.string.connectingTo) + device.deviceAddress, true, true
-		);
+		noteSync.getString(R.string.connectingTo) + device.deviceAddress, true, true);
+		ServiceStatic.setDevice(device.deviceName, device.deviceAddress);
 		manager.connect(channel, config, new ActionListener() {
 			@Override
 			public void onSuccess() {

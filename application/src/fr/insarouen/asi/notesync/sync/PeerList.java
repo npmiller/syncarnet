@@ -29,6 +29,7 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.widget.Toast;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.net.wifi.p2p.WifiP2pInfo;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 	private Intent serviceIntent;
 	private Intent intent;
 	private Boolean display;
+	private String TAG = "NoteSync";
 
 	public PeerList(NoteSync noteSync, WifiP2pManager manager, Channel channel, Boolean display) {
 		this.peerList = new ArrayList<WifiP2pDevice>();
@@ -104,7 +106,9 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 
 		public static Intent intent;
 		public static NoteSync noteSync;
-		public static String host; 
+		public static String host;
+		public static String hostName;
+		public static String hostId;
 		public static boolean isGroupOwner;
 
 		public static void set(Intent intent, NoteSync noteSync, String host, boolean isGroupOwner) {
@@ -112,6 +116,11 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 			ServiceStatic.noteSync = noteSync;
 			ServiceStatic.host = host;
 			ServiceStatic.isGroupOwner = isGroupOwner;
+		}
+
+		public static void setDevice(String hostName, String hostId) {
+			ServiceStatic.hostName = hostName;
+			ServiceStatic.hostId = hostId;
 		}
 
 		public static Intent getIntent() {
@@ -124,6 +133,14 @@ public class PeerList implements PeerListListener, ConnectionInfoListener {
 
 		public static String getHost() {
 			return ServiceStatic.host;
+		}
+
+		public static String getHostName() {
+			return ServiceStatic.hostName;
+		}
+
+		public static String getHostId() {
+			return ServiceStatic.hostId;
 		}
 
 		public static boolean getIsGroupOwner() {

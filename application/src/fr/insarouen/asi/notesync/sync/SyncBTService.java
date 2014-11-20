@@ -82,6 +82,7 @@ public class SyncBTService {
 	private NoteSync notesync;
 	private TaskList originalTL;
 	private byte[] receivedTLBytes;
+	private BluetoothDevice device;
 
 	// Constants that indicate the current connection state
 	public static final int STATE_NONE = 0;       // we're doing nothing
@@ -118,6 +119,7 @@ public class SyncBTService {
 		Log.d(TAG, "Last step to sync !");
 		if (server) {
 			Log.d(TAG, "EndSync server");
+			notesync.savePeer(device.getName(), device.getAddress());
 			//doit fermer la fenêtre de synchro bt
 		} else {
 			try {
@@ -239,6 +241,8 @@ public class SyncBTService {
 			mConnectedThreadClient.start();
 
 		setState(STATE_CONNECTED);
+
+		this.device = device;
 			}
 
 	/**

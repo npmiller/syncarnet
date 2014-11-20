@@ -26,6 +26,7 @@ import android.app.ProgressDialog;
 import android.os.SystemClock;;
 import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
@@ -41,6 +42,7 @@ import java.util.List;
 import fr.insarouen.asi.notesync.*;
 import fr.insarouen.asi.notesync.tasks.*;
 import fr.insarouen.asi.notesync.sync.*;
+import fr.insarouen.asi.notesync.sync.PeerList.ServiceStatic;
 
 public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 
@@ -50,6 +52,7 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 	private PeerList peerList;
 	private ProgressDialog progressDialog; 
 	private Boolean displayPeers;
+	private String TAG = "NoteSync";
 
 	public NoteSyncBroadcastReceiver(WifiP2pManager manager, Channel channel, NoteSync noteSync, Boolean displayPeers) {
 		super();
@@ -98,6 +101,10 @@ public class NoteSyncBroadcastReceiver extends BroadcastReceiver {
 			NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
 			if (networkInfo.isConnected()) {
+				WifiP2pGroup group = (WifiP2pGroup) intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_GROUP);
+				if (group != null) {
+					ServiceStatic.setDevice(group.getOwner().deviceName, group.getOwner().deviceAddress);
+				}
 
 				// we are connected with the other device, request connection
 				// info to find group owner IP

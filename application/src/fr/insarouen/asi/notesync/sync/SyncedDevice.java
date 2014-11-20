@@ -16,19 +16,30 @@
  *
  */
 
-package fr.insarouen.asi.notesync;
+package fr.insarouen.asi.notesync.sync;
 
 import fr.insarouen.asi.notesync.tasks.*;
+import fr.insarouen.asi.notesync.*;
 import java.io.Serializable;
 import java.util.Date; // rightNow = new Date().getTime(); (In Unix Time)
 import java.util.UUID;
 
 public class SyncedDevice implements Serializable {
+	private String name;
+	private String id;
 	// unix timestamp
 	private long lastSynchronized;
 
 	public SyncedDevice() {
-		// TODO: Add all connections informations Wifi + Bluetooth
+		this.name = "NULL";
+		this.id = "NULL";
+		this.lastSynchronized = 0;
+	}
+
+	public SyncedDevice(String name, String id, long lastSynchronized) {
+		this.name = name;
+		this.id = id;
+		this.lastSynchronized = lastSynchronized;
 	}
 
 	public void updated() {
@@ -62,6 +73,7 @@ public class SyncedDevice implements Serializable {
 
 	public String toString() {
 		// The toString is used in the ArrayAdapter
-		return new Long(lastSynchronized).toString();
+		String lastSync = new Date(lastSynchronized).toLocaleString();
+		return name + R.string.lastSync + lastSync;
 	}
 }
