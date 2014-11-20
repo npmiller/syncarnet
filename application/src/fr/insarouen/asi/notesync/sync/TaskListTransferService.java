@@ -163,6 +163,7 @@ public class TaskListTransferService extends IntentService {
 		protected void onPostExecute(String result) {
 			if (result != null) {
 				noteSync.showToast(noteSync.getString(R.string.successSync));
+				noteSync.savePeer(ServiceStatic.getHostName(), ServiceStatic.getHostId());
 			}
 		}
 
