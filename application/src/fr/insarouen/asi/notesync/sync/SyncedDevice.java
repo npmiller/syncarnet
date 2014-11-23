@@ -23,23 +23,17 @@ import fr.insarouen.asi.notesync.*;
 import java.io.Serializable;
 import java.util.Date; // rightNow = new Date().getTime(); (In Unix Time)
 import java.util.UUID;
+import java.text.DateFormat;
 
 public class SyncedDevice implements Serializable {
 	private String name;
 	private String id;
-	// unix timestamp
-	private long lastSynchronized;
+	private long lastSynchronized; // unix timestamp
 
-	public SyncedDevice() {
-		this.name = "NULL";
-		this.id = "NULL";
-		this.lastSynchronized = 0;
-	}
-
-	public SyncedDevice(String name, String id, long lastSynchronized) {
+	public SyncedDevice(String name, String id) {
 		this.name = name;
 		this.id = id;
-		this.lastSynchronized = lastSynchronized;
+		this.lastSynchronized = new Date().getTime();
 	}
 
 	public void updated() {
@@ -73,7 +67,7 @@ public class SyncedDevice implements Serializable {
 
 	public String toString() {
 		// The toString is used in the ArrayAdapter
-		String lastSync = new Date(lastSynchronized).toLocaleString();
+		String lastSync = DateFormat.getDateInstance().format(new Date(lastSynchronized));
 		return name + R.string.lastSync + lastSync;
 	}
 }

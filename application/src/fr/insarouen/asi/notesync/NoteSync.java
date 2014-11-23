@@ -229,7 +229,7 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	}
 
 	public void savePeer(String name, String id) {
-		this.savedPeers.add(new SyncedDevice(name, id, new Date().getTime()));
+		this.savedPeers.add(new SyncedDevice(name, id));
 	}
 
 	/* Menu callbacks */
