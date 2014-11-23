@@ -232,6 +232,23 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		this.savedPeers.add(new SyncedDevice(name, id));
 	}
 
+	/**
+	 * Return a timestamp corresponding to the saved peer that
+	 * hasn't been synchronized for the longest time.
+	 */
+	public long oldestSync() {
+		if (savedPeers.size() == 0)
+			return 0;
+
+		long timestamp = new Date().getTime();
+		for (SyncedDevice sd : savedPeers) {
+			if (sd.lastSynchronized() < timestamp) {
+				timestamp = sd.lastSynchronized();
+			}
+		}
+		return timestamp;
+	}
+
 	/* Menu callbacks */
 	@Override
 	public void onAddClick() {
