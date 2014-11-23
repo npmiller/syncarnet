@@ -61,7 +61,6 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 	public void removeTask(int position) {
 		origTasks.remove(tasks.remove(position));
 		notifyDataSetChanged();
-		projects.notifyDataSetChanged();
 		if(getCount() == 0) {
 			resetData();
 		}
@@ -126,6 +125,12 @@ public class TaskListAdapter extends BaseAdapter implements Filterable {
 	@Override
 	public Filter getFilter() {
 		return new ProjectFilter();
+	}
+
+	@Override
+	public void notifyDataSetChanged() {
+		projects.notifyDataSetChanged();
+		super.notifyDataSetChanged();
 	}
 
 	private class ProjectFilter extends Filter {
