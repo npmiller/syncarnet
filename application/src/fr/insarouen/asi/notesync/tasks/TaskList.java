@@ -80,6 +80,18 @@ public class TaskList extends ArrayList<Task> implements Serializable {
 	}
 
 	/**
+	 * Removes a task from the TaskList and stores its UUID, also
+	 * removes the given project from the project list (useful when changing
+	 * a task's project).
+	 */
+	public boolean remove(Object o, String project) {
+		boolean r = super.remove(o);
+		deletedTasks.add(((Task)o).getUUID());
+		cleanProjects(project);
+		return r;
+	}
+
+	/**
 	 * Removes a task from the TaskList and stores its UUID
 	 */
 	@Override

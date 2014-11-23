@@ -178,8 +178,8 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	  @param Task The new task
 	  */
 	@Override
-	public void replaceTask(Task t) {
-		tasks.remove(t); // We need to do this to update the position of the task as well as the projet list
+	public void replaceTask(Task t, String old_project) {
+		tasks.remove(t, old_project); // We need to do this to update the position of the task as well as the projet list
 		tasks.add(t);
 		adapter.notifyDataSetChanged();
 

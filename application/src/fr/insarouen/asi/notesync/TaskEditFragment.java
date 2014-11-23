@@ -49,7 +49,7 @@ public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDat
 	private EditText description = null;
 
 	public interface Callbacks {
-		public void replaceTask(Task t);
+		public void replaceTask(Task t, String old_project);
 	}
 
 	public TaskEditFragment() {
@@ -125,12 +125,13 @@ public class TaskEditFragment extends Fragment implements DatePickerDialog.OnDat
 				toast.show();
 			} else {
 				String p = project.getText().toString().trim();
+				String old_project = task.getProject();
 				int pos = priority.getSelectedItemPosition();
 				task.setDescription(d);
 				task.setDue(cal);
 				task.setProject(p);
 				task.setPriority(PrioritySpinnerHelper.getPriority(pos));
-				((Callbacks)getActivity()).replaceTask(task);
+				((Callbacks)getActivity()).replaceTask(task, old_project);
 			}
 		}
 	}
