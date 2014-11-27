@@ -228,10 +228,6 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 		savedPeers.remove(pos);
 	}
 
-	public void savePeer(String name, String id) {
-		this.savedPeers.add(new SyncedDevice(name, id));
-	}
-
 	/**
 	 * Return a timestamp corresponding to the saved peer that
 	 * hasn't been synchronized for the longest time.
@@ -344,4 +340,24 @@ public class NoteSync extends Activity implements TaskAddFragment.Callbacks, Tas
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		syncService.onBTActivityResult(requestCode, resultCode, data);
 	}
+
+	//synced devices part
+	public void savePeer(String name, String id) {
+		this.savedPeers.add(new SyncedDevice(name, id));
+	}
+
+	public boolean knowPeer(String id) {
+		for (SyncedDevice sd : this.savedPeers) {
+			if (id.equals(sd.getId())) return true;
+		}
+		return false;
+	}
+
+	public SyncedDevice getPeer(String id) {
+		for (SyncedDevice sd : this.savedPeers) {
+			if (id.equals(sd.getId())) return sd;
+		}
+		return null;
+	}
+
 }

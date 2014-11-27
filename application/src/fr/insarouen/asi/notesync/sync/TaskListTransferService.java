@@ -70,7 +70,14 @@ public class TaskListTransferService extends IntentService {
 		} else {
 			try {
 				TaskList originalTL = new TaskList();
-				String originalTLString = noteSync.getTasks().jsonify();
+				String originalTLString;
+				if (noteSync.knowPeer(ServiceStatic.getHostId())) {
+					originalTLString = noteSync.getPeer(ServiceStatic.getHostId()).buildDifferentialTaskList(noteSync.getTasks()).jsonify();
+					Log.d(TAG, "Built differential TaskList");
+				} else {
+					originalTLString = noteSync.getTasks().jsonify();
+					Log.d(TAG, "Device not already known");
+				}
 				socket.bind(null);
 				socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
 
@@ -87,6 +94,7 @@ public class TaskListTransferService extends IntentService {
 				noteSync.runOnUiThread(new SetTaskListRun(noteSync, mergedTL));
 
 				noteSync.showToast(noteSync.getString(R.string.successSync));
+				noteSync.savePeer(ServiceStatic.getHostName(), ServiceStatic.getHostId());
 			} catch (IOException e) {
 				noteSync.showToast(noteSync.getString(R.string.IOException));
 				Log.e(TAG,"IOException : "+e.getStackTrace().toString());
@@ -127,7 +135,16 @@ public class TaskListTransferService extends IntentService {
 		protected String doInBackground(Void... params) {
 			try {
 				TaskList originalTL = new TaskList();
-				String originalTLString = noteSync.getTasks().jsonify();
+				//if device is already known => get differential task list
+				//device.buildDifferentialTaskList(this.taskList)
+				String originalTLString;
+				if (noteSync.knowPeer(ServiceStatic.getHostId())) {
+					originalTLString = noteSync.getPeer(ServiceStatic.getHostId()).buildDifferentialTaskList(noteSync.getTasks()).jsonify();
+					Log.d(TAG, "Built differential TaskList");
+				} else {
+					originalTLString = noteSync.getTasks().jsonify();
+					Log.d(TAG, "Device not already known");
+				}
 
 				ServerSocket serverSocket = new ServerSocket(8988);
 

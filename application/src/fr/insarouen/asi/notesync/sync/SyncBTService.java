@@ -108,7 +108,7 @@ public class SyncBTService {
 		mHandler = null;
 		originalTL = new TaskList();
 		originalTL.unJsonify(notesync.getTasks().jsonify());
-		Log.d(TAG, "taskList retrieved : "+originalTL.toString());
+		Log.d(TAG, "taskList retrieved");
 	}
 
 	public void setBytes(byte[] buffer) {
@@ -233,16 +233,16 @@ public class SyncBTService {
 			mInsecureAcceptThread = null;
 		}
 
+		this.device = device;
+
 		// Start the thread to manage the connection and perform transmissions
 		// chacun a un server et un client séparés pour envoyer et recevoir respectivement
-			mConnectedThreadServer = new ConnectedThreadServer(socket, socketType);
-			mConnectedThreadServer.start();
-			mConnectedThreadClient = new ConnectedThreadClient(socket, socketType);
-			mConnectedThreadClient.start();
+		mConnectedThreadServer = new ConnectedThreadServer(socket, socketType);
+		mConnectedThreadServer.start();
+		mConnectedThreadClient = new ConnectedThreadClient(socket, socketType);
+		mConnectedThreadClient.start();
 
 		setState(STATE_CONNECTED);
-
-		this.device = device;
 			}
 
 	/**
@@ -482,8 +482,17 @@ public class SyncBTService {
 
 			try {
 				Log.d(TAG, "Jsonifying");
-				String TLString = originalTL.jsonify();
-				Log.d(TAG, "Jsonifyed : "+TLString);
+				String TLString;
+				if (notesync.knowPeer(device.getAddress())) {
+					Log.d(TAG, "Device already known");
+					SyncedDevice connectedPeer = notesync.getPeer(device.getAddress());
+					TLString = connectedPeer.buildDifferentialTaskList(originalTL).jsonify();
+					Log.d(TAG, "Built differential TaskList");
+				} else {
+					Log.d(TAG, "Device not already known");
+					TLString = originalTL.jsonify();
+				}
+				Log.d(TAG, "Jsonifyed");
 				Log.d(TAG, "ObjectToBytes");
 				byte[] bytes = ObjectToBytes((Object) TLString);
 				int TLSize = bytes.length;

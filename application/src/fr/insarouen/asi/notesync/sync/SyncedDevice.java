@@ -44,6 +44,10 @@ public class SyncedDevice implements Serializable {
 		return this.lastSynchronized;
 	}
 
+	public String getId() {
+		return this.id;
+	}
+
 	public TaskList buildDifferentialTaskList(TaskList tl) {
 		TaskList diffTaskList = new TaskList();
 		for (Task t : tl) {
