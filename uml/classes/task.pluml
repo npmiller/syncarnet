@@ -1,5 +1,5 @@
 @startuml
-package fr.insarouen.asi.notesync.tasks {
+package fr.syncarnet.tasks {
 class Task <<Serializable>> {
 	-String description
 	-Calendar due

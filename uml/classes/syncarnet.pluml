@@ -1,0 +1,40 @@
+@startuml
+
+package fr.syncarnet {
+class SynCarnet {
+	+onCreate(Bundle)
+	+void setIsWifiP2pEnabled(boolean)
+	+boolean isWifiP2pEnabled()
+	+void setTaskList(TaskList)
+	+void onSyncBTClick()
+	+void onSyncWifiClick()
+	+void onActivityResult(int, int, Intent)
+	+void onInitiateDiscovery()
+}
+
+class TaskListAdapter {
+	-TaskList tasks
+	-TaskList origTasks
+	-LayoutInflater inflater
+	-ProjectsAdapter projects
+
+	+TaskAdapter(Context, TaskList)
+	+getCount()
+	+getItem()
+	+getItemId()
+	+getView()
+
+	+ProjectsAdapter getProjectsAdapter()
+
+	+void setTasks(TaskList)
+	+void resetData()
+	+void removeTask(int)
+
+	+Filter getFilter()
+}
+}
+SynCarnet <|-- Activity
+TaskListAdapter <|-- BaseAdapter
+TaskListAdapter <|-- Filterable
+
+@enduml

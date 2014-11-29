@@ -1,6 +1,6 @@
 @startuml
 
-package fr.insarouen.asi.notesync.sync {
+package fr.syncarnet.sync {
 
 class DeviceListActivity {
 	{static} String EXTRA_DEVICE_ADDRESS = "device_address"
@@ -12,17 +12,17 @@ class DeviceListActivity {
 
 DeviceListActivity <|- Activity
 
-class NoteSyncBroadcastReceiver {
-	+NoteSyncBroadcastReceiver NoteSyncBroadcastReceiver(WifiP2pManager, Channel, NoteSync)
+class SynCarnetBroadcastReceiver {
+	+SynCarnetBroadcastReceiver SynCarnetBroadcastReceiver(WifiP2pManager, Channel, SynCarnet)
 	+onReceive(Context, Intent)
 }
 
-NoteSyncBroadcastReceiver <|- BroadcastReceiver
+SynCarnetBroadcastReceiver <|- BroadcastReceiver
 
 interface PeerListListener
 interface ConnectionInfoListener
 class PeerList {
-	+PeerList PeerList(NoteSync, WifiP2pManager, Channel)
+	+PeerList PeerList(SynCarnet, WifiP2pManager, Channel)
 	+void setIntent(Intent)
 	+void onPeersAvailable(WifiP2pDeviceList)
 	+void onConnectionInfoAvailable(final WifiP2pInfo)
@@ -34,13 +34,13 @@ PeerList <|- ConnectionInfoListener
 'static
 class ServiceStatic {
    +{static} Intent
-   +{static} NoteSync
+   +{static} SynCarnet
    +{static} String
    +{static} boolean
 
-   +{static} void set(Intent, NoteSync, String, boolean)
+   +{static} void set(Intent, SynCarnet, String, boolean)
    +{static} Intent getIntent()
-   +{static} Intent getNoteSync()
+   +{static} Intent getSynCarnet()
    +{static} Intent getHost()
    +{static} Intent getIsGroupOwner()
 }
@@ -62,7 +62,7 @@ class PeerListDialog {
 	+Dialog onCreateDialog(Bundle)
 	+setPeerList(List<WifiP2pDevice>)
 	+boolean peerListEmpty()
-	+void reconnect(NoteSync)
+	+void reconnect(SynCarnet)
 
 	+interface OnPeerSelected
 }
@@ -70,7 +70,7 @@ class PeerListDialog {
 PeerListDialog <|- DialogFragment
 
 class PeerSelection {
-	+PeerSelection PeerSelection(WifiP2pManager, Channel, NoteSync)
+	+PeerSelection PeerSelection(WifiP2pManager, Channel, SynCarnet)
 	+void onPeerSelected(WifiP2pDevice)
 	+void setConnected()
 }
@@ -84,7 +84,7 @@ class SyncBTService {
 	+{static} final int STATE_CONNECTED = 3
 
 	+SyncBTService SyncBTService()
-	+SyncBTService SyncBTService(NoteSync)
+	+SyncBTService SyncBTService(SynCarnet)
 	+void endSync(boolean)
 	+synchronized int getState()
 	+synchronized void start()
@@ -123,7 +123,7 @@ TaskListTransferService <|- IntentService
 
 ' static public
 class TaskListAsync {
-	+TaskListAsync TaskListAsync(NoteSync)
+	+TaskListAsync TaskListAsync(SynCarnet)
 	#String doInBackground(Void...)
 	#void onPostExecute(String)
 	#void onPreExecute()
@@ -135,7 +135,7 @@ TaskListTransferService +-- TaskListAsync
 
 ' protected
 class SetTaskListRun {
-	+SetTaskListRun SetTaskListRun(NoteSync, TaskList)
+	+SetTaskListRun SetTaskListRun(SynCarnet, TaskList)
 	+void run()
 }
 

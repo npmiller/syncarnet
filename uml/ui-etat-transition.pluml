@@ -1,7 +1,7 @@
 @startuml
-[*] --> NoteSync
+[*] --> SynCarnet
 
-state NoteSync {
+state SynCarnet {
 	state "Liste des tâches" as TaskList
 	state "Ajout d'une tâche" as TaskAdd
 	state "Édition d'une tâche" as TaskEdit
@@ -11,5 +11,5 @@ state NoteSync {
 	TaskList --> TaskAdd
 	TaskAdd --> TaskList
 }
-NoteSync --> [*]
+SynCarnet --> [*]
 @enduml

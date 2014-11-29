@@ -4,6 +4,6 @@
 
 !include sync.pluml
 
-!include notesync.pluml
+!include syncarnet.pluml
 
 @enduml
