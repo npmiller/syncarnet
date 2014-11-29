@@ -44,7 +44,7 @@ import android.content.DialogInterface.OnClickListener;
 
 import android.util.Log;
 
-public class SyncedDevicesFragment extends ListFragment implements OnItemLongClickListener {
+public class SyncedDevicesFragment extends ListFragment {
 
 	public interface Callbacks {
 		public ArrayList<SyncedDevice> getSyncedDevices();
@@ -62,7 +62,6 @@ public class SyncedDevicesFragment extends ListFragment implements OnItemLongCli
 				((Callbacks)getActivity()).getSyncedDevices()
 			)
 		);
-		getListView().setOnItemLongClickListener(this);
 		setHasOptionsMenu(false); // No options menu 
 	}
 
@@ -90,20 +89,7 @@ public class SyncedDevicesFragment extends ListFragment implements OnItemLongCli
 
 		public void onClick(DialogInterface dialog, int id) {
 			((Callbacks)getActivity()).removeSyncedDevice(position);
+			((ArrayAdapter)SyncedDevicesFragment.this.getListAdapter()).notifyDataSetChanged();
 		}
-	}
-
-	public boolean onItemLongClick(AdapterView av, View v, int position, long id) {
-		//AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
-		//adb.setMessage(R.string.unpair);
-		//adb.setPositiveButton(R.string.yes, new OnListItemLongClickListener(position));
-		//adb.setNegativeButton(R.string.cancel,
-				//new OnClickListener() {
-					//public void onClick(DialogInterface dialog, int id) {
-						//dialog.cancel();
-					//}
-				//});
-		//adb.show();
-		return true;
 	}
 }
