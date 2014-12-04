@@ -343,7 +343,11 @@ public class SynCarnet extends Activity implements TaskAddFragment.Callbacks, Ta
 
 	//synced devices part
 	public void savePeer(String name, String id) {
-		this.savedPeers.add(new SyncedDevice(name, id));
+		if (knowPeer(id)) {
+			updatePeer(id);
+		} else {
+			this.savedPeers.add(new SyncedDevice(name, id));
+		}
 	}
 
 	public boolean knowPeer(String id) {
@@ -351,6 +355,20 @@ public class SynCarnet extends Activity implements TaskAddFragment.Callbacks, Ta
 			if (id.equals(sd.getId())) return true;
 		}
 		return false;
+	}
+
+	private void updatePeer(String id) {
+		Integer index = null;
+		for (SyncedDevice sd : this.savedPeers) {
+			if (id.equals(sd.getId())) {
+				index = savedPeers.indexOf(sd);
+			}
+		}
+		if (index != null) {
+			SyncedDevice device = savedPeers.get(index);
+			device.updated();
+			savedPeers.set(index, device);
+		}
 	}
 
 	public SyncedDevice getPeer(String id) {
