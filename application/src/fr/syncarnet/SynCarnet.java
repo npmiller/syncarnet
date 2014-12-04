@@ -285,12 +285,19 @@ public class SynCarnet extends Activity implements TaskAddFragment.Callbacks, Ta
 	}
 
 	private ArrayList<SyncedDevice> readSavedPeers() {
+		ArrayList<SyncedDevice> result = new ArrayList<SyncedDevice>();
 		try {
 			FileInputStream fis = this.openFileInput(peers_file);
 			ObjectInputStream is = new ObjectInputStream(fis);
-			return (ArrayList<SyncedDevice>)is.readObject();
+			ArrayList al = (ArrayList)is.readObject();
+			for (Object o : al) {
+				if (o instanceof SyncedDevice) {
+					result.add((SyncedDevice) o);
+				}
+			}
+			return result;
 		} catch (Exception e) {
-			return new ArrayList<SyncedDevice>();
+			return result;
 		}
 	}
 
