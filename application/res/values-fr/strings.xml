@@ -31,7 +31,6 @@
 	<string name="filter">Filtrer</string>
 	<string name="findingPeers">Recherche des pairs en cours</string>
 	<string name="IOException">Une erreur de transfert est apparue ; veuillez réessayer</string>
-	<string name="lastSync"> synchronisé le </string>
 	<string name="manageSyncedDevices">Gérer les appareils synchronisés</string>
 	<string name="needWifi">Vous avez besoin du Wifi pour utiliser ceci. Voulez-vous l\'activer ?</string>
 	<string name="nodescription">Vous devez fixez une description</string>

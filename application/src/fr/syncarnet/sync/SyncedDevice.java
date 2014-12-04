@@ -72,6 +72,6 @@ public class SyncedDevice implements Serializable {
 	public String toString() {
 		// The toString is used in the ArrayAdapter
 		String lastSyncDate = DateFormat.getDateInstance().format(new Date(lastSynchronized));
-		return name + R.string.filter + lastSyncDate;
+		return name + " (" + lastSyncDate + ")";
 	}
 }

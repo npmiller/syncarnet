@@ -31,7 +31,6 @@
 	<string name="filter">Filter</string>
 	<string name="findingPeers">Finding peers</string>
 	<string name="IOException">An error occured while transfering ; please try again</string>
-	<string name="lastSync"> sync the </string>
 	<string name="manageSyncedDevices">Manage synced devices</string>
 	<string name="needWifi">You need to Wifi to use this. Do you want to activate it ?</string>
 	<string name="nodescription">You have to define a description.</string>
