@@ -1,4 +1,4 @@
-NoteSync
+SynCarnet
 ===========
 TODO-list application with peer-to-peer synchronisation (without central server).
 
