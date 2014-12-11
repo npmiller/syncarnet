@@ -44,6 +44,7 @@
 	<string name="peeredWifi">Vous êtes déjà connecté à un pair, réactivez le wifi pour attendre une connexion d\'un autre pair</string>
 	<string name="pickdate">Choisir date d\'échéance</string>
 	<string name="project">Projet</string>
+	<string name="reconnectInfo">Choisir "Trouver un pair pour se connecter" pour se resynchroniser avec un pair encore connecté en Wifi P2P</string>
 	<string name="scanning">Recherche de pair...</string>
 	<string name="searchToSync">Trouver un pair pour se connecter</string>
 	<string name="select_device">Choisissez un pair pour vous connecter</string>

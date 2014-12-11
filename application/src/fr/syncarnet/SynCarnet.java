@@ -261,13 +261,21 @@ public class SynCarnet extends Activity implements TaskAddFragment.Callbacks, Ta
 		Toast.makeText(this, this.getString(R.string.deletedTaskCleared), Toast.LENGTH_SHORT).show();
 	}
 
-	/** Function to use in order to display toasts from other threads */
-	public void showToast(final String text) {
+	/** Functions to use in order to display toasts from other threads */
+	public void showToast(final String text, final Boolean shortLength) {
 		runOnUiThread(new Runnable() {
 			public void run() {
-				Toast.makeText(SynCarnet.this, text, Toast.LENGTH_SHORT).show();
+				if (shortLength) {
+					Toast.makeText(SynCarnet.this, text, Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(SynCarnet.this, text, Toast.LENGTH_LONG).show();
+				}
 			}
 		});
+	}
+
+	public void showToast(final String text) {
+		showToast(text, true);
 	}
 
 	/* Save and retrieve local peer list */

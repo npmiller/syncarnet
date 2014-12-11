@@ -133,6 +133,7 @@ public class SyncService {
 
 	public void onSyncWifiClick() {
 		WifiManager wifi = (WifiManager) synCarnet.getSystemService(Context.WIFI_SERVICE);
+		synCarnet.showToast(synCarnet.getString(R.string.reconnectInfo), false);
 		if (!wifi.isWifiEnabled()) {
 			enableWifiDialog();
 		} else {
@@ -145,7 +146,7 @@ public class SyncService {
 		if (!isConnected){
 			synCarnet.receiver = new SynCarnetBroadcastReceiver(manager, channel, synCarnet, false);
 			synCarnet.registerReceiver(synCarnet.receiver, synCarnet.intentFilter);
-		manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+			manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
 			@Override
 			public void onSuccess() {

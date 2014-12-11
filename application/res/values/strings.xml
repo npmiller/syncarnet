@@ -44,6 +44,7 @@
 	<string name="peeredWifi">You are already peered, reactivate wifi to wait for another peer</string>
 	<string name="pickdate">Pick due date</string>
 	<string name="project">Project</string>
+	<string name="reconnectInfo">Choose "Find peer to connect to" to resync with a peer still connected in Wifi P2P</string>
 	<string name="scanning">Scanning for devices...</string>
 	<string name="searchToSync">Find peer to connect to</string>
 	<string name="select_device">Select a device to connect</string>
