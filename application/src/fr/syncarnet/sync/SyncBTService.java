@@ -79,7 +79,7 @@ public class SyncBTService {
 	private ConnectedThreadServer mConnectedThreadServer;
 	private ConnectedThreadClient mConnectedThreadClient;
 	private int mState;
-	private SynCarnet syncarnet;
+	private SynCarnet synCarnet;
 	private TaskList originalTL;
 	private byte[] receivedTLBytes;
 	private BluetoothDevice device;
@@ -101,14 +101,14 @@ public class SyncBTService {
 		mHandler = null;
 	}
 
-	public SyncBTService(SynCarnet syncarnet) {
-		this.syncarnet = syncarnet;
+	public SyncBTService(SynCarnet synCarnet) {
+		this.synCarnet = synCarnet;
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
 		mHandler = null;
 		originalTL = new TaskList();
-		originalTL.unJsonify(syncarnet.getTasks().jsonify());
-		Log.d(TAG, "taskList retrieved");
+		originalTL.unJsonify(synCarnet.getTasks().jsonify());
+		Log.d(TAG, "TaskList retrieved");
 	}
 
 	public void setBytes(byte[] buffer) {
@@ -116,11 +116,10 @@ public class SyncBTService {
 	}
 
 	public void endSync(boolean server) {
-		Log.d(TAG, "Last step to sync !");
+		Log.d(TAG, "Last step to sync");
 		if (server) {
 			Log.d(TAG, "EndSync server");
-			syncarnet.savePeer(device.getName(), device.getAddress());
-			//doit fermer la fenêtre de synchro bt
+			synCarnet.savePeer(device.getName(), device.getAddress());
 		} else {
 			try {
 				Log.d(TAG, "Rebuilding task list");
@@ -132,9 +131,10 @@ public class SyncBTService {
 				Log.d(TAG, "Task list rebuilt");
 				TaskList mergedTL = TaskList.merge(receivedTL, originalTL);
 				Log.d(TAG, "Task list merged");
-				syncarnet.runOnUiThread(new SetTaskListRun(syncarnet, mergedTL));
+				synCarnet.runOnUiThread(new SetTaskListRun(synCarnet, mergedTL));
 
-				Log.d(TAG, "Finally sync !");
+				Log.d(TAG, "Sync done");
+				synCarnet.showToast(synCarnet.getString(R.string.successSync));
 			} catch (IOException e) {
 				Log.e(TAG, "IOException during bytesToObject", e);
 			} catch (ClassNotFoundException e) {
@@ -162,7 +162,7 @@ public class SyncBTService {
 	 * Start the chat service. Specifically start AcceptThread to begin a
 	 * session in listening (server) mode. Called by the Activity onResume() */
 	public synchronized void start() {
-		if (D) Log.d(TAG, "start");
+		if (D) Log.d(TAG, "Start");
 
 		// Cancel any thread attempting to make a connection
 		if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
@@ -190,7 +190,7 @@ public class SyncBTService {
 	 * @param secure Socket Security type - Secure (true) , Insecure (false)
 	 */
 	public synchronized void connect(BluetoothDevice device, boolean secure) {
-		if (D) Log.d(TAG, "connect to: " + device);
+		if (D) Log.d(TAG, "Connect to: " + device);
 
 		// Cancel any thread attempting to make a connection
 		if (mState == STATE_CONNECTING) {
@@ -214,7 +214,7 @@ public class SyncBTService {
 	 */
 	public synchronized void connected(BluetoothSocket socket, BluetoothDevice
 			device, final String socketType, boolean server) {
-		if (D) Log.d(TAG, "connected, Socket Type:" + socketType);
+		if (D) Log.d(TAG, "Connected, Socket Type:" + socketType);
 
 		// Cancel the thread that completed the connection
 		if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
@@ -249,7 +249,7 @@ public class SyncBTService {
 	 * Stop all threads
 	 */
 	public synchronized void stop() {
-		if (D) Log.d(TAG, "stop");
+		if (D) Log.d(TAG, "Stop");
 
 		if (mConnectThread != null) {
 			mConnectThread.cancel();
@@ -424,7 +424,7 @@ public class SyncBTService {
 				try {
 					mmSocket.close();
 				} catch (IOException e2) {
-					Log.e(TAG, "unable to close() " + mSocketType +
+					Log.e(TAG, "Unable to close() " + mSocketType +
 							" socket during connection failure", e2);
 				}
 				connectionFailed();
@@ -459,7 +459,7 @@ public class SyncBTService {
 		private final OutputStream mmOutStream;
 
 		public ConnectedThreadServer(BluetoothSocket socket, String socketType) {
-			Log.d(TAG, "create ConnectedThreadServer: " + socketType);
+			Log.d(TAG, "Create ConnectedThreadServer: " + socketType);
 			mmSocket = socket;
 			//InputStream tmpIn = null;
 			OutputStream tmpOut = null;
@@ -469,7 +469,7 @@ public class SyncBTService {
 				//tmpIn = socket.getInputStream();
 				tmpOut = socket.getOutputStream();
 			} catch (IOException e) {
-				Log.e(TAG, "temp sockets not created", e);
+				Log.e(TAG, "Temp sockets not created", e);
 			}
 
 			//mmInStream = tmpIn;
@@ -481,11 +481,12 @@ public class SyncBTService {
 			byte[] buffer;
 
 			try {
+				synCarnet.showToast(synCarnet.getString(R.string.connectingTo) + device.getName());
 				Log.d(TAG, "Jsonifying");
 				String TLString;
-				if (syncarnet.knowPeer(device.getAddress())) {
+				if (synCarnet.knowPeer(device.getAddress())) {
 					Log.d(TAG, "Device already known");
-					SyncedDevice connectedPeer = syncarnet.getPeer(device.getAddress());
+					SyncedDevice connectedPeer = synCarnet.getPeer(device.getAddress());
 					TLString = connectedPeer.buildDifferentialTaskList(originalTL).jsonify();
 					Log.d(TAG, "Built differential TaskList");
 				} else {
@@ -533,7 +534,7 @@ public class SyncBTService {
 		//private final OutputStream mmOutStream;
 
 		public ConnectedThreadClient(BluetoothSocket socket, String socketType) {
-			Log.d(TAG, "create ConnectedThreadClient: " + socketType);
+			Log.d(TAG, "Create ConnectedThreadClient: " + socketType);
 			mmSocket = socket;
 			InputStream tmpIn = null;
 			//OutputStream tmpOut = null;
@@ -543,7 +544,7 @@ public class SyncBTService {
 				tmpIn = socket.getInputStream();
 				//tmpOut = socket.getOutputStream();
 			} catch (IOException e) {
-				Log.e(TAG, "temp sockets not created", e);
+				Log.e(TAG, "Temp sockets not created", e);
 			}
 
 			mmInStream = tmpIn;
@@ -573,7 +574,7 @@ public class SyncBTService {
 				SyncBTService.this.setBytes(dataBytes);
 				Log.d(TAG, "Buffer set in outer class ");
 			} catch (IOException e) {
-				Log.e(TAG, "disconnected", e);
+				Log.e(TAG, "Disconnected", e);
 				connectionLost();
 			}
 

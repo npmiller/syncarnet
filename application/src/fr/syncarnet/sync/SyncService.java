@@ -51,7 +51,7 @@ import android.widget.Toast;
 public class SyncService {
 
 	private String TAG = "SynCarnet";
-	private SynCarnet syncarnet;
+	private SynCarnet synCarnet;
 	private WifiP2pManager manager;
 	private boolean isConnected = false;
 	private boolean isConnecting = false;
@@ -68,8 +68,8 @@ public class SyncService {
 	public SyncService() {
 	}
 
-	public SyncService(SynCarnet syncarnet, WifiP2pManager manager, Channel channel, BluetoothAdapter mBluetoothAdapter) {
-		this.syncarnet = syncarnet;
+	public SyncService(SynCarnet synCarnet, WifiP2pManager manager, Channel channel, BluetoothAdapter mBluetoothAdapter) {
+		this.synCarnet = synCarnet;
 		this.manager = manager;
 		this.channel = channel;
 		this.mBluetoothAdapter = mBluetoothAdapter;
@@ -109,19 +109,19 @@ public class SyncService {
 
 	protected void enableWifiDialog() {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(syncarnet);
-		builder.setMessage(syncarnet.getString(R.string.needWifi))
-			.setTitle(syncarnet.getString(R.string.noWifi))
+		AlertDialog.Builder builder = new AlertDialog.Builder(synCarnet);
+		builder.setMessage(synCarnet.getString(R.string.needWifi))
+			.setTitle(synCarnet.getString(R.string.noWifi))
 			.setCancelable(false)
-			.setPositiveButton(syncarnet.getString(R.string.yes),
+			.setPositiveButton(synCarnet.getString(R.string.yes),
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							Intent i = new Intent(Settings.ACTION_WIFI_SETTINGS);
-							syncarnet.startActivity(i);
+							synCarnet.startActivity(i);
 						}
 			}
 			)
-			.setNegativeButton(syncarnet.getString(R.string.no),
+			.setNegativeButton(synCarnet.getString(R.string.no),
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 						}
@@ -132,54 +132,54 @@ public class SyncService {
 	}
 
 	public void onSyncWifiClick() {
-		WifiManager wifi = (WifiManager) syncarnet.getSystemService(Context.WIFI_SERVICE);
+		WifiManager wifi = (WifiManager) synCarnet.getSystemService(Context.WIFI_SERVICE);
 		if (!wifi.isWifiEnabled()) {
 			enableWifiDialog();
 		} else {
 			DialogFragment choiceFragment = new WifiActionChoiceDialog();
-			choiceFragment.show(syncarnet.getFragmentManager(), "actionSyncChoice");
+			choiceFragment.show(synCarnet.getFragmentManager(), "actionSyncChoice");
 		}
 	}
 
 	public void wifiDiscoverable() {
 		if (!isConnected){
-			syncarnet.receiver = new SynCarnetBroadcastReceiver(manager, channel, syncarnet, false);
-			syncarnet.registerReceiver(syncarnet.receiver, syncarnet.intentFilter);
+			synCarnet.receiver = new SynCarnetBroadcastReceiver(manager, channel, synCarnet, false);
+			synCarnet.registerReceiver(synCarnet.receiver, synCarnet.intentFilter);
 		manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
 			@Override
 			public void onSuccess() {
-				Toast.makeText(syncarnet, syncarnet.getString(R.string.wifiDiscoverable),
+				Toast.makeText(synCarnet, synCarnet.getString(R.string.wifiDiscoverable),
 						Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
 			public void onFailure(int reasonCode) {
-				Toast.makeText(syncarnet, syncarnet.getString(R.string.discoveryFailed),
+				Toast.makeText(synCarnet, synCarnet.getString(R.string.discoveryFailed),
 						Toast.LENGTH_SHORT).show();
 				Log.d("SynCarnet","Discovery failed : "+reasonCode);
-				if (syncarnet.progressDialog != null && syncarnet.progressDialog.isShowing()) {
-					syncarnet.progressDialog.dismiss();
+				if (synCarnet.progressDialog != null && synCarnet.progressDialog.isShowing()) {
+					synCarnet.progressDialog.dismiss();
 				}
 			}
 		});
 		} else {
-			Toast.makeText(this.syncarnet, syncarnet.getString(R.string.peeredWifi), Toast.LENGTH_SHORT).show();
+			Toast.makeText(this.synCarnet, synCarnet.getString(R.string.peeredWifi), Toast.LENGTH_SHORT).show();
 		}
 	}
 
 	public void wifiConnectToPeer() {
 		if (!isConnected){
-			syncarnet.receiver = new SynCarnetBroadcastReceiver(manager, channel, syncarnet, true);
-			syncarnet.registerReceiver(syncarnet.receiver, syncarnet.intentFilter);
+			synCarnet.receiver = new SynCarnetBroadcastReceiver(manager, channel, synCarnet, true);
+			synCarnet.registerReceiver(synCarnet.receiver, synCarnet.intentFilter);
 			onInitiateDiscovery();
 		} else {
-			syncarnet.peerListDialog.reconnect(syncarnet);
+			synCarnet.peerListDialog.reconnect(synCarnet);
 		}
 	}
 
 	public void onInitiateDiscovery() {
-		syncarnet.progressDialog = ProgressDialog.show(syncarnet, syncarnet.getString(R.string.backCancel), syncarnet.getString(R.string.findingPeers), true,
+		synCarnet.progressDialog = ProgressDialog.show(synCarnet, synCarnet.getString(R.string.backCancel), synCarnet.getString(R.string.findingPeers), true,
 				true, new DialogInterface.OnCancelListener() {
 					@Override
 					public void onCancel(DialogInterface dialog) {
@@ -190,17 +190,17 @@ public class SyncService {
 
 			@Override
 			public void onSuccess() {
-				Toast.makeText(syncarnet, syncarnet.getString(R.string.discoveryInitiated),
+				Toast.makeText(synCarnet, synCarnet.getString(R.string.discoveryInitiated),
 						Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
 			public void onFailure(int reasonCode) {
-				Toast.makeText(syncarnet, syncarnet.getString(R.string.discoveryFailed),
+				Toast.makeText(synCarnet, synCarnet.getString(R.string.discoveryFailed),
 						Toast.LENGTH_SHORT).show();
 				Log.d("SynCarnet","Discovery failed : "+reasonCode);
-				if (syncarnet.progressDialog != null && syncarnet.progressDialog.isShowing()) {
-					syncarnet.progressDialog.dismiss();
+				if (synCarnet.progressDialog != null && synCarnet.progressDialog.isShowing()) {
+					synCarnet.progressDialog.dismiss();
 				}
 			}
 		});
@@ -233,27 +233,27 @@ public class SyncService {
 	public void onSyncBTClick() {
 		if (!mBluetoothAdapter.isEnabled()) {
 			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			syncarnet.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+			synCarnet.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
 		} else {
 			DialogFragment choiceFragment = new BtActionChoiceDialog();
-			choiceFragment.show(syncarnet.getFragmentManager(), "actionSyncChoice");
+			choiceFragment.show(synCarnet.getFragmentManager(), "actionSyncChoice");
 		}
 	}
 
 	public void btDiscoverable() {
 		ensureDiscoverable();
-		mBTService = new SyncBTService(syncarnet);
+		mBTService = new SyncBTService(synCarnet);
 		mBTService.start();
 	}
 
 	public void btConnectToPeer() {
 		// If BT is not on, request that it be enabled.
 		// setupChat() will then be called during onActivityResult
-		mBTService = new SyncBTService(syncarnet);
+		mBTService = new SyncBTService(synCarnet);
 		mBTService.start();
 		Intent serverIntent = null;
-		serverIntent = new Intent(syncarnet, fr.syncarnet.sync.DeviceListActivity.class);
-		syncarnet.startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+		serverIntent = new Intent(synCarnet, fr.syncarnet.sync.DeviceListActivity.class);
+		synCarnet.startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 	}
 
 	public void onBTActivityResult(int requestCode, int resultCode, Intent data) {
@@ -274,7 +274,7 @@ public class SyncService {
 				// When the request to enable Bluetooth returns
 				if (resultCode == Activity.RESULT_OK) {
 					DialogFragment choiceFragment = new BtActionChoiceDialog();
-					choiceFragment.show(syncarnet.getFragmentManager(), "actionSyncChoice");
+					choiceFragment.show(synCarnet.getFragmentManager(), "actionSyncChoice");
 				} else {
 					// User did not enable Bluetooth or an error occurred
 				}
@@ -295,37 +295,37 @@ public class SyncService {
 		if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
 			Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 			discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-			syncarnet.startActivity(discoverableIntent);
+			synCarnet.startActivity(discoverableIntent);
 		}
 	}
 
 	//various methods used for verbosity in sync
 
 	public ProgressDialog getProgressDialog() {
-		return this.syncarnet.progressDialog;
+		return this.synCarnet.progressDialog;
 	}
 
 	public void setProgressDialog(ProgressDialog progressDialog) {
-		this.syncarnet.progressDialog = progressDialog;
+		this.synCarnet.progressDialog = progressDialog;
 	}
 
 	public void onPeerSelection(PeerListDialog peerListDialog) {
-		if (syncarnet.peerListDialog == null) {
-			syncarnet.peerListDialog = peerListDialog;
-			if (!isConnected && !isConnecting && !syncarnet.peerListDialog.peerListEmpty())
-				syncarnet.peerListDialog.show(syncarnet.getFragmentManager(), "PeerListDialog");
+		if (synCarnet.peerListDialog == null) {
+			synCarnet.peerListDialog = peerListDialog;
+			if (!isConnected && !isConnecting && !synCarnet.peerListDialog.peerListEmpty())
+				synCarnet.peerListDialog.show(synCarnet.getFragmentManager(), "PeerListDialog");
 		}
 	}
 
 	public void setConnected(boolean isConnected) {
 		this.isConnected = isConnected;
 		if (isConnected){
-			if (syncarnet.peerListDialog != null) {
-				syncarnet.peerListDialog.getPeerSelection().setConnected();
-				syncarnet.peerListDialog.dismiss();
+			if (synCarnet.peerListDialog != null) {
+				synCarnet.peerListDialog.getPeerSelection().setConnected();
+				synCarnet.peerListDialog.dismiss();
 			}
-			if (syncarnet.progressDialog != null && syncarnet.progressDialog.isShowing()) {
-				syncarnet.progressDialog.dismiss();
+			if (synCarnet.progressDialog != null && synCarnet.progressDialog.isShowing()) {
+				synCarnet.progressDialog.dismiss();
 			}
 		}
 	}

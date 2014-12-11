@@ -19,11 +19,11 @@
 	<string name="clearFilter">Supprimer les filtres</string>
 	<string name="connectFailed">La connexion a échoué ; veuillez réessayer</string>
 	<string name="connectingTo">Connexion à : </string>
-	<string name="connexionSuccessful">Connection effectuée avec succès</string>
+	<string name="connexionSuccessful">Connexion effectuée avec succès</string>
 	<string name="dateCleared">Date d\'échéance supprimée</string>
 	<string name="deletedTaskCleared">Cache des tâches supprimées vidé.</string>
 	<string name="description">Description</string>
-	<string name="discoverable">Attendre une connection</string>
+	<string name="discoverable">Attendre une connexion</string>
 	<string name="discoveryFailed">La découverte des pairs à échoué ; veuillez réactiver le Wifi et réessayer </string>
 	<string name="discoveryInitiated">Découverte des pairs lancée</string>
 	<string name="done">Fini ?</string>
