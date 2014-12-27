@@ -83,6 +83,7 @@ public class SyncBTService {
 	private TaskList originalTL;
 	private byte[] receivedTLBytes;
 	private BluetoothDevice device;
+	private Boolean isServer;
 
 	// Constants that indicate the current connection state
 	public static final int STATE_NONE = 0;       // we're doing nothing
@@ -236,11 +237,16 @@ public class SyncBTService {
 		this.device = device;
 
 		// Start the thread to manage the connection and perform transmissions
-		// chacun a un server et un client séparés pour envoyer et recevoir respectivement
-		mConnectedThreadServer = new ConnectedThreadServer(socket, socketType);
-		mConnectedThreadServer.start();
-		mConnectedThreadClient = new ConnectedThreadClient(socket, socketType);
-		mConnectedThreadClient.start();
+		// chacun a un serveur et un client séparés pour envoyer et recevoir respectivement
+		// le serveur fait d'abord le thread server puis le thread client, l'inverse pour le client ; 
+		// pour permettre de faire les 2 threads à la suite et essayer d'accélérer
+		if (isServer) {
+			mConnectedThreadServer = new ConnectedThreadServer(socket, socketType);
+			mConnectedThreadServer.start();
+		} else {
+			mConnectedThreadClient = new ConnectedThreadClient(socket, socketType);
+			mConnectedThreadClient.start();
+		}
 
 		setState(STATE_CONNECTED);
 			}
@@ -345,6 +351,7 @@ public class SyncBTService {
 							case STATE_LISTEN:
 							case STATE_CONNECTING:
 								// Situation normal. Start the connected thread.
+								SyncBTService.this.isServer = true;
 								connected(socket, socket.getRemoteDevice(),
 										mSocketType, true);
 								break;
@@ -419,6 +426,7 @@ public class SyncBTService {
 				// This is a blocking call and will only return on a
 				// successful connection or an exception
 				mmSocket.connect();
+				SyncBTService.this.isServer = false;
 			} catch (IOException e) {
 				// Close the socket
 				try {
@@ -455,12 +463,14 @@ public class SyncBTService {
 	 */
 	private class ConnectedThreadServer extends Thread {
 		private final BluetoothSocket mmSocket;
+		private final String mmSocketType;
 		//private final InputStream mmInStream;
 		private final OutputStream mmOutStream;
 
 		public ConnectedThreadServer(BluetoothSocket socket, String socketType) {
 			Log.d(TAG, "Create ConnectedThreadServer: " + socketType);
 			mmSocket = socket;
+			mmSocketType = socketType;
 			//InputStream tmpIn = null;
 			OutputStream tmpOut = null;
 
@@ -510,6 +520,10 @@ public class SyncBTService {
 			} catch (IOException e) {
 				Log.e(TAG, "Exception during write", e);
 			}
+			if (SyncBTService.this.isServer) {
+				mConnectedThreadClient = new ConnectedThreadClient(mmSocket, mmSocketType);
+				mConnectedThreadClient.start();
+			}
 
 			SyncBTService.this.endSync(true);
 		}
@@ -530,12 +544,14 @@ public class SyncBTService {
 	 */
 	private class ConnectedThreadClient extends Thread {
 		private final BluetoothSocket mmSocket;
+		private final String mmSocketType;
 		private final InputStream mmInStream;
 		//private final OutputStream mmOutStream;
 
 		public ConnectedThreadClient(BluetoothSocket socket, String socketType) {
 			Log.d(TAG, "Create ConnectedThreadClient: " + socketType);
 			mmSocket = socket;
+			mmSocketType = socketType;
 			InputStream tmpIn = null;
 			//OutputStream tmpOut = null;
 
@@ -576,6 +592,10 @@ public class SyncBTService {
 			} catch (IOException e) {
 				Log.e(TAG, "Disconnected", e);
 				connectionLost();
+			}
+			if (!SyncBTService.this.isServer) {
+				mConnectedThreadServer = new ConnectedThreadServer(mmSocket, mmSocketType);
+				mConnectedThreadServer.start();
 			}
 
 			SyncBTService.this.endSync(false);
