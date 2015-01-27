@@ -2,12 +2,22 @@ SynCarnet
 ===========
 TODO-list application with peer-to-peer synchronisation (without central server).
 
+Installation
+------------
+
+Syncarnet is available on [FDroid](https://f-droid.org/).
+
+Building
+--------
+
 To compile the code into an ``apk``, place yourself in the application directory and use the ant tool:
 ```bash
 ant debug
 ```
 You can then find the ``apk`` in the bin folder.
 
+Running tests
+-------------
 To run the test suite, first you need to compile the application, then place yourself in the tests folder and simply type:
 ```bash
 make                # build the tests
